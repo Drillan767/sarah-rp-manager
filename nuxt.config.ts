@@ -3,6 +3,7 @@ export default defineNuxtConfig({
     modules: [
         '@nuxtjs/supabase',
         'dayjs-nuxt',
+        '@nuxtjs/tailwindcss'
     ],
 
     css: [
