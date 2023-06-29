@@ -10,5 +10,18 @@ export default defineNuxtConfig({
         '~/assets/scss/main.scss'
     ],
 
+    app: {
+        head: {
+            titleTemplate: '%s | Le Jardin de Sarah',
+        }
+    },
+
+    runtimeConfig: {
+        public: {
+            supabaseURl: process.env.SUPABASE_URL,
+            supabaseKey: process.env.SUPABASE_KEY,
+        },
+    },
+
     devtools: { enabled: true }
 })

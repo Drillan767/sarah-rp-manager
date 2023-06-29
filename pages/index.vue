@@ -1,5 +1,8 @@
 <template>
     <div class="container-fluid">
+        <button @click="logout">
+            Déconnexion
+        </button>
         <h2>I am loaded from a page!</h2>
 
         <!-- Button trigger js modal -->
@@ -34,3 +37,15 @@
 
     </div>
 </template>
+
+<script setup>
+const router = useRouter()
+const supabase = useSupabaseAuthClient()
+
+const logout = async() => {
+
+    const { error } = await supabase.auth.signOut()
+    router.push('/connexion')
+}
+
+</script>

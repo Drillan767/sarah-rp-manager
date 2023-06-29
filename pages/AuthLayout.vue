@@ -1,0 +1,26 @@
+<template>
+    <div class="lg:flex">
+        <div class="lg:w-1/2 xl:max-w-screen-sm">
+            <div class="py-12 bg-indigo-100 lg:bg-white flex justify-center lg:justify-start lg:px-12">
+                <div class="cursor-pointer flex items-center">
+                    <img class="rounded-full h-24 w-24"
+                        src="https://pbs.twimg.com/profile_images/1643897032950546434/mYMaG8Zl_400x400.jpg" />
+
+                    <div class="text-2xl text-indigo-800 tracking-wide ml-2 font-semibold">Le Jardin de Sarah</div>
+                </div>
+            </div>
+            <div class="mt-10 px-12 sm:px-24 md:px-48 lg:px-12 lg:mt-16 xl:px-24 xl:max-w-2xl">
+                <h2
+                    class="text-center text-4xl text-indigo-900 font-display font-semibold lg:text-left xl:text-5xl xl:text-bold">
+                    <slot name="title" />
+                </h2>
+                <div class="mt-12">
+                    <slot name="form" />
+                </div>
+            </div>
+        </div>
+        <div class="hidden lg:flex items-center justify-center bg-indigo-100 flex-1 h-screen overflow-hidden">
+            <img class="max-w-screen" src="https://images7.alphacoders.com/689/689877.jpg" />
+        </div>
+    </div>
+</template>

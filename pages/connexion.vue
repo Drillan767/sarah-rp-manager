@@ -1,40 +1,85 @@
 <template>
-    <div class="bg-gray-700 ">
-        <div class="flex min-h-screen items-center justify-center">
-            <div class="min-h-1/2 bg-gray-900  border border-gray-900 rounded-2xl">
-                <div class="mx-4 sm:mx-24 md:mx-34 lg:mx-56 mx-auto  flex items-center space-y-4 py-16 font-semibold text-gray-500 flex-col">
-                    <svg viewBox="0 0 24 24" class=" h-12 w-12 text-white" fill="currentColor">
-                        <g>
-                            <path
-                                d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z">
-                            </path>
-                        </g>
-                    </svg>
-
-                    <h1 class="text-white text-2xl">Connexion avec Twitter</h1>
-
-                    <button
-                        @click.prevent="login"
-                        class="w-full p-2 bg-gray-50 rounded-full font-bold text-gray-900 border border-gray-700 ">
+    <AuthLayout>
+        <template #title>
+            Connexion
+        </template>
+        <template #form>
+            <form @submit.prevent="login">
+                <p v-if="error !== ''" class="text-red-600 mb-4">
+                    {{ error }}
+                </p>
+                <div>
+                    <div class="text-sm font-bold text-gray-700 tracking-wide">Adresse email</div>
+                    <input v-model="email" class="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                        type="email" placeholder="mike@gmail.com">
+                </div>
+                <div class="mt-8">
+                    <div class="flex justify-between items-center">
+                        <div class="text-sm font-bold text-gray-700 tracking-wide">
+                            Mot de passe
+                        </div>
+                        <div>
+                            <a class="text-xs font-display font-semibold text-indigo-600 hover:text-indigo-800
+                                        cursor-pointer">
+                                Mot de passe oublié ?
+                            </a>
+                        </div>
+                    </div>
+                    <input v-model="password" class="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                        type="password" placeholder="Mot de passe">
+                </div>
+                <div class="mt-10">
+                    <button class="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide
+                                font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-600
+                                shadow-lg">
                         Connexion
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
+
+                <div class="mt-12 text-sm font-display font-semibold text-gray-700 text-center">
+                    Pas de compte ? <a class="cursor-pointer text-indigo-600 hover:text-indigo-800" href="/inscription">Inscription</a>
+                </div>
+            </form>
+        </template>
+    </AuthLayout>
 </template>
 
 <script setup>
-const supabase = useSupabaseAuthClient();
+import AuthLayout from './AuthLayout.vue'
 
-const login = async() => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'twitter',
+useHead({
+    title: 'Connexion'
+})
+
+const router = useRouter()
+const supabase = useSupabaseAuthClient()
+
+const email = ref('');
+const password = ref('');
+const error = ref('');
+
+/* const config = useRuntimeConfig();
+
+console.log(config.public.supabaseURl, config.public.supabaseKey);
+
+const supabase = createClient(config.public.supabaseURl, config.public.supabaseKey) */
+
+const login = async () => {
+    const { data, error: errResponse } = await supabase.auth.signInWithPassword({
+        email: email.value,
+        password: password.value,
     })
 
-    if (error) {
+    router.push('/')
+
+    if (errResponse) {
+        error.value = errResponse.message
         console.log({ error })
     }
+}
+
+const logout = () => {
+    supabase.auth.signOut();
 }
 
 </script>
