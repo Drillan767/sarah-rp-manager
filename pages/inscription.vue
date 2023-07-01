@@ -36,9 +36,7 @@
                 type="password" placeholder="Mot de passe">
         </div>
         <div class="mt-10">
-            <button class="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide
-                                font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-600 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                                shadow-lg" :disabled="!canSubmit">
+            <button class="btn" :disabled="!canSubmit">
                 Inscription
             </button>
         </div>
@@ -85,13 +83,24 @@ const submit = async () => {
     } else {
         error.value = `Format d'email incorrect`
     }
-    // ^([_a-z0-9]+[\._a-z0-9]*)(\+[a-z0-9]+)?@(([a-z0-9-]+\.)*[a-z]{2,4})$
-    /*  const { data, error } = await supabase.auth.signUp({
-         email: email.value,
-         password: password.value,
-     }) */
-    // console.log(data);
-    console.log('submitted');
 }
 
 </script>
+
+<style scoped lang="scss">
+    .btn {
+        @apply bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide font-semibold shadow-lg;
+
+        &:focus {
+            @apply outline-none;
+        }
+
+        &:disabled {
+            @apply bg-slate-50 text-slate-500 border-slate-200 shadow-none;
+        }
+
+        &:hover {
+            @apply bg-indigo-600;
+        }
+    }
+</style>
