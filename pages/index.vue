@@ -1,51 +1,36 @@
 <template>
     <div class="container-fluid">
-        <button @click="logout">
-            Déconnexion
-        </button>
-        <h2>I am loaded from a page!</h2>
+        <button @click="increment()">Incrémenter</button>
+        {{ doubleCount }}
+    </div>
 
-        <!-- Button trigger js modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            Launch demo modal
-        </button>
-
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        I am bootstrap modal using JS!
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!--  Example how you could render api data -->
-        <!--  <div v-for="video in videos.data">-->
-        <!--    <nuxt-link to="/">-->
-        <!--      Title-->
-        <!--    </nuxt-link>-->
-        <!--  </div>-->
-
+    <div>
+        <p>{{ user }}</p>
     </div>
 </template>
 
 <script setup>
+import { useCounterStore } from '@/stores/counter'
+import { useUserStore } from '@/stores/users'
+import { storeToRefs } from 'pinia'
+
+useHead({
+    title: 'Accueil'
+})
+
 const router = useRouter()
 const supabase = useSupabaseAuthClient()
+const store = useCounterStore()
+const userStore = useUserStore()
 
 const logout = async() => {
 
     const { error } = await supabase.auth.signOut()
     router.push('/connexion')
 }
+
+const { name, doubleCount } = storeToRefs(store)
+const { user } = storeToRefs(userStore)
+const { increment } = store
 
 </script>

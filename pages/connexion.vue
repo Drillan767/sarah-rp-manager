@@ -58,12 +58,6 @@ const email = ref('');
 const password = ref('');
 const error = ref('');
 
-/* const config = useRuntimeConfig();
-
-console.log(config.public.supabaseURl, config.public.supabaseKey);
-
-const supabase = createClient(config.public.supabaseURl, config.public.supabaseKey) */
-
 const login = async () => {
     const { data, error: errResponse } = await supabase.auth.signInWithPassword({
         email: email.value,
