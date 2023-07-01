@@ -103,7 +103,6 @@
 
     <main class="mt-16">
         <slot />
-        <!-- your content goes here -->
     </main>
 </template>
 
