@@ -81,16 +81,14 @@
                     </h3>
                     <ul class="mb-8 text-sm font-medium">
                         <li>
-                            <a class="flex items-center rounded py-3 pl-3 pr-4 text-gray-50 hover:bg-gray-600" href="#ex1">
-                                <span class="select-none" @click="logout">
-                                    Déconnexion
-                                </span>
-                            </a>
+                            <RouterLink to="/profil" class="flex items-center rounded py-3 pl-3 pr-4 text-gray-50 hover:bg-gray-600">
+                                Profil
+                            </RouterLink>
                         </li>
                         <li>
-                            <a class="flex items-center rounded py-3 pl-3 pr-4 text-gray-50 hover:bg-gray-600" href="#ex2">
-                                <span class="select-none">...</span>
-                            </a>
+                            <span class="flex items-center rounded cursor-pointer py-3 pl-3 pr-4 text-gray-50 hover:bg-gray-600" @click="logout()">
+                                Déconnexion
+                            </span>
                         </li>
                     </ul>
                 </div>
@@ -101,16 +99,28 @@
     </div>
     <!-- Sidebar end -->
 
-    <main class="mt-16">
+    <main class="pt-8 pb-16 lg:pt-16 lg:pb-24 bg-white dark:bg-gray-900">
         <slot />
     </main>
 </template>
 
 <script setup>
 import { useUserStore } from '@/stores/users';
-const userStore = useUserStore();
+import { storeToRefs } from 'pinia';
+
+const router = useRouter()
+const userStore = useUserStore()
+const breadcrumb = useBreadcrumb()
 
 const { logout } = userStore;
+const { loggedIn } = storeToRefs(userStore)
+
+watch(loggedIn, (newVal) => {
+    if (newVal === false) {
+        router.push('/connexion')
+    }
+})
+
 
 const showSidebar = ref(false)
 

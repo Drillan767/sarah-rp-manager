@@ -3,13 +3,9 @@
         <button @click="increment()">Incrémenter</button>
         {{ doubleCount }}
     </div>
-
-    <div>
-        <p>{{ user }}</p>
-    </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useCounterStore } from '@/stores/counter'
 import { useUserStore } from '@/stores/users'
 import { storeToRefs } from 'pinia'
@@ -21,6 +17,7 @@ useHead({
 const router = useRouter()
 const supabase = useSupabaseAuthClient()
 const store = useCounterStore()
+const breadcrumb = useBreadcrumbStore()
 const userStore = useUserStore()
 
 const logout = async() => {
@@ -30,7 +27,6 @@ const logout = async() => {
 }
 
 const { name, doubleCount } = storeToRefs(store)
-const { user } = storeToRefs(userStore)
 const { increment } = store
 
 </script>

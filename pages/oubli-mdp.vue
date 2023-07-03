@@ -30,7 +30,7 @@
     </form>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const client = useSupabaseAuthClient()
 
 useHead({
