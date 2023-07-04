@@ -1,12 +1,12 @@
 import { defineStore } from "pinia"
 
-export const useBreadcrumbStore = defineStore('breadcrumb', () => {
-    const count = ref(0)
-    const name = ref('Eduardo')
-    const doubleCount = computed(() => count.value * 2)
-    function increment() {
-        count.value++
-    }
+type Breadcrumb = {
+    url?: string,
+    title: string,
+}
 
-    return { count, name, doubleCount, increment }
+export const useBreadcrumbStore = defineStore('breadcrumb', () => {
+    const links = ref<Breadcrumb[]>([])
+
+    return { links }
 })

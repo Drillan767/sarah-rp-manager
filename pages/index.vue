@@ -7,6 +7,7 @@
 
 <script setup lang="ts">
 import { useCounterStore } from '@/stores/counter'
+import { useBreadcrumbStore } from '~~/stores/breadcrumb'
 import { useUserStore } from '@/stores/users'
 import { storeToRefs } from 'pinia'
 

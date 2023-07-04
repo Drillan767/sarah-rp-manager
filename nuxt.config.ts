@@ -6,6 +6,7 @@ export default defineNuxtConfig({
         '@nuxtjs/tailwindcss',
         '@pinia/nuxt',
         '@pinia-plugin-persistedstate/nuxt',
+        '@vee-validate/nuxt',
     ],
 
     css: [
@@ -46,6 +47,10 @@ export default defineNuxtConfig({
             supabaseURl: process.env.SUPABASE_URL,
             supabaseKey: process.env.SUPABASE_KEY,
         },
+    },
+
+    imports: {
+        dirs: ['stores']
     },
 
     devtools: { enabled: true }
