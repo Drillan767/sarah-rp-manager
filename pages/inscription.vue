@@ -12,7 +12,7 @@
         <div>
             <div class="text-sm font-bold text-gray-700 tracking-wide">Adresse email</div>
             <input v-model="email"
-                class="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500" type="email"
+                class="bg-white w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500" type="email"
                 placeholder="mike@gmail.com">
         </div>
         <div class="mt-8">
@@ -22,7 +22,7 @@
                 </div>
             </div>
             <input v-model="password"
-                class="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                class="bg-white w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
                 type="password" placeholder="Mot de passe">
         </div>
         <div class="mt-8">
@@ -32,11 +32,11 @@
                 </div>
             </div>
             <input v-model="repeatPassword"
-                class="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                class="bg-white w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
                 type="password" placeholder="Mot de passe">
         </div>
-        <div class="mt-10">
-            <button class="btn" :disabled="!canSubmit">
+        <div class="mt-10 flex justify-center">
+            <button class="btn-primary btn btn-wide" :disabled="!canSubmit">
                 Inscription
             </button>
         </div>
@@ -86,21 +86,3 @@ const submit = async () => {
 }
 
 </script>
-
-<style scoped lang="scss">
-    .btn {
-        @apply bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide font-semibold shadow-lg;
-
-        &:focus {
-            @apply outline-none;
-        }
-
-        &:disabled {
-            @apply bg-slate-50 text-slate-500 border-slate-200 shadow-none;
-        }
-
-        &:hover {
-            @apply bg-indigo-600;
-        }
-    }
-</style>

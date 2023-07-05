@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     darkMode: 'media',
-    content: [
-        'node_modules/flowbite-vue/**/*.{js,jsx,ts,tsx}',
-        'node_modules/flowbite/**/*.{js,jsx,ts,tsx}'
-    ],
+    content: [],
     theme: {
         extend: {
             colors: {
@@ -20,9 +17,9 @@ module.exports = {
                     800: "#1e40af",
                     900: "#1e3a8a",
                     950: "#172554",
-                },
-            },
-        },
+                }
+            }
+        }
     },
-    plugins: [require("flowbite/plugin")],
+    plugins: [require("daisyui")],
 };

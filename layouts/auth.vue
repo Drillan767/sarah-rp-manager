@@ -1,6 +1,6 @@
 <template>
     <div class="lg:flex">
-        <div class="lg:w-1/2 xl:max-w-screen-sm">
+        <div class="lg:w-1/2 xl:max-w-screen-sm min-h-screen bg-white ">
             <div class="py-12 bg-indigo-100 lg:bg-white flex justify-center lg:justify-start lg:px-12">
                 <div class="cursor-pointer flex items-center">
                     <img class="rounded-full h-24 w-24"

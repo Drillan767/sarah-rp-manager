@@ -53,7 +53,6 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from 'flowbite-vue'
 import { storeToRefs } from 'pinia'
 import { image, required, email, max } from '@vee-validate/rules'
 import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
