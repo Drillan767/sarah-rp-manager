@@ -1,23 +1,23 @@
 <template>
-    <section class="bg-white dark:bg-gray-900">
+    <section>
         <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
             <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Informations du profil</h2>
-            <Form @submit.prevent="submit">
+            <form @submit.prevent="submit">
                 <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
                     <div class="w-full">
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Adresse email
                         </label>
-                        <Field name="email" type="email" rules="email|required" id="email"
-                            placeholder="sarah@gmail.com" class="input" required />
+                        <Field v-model="form.email" name="email" type="email" rules="email|required" id="email" placeholder="sarah@gmail.com"
+                            class="input input-bordered w-full max-w-xs" required />
                         <ErrorMessage name="email" class="text-red-500" />
                     </div>
                     <div class="w-full">
                         <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Pseudo
                         </label>
-                        <Field name="username" type="text" rules="required" id="username"
-                            placeholder="Sarah" class="input" required />
+                        <Field v-model="form.username" name="username" type="text" rules="required" id="username" placeholder="Sarah"
+                            class="input input-bordered w-full max-w-xs" required />
                         <ErrorMessage name="username" class="text-red-500" />
                     </div>
                     <div class="sm:col-span-2">
@@ -26,8 +26,8 @@
                             Avatar
                         </label>
                         <Field name="media" v-slot="{ handleChange }" rules="image|max:2000">
-                            <input @change="handleChange" class="file-input" aria-describedby="user_avatar_help"
-                            id="user_avatar" type="file">
+                            <input @change="handleChange" class="file-input file-input-bordered w-full"
+                                aria-describedby="user_avatar_help" accept="image/*" id="user_avatar" type="file">
                         </Field>
                         <ErrorMessage name="media" class="text-red-500" />
 
@@ -37,15 +37,15 @@
                         <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Description
                         </label>
-                        <textarea v-model="form.description" id="description" rows="8" class="textarea"
-                            placeholder="Your description here"></textarea>
+                        <textarea v-model="form.description" id="description" rows="8"
+                            class="textarea textarea-bordered w-full" placeholder="Description du personnage"></textarea>
                     </div>
                 </div>
                 <div class="flex justify-end gap-x-4 mt-4">
-                    <Button @click="editPassword" color="yellow">Modifier le mot de passe</Button>
-                    <Button color="default" type="submit">Enregistrer</Button>
+                    <button @click="editPassword" class="btn btn-warning">Modifier le mot de passe</button>
+                    <button class="btn btn-primary" type="submit">Enregistrer</button>
                 </div>
-            </Form>
+            </form>
         </div>
 
         <ChangePasswordModal />
@@ -55,10 +55,11 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { image, required, email, max } from '@vee-validate/rules'
-import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
+import { Field, ErrorMessage, defineRule, configure } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
 import ChangePasswordModal from '@/components/modal/ChangePasswordModal.vue'
 import { useBreadcrumbStore } from '@/stores/breadcrumb'
+import { useUserStore } from '@/stores/users'
 
 useHead({
     title: 'Profil',
@@ -66,6 +67,10 @@ useHead({
 
 const breadcrumb = useBreadcrumbStore()
 const { links } = storeToRefs(breadcrumb)
+
+const userStore = useUserStore()
+const { updateProfile } = userStore
+const { user } = storeToRefs(userStore)
 
 links.value = [
     {
@@ -83,8 +88,15 @@ defineRule('image', image)
 defineRule('max', max)
 
 configure({
-  generateMessage: localize('fr'),
-});
+    generateMessage: localize('fr', {
+        messages: {
+            required: 'Le champ est requis',
+            email: 'Format d\'email non valide',
+            image: 'Veuillez sélectionner une image',
+            max: 'Le fichier ne doit pas faire plus de 2 mo'
+        },
+    }),
+})
 
 const preview = ref('')
 
@@ -100,30 +112,23 @@ const displayAvatar = (e: Event) => {
 
 const file = ref<File | null>(null)
 const form = reactive({
-    email: '',
-    username: '',
-    password: '',
-    passwordRepeat: '',
-    description: '',
+    email: user.value.email,
+    username: user.value.username,
+    description: user.value.description,
 })
 
 const submit = async () => {
     const formData = new FormData()
+    formData.append('session_id', user.value.session_id)
     formData.append('email', form.email)
     formData.append('username', form.username)
-    formData.append('password', form.password)
-    formData.append('passwordRepeat', form.passwordRepeat)
     formData.append('description', form.description)
 
     if (file.value) {
         formData.append('media', file.value)
     }
 
-    await useFetch('/api/profile/update', {
-        method: 'POST',
-        body: formData
-    })
-    console.log(form)
+    updateProfile(formData)
 }
 
 const editPassword = () => {
@@ -131,3 +136,9 @@ const editPassword = () => {
 }
 
 </script>
+
+<style scoped>
+    input, textarea {
+       @apply text-gray-900 dark:text-gray-100
+    }
+</style>
