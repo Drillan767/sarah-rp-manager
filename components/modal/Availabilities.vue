@@ -26,6 +26,14 @@
 <script setup lang="ts">
 import availabilies from '@/assets/availabilities.json'
 
+// Add buttons to automatically fill checkboxes for specific scenarios
+// such as "completely free on the week end"
+// Or "Available after work"
+// The buttons will also be a checkbox refering a boolean, if the condition
+// is met manually, the checkbox will be "checked"
+// If the condition is partially checked, clicking on it will fill the rest of the condition
+
+
 type Days = {
     Lundi: string[],
     Mardi: string[],
