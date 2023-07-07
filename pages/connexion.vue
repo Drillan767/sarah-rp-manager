@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="login">
+    <form @submit.prevent="signin">
         <h2 class="text-center mb-6 text-4xl text-indigo-900 font-display font-semibold lg:text-left xl:text-5xl xl:text-bold">
             Connexion
         </h2>
@@ -45,29 +45,26 @@
 </template>
 
 <script setup lang="ts">
+import { useUserStore } from '@/stores/users';
 
 useHead({
     title: 'Connexion'
 })
 
-const router = useRouter()
-const supabase = useSupabaseAuthClient()
+const userStore = useUserStore()
 
 const email = ref('');
 const password = ref('');
 const error = ref('');
 
-const login = async () => {
-    const { data, error: errResponse } = await supabase.auth.signInWithPassword({
-        email: email.value,
-        password: password.value,
-    })
+const { login } = userStore
 
-    router.push('/')
-
-    if (errResponse) {
-        error.value = errResponse.message
-        console.log({ error })
+const signin = async () => {
+    const errorMessage = await login(email.value, password.value)
+    if (errorMessage) {
+        error.value = errorMessage
     }
 }
+
+
 </script>

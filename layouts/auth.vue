@@ -4,7 +4,7 @@
             <div class="py-12 bg-indigo-100 lg:bg-white flex justify-center lg:justify-start lg:px-12">
                 <div class="cursor-pointer flex items-center">
                     <img class="rounded-full h-24 w-24"
-                        src="https://pbs.twimg.com/profile_images/1643897032950546434/mYMaG8Zl_400x400.jpg" />
+                        src="/sarah.jpg" />
 
                     <div class="text-2xl text-indigo-800 tracking-wide ml-2 font-semibold">Le Jardin de Sarah</div>
                 </div>

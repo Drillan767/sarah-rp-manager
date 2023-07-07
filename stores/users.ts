@@ -19,32 +19,39 @@ const defaultUser = {
 
 export const useUserStore = defineStore('user', () => {
 
-    const auth = useSupabaseAuthClient()
+    const authClient = useSupabaseAuthClient()
     const client = useSupabaseClient()
     const session = useSupabaseUser();
     const router = useRouter()
 
-    /*
-        Step 1 : fetch user on login
-        Step 2 : if no user, get only email, fill the rest with default data / profile pic
-        Step 3 : On info update, store info both in Pinia and Supabase.
-        Step 4 : ... Logout I guess.
-    */
-
-
-
     const user = ref<User>({} as User)
     const loggedIn = computed(() => session !== null)
+
+    async function login(email: string, password: string) {
+        const { error: errResponse, data } = await authClient.auth.signInWithPassword({
+            email,
+            password
+        })
+
+        if (data.session || data.user) {
+            initSession()
+            router.push('/')
+        }
+
+        if (errResponse) {
+            return errResponse.message
+        }
+    }
 
     async function initSession() {
         const sessId = session.value!.id
         const sessEmail = session.value?.email
-        const { data: fetchedUser } = await useAsyncData<User|null>('user', async() => {
+        const { data: fetchedUser } = await useAsyncData<User | null>('fetchedUser', async () => {
             const { data } = await client
                 .from('users')
                 .select('*')
                 .eq('session_id', sessId)
-                .single()
+                .maybeSingle()
 
             return data
         })
@@ -53,30 +60,45 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function updateProfile(formData: FormData) {
-        const { data, error} = await useFetch('/api/profile/update', {
+        const { data } = await useFetch('/api/profile/update', {
             method: 'POST',
             body: formData
         })
 
-        console.log(data, error)
+        if (data.value && data.value.payload) {
+            user.value.email = data.value.payload.email
+            user.value.username = data.value.payload.username
+
+            console.log(data.value.payload)
+
+            if (data.value.payload.image_url) {
+                console.log('oui une image oui')
+                user.value.image_url = data.value.payload.image_url
+            }
+        }
+    }
+
+    async function updatePassword(newPassword: string) {
+        await authClient.auth.updateUser({ password: newPassword })
     }
 
     async function logout() {
-        await auth.auth.signOut();
+        await authClient.auth.signOut();
         router.push('/connexion')
     }
 
-    function checkFromServer() {
-        console.log('Yep I got reached from back end')
-    }
-
     return {
-        initSession,
+        login,
         user,
         updateProfile,
+        updatePassword,
         session,
         loggedIn,
         logout,
-        
     }
-}, { persist: true })
+},
+    {
+        persist: {
+            storage: persistedState.localStorage,
+          },
+    })

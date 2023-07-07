@@ -2,22 +2,30 @@
     <section>
         <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
             <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Informations du profil</h2>
-            <form @submit.prevent="submit">
+            <Form @submit="submit">
+                <div class="alert alert-success mb-4" v-if="success">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Informations sauvegardées</span>
+                </div>
                 <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
                     <div class="w-full">
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Adresse email
                         </label>
-                        <Field v-model="form.email" name="email" type="email" rules="email|required" id="email" placeholder="sarah@gmail.com"
-                            class="input input-bordered w-full max-w-xs" required />
+                        <Field v-model="form.email" name="email" type="email" rules="email|required" id="email"
+                            placeholder="sarah@gmail.com" class="input input-bordered w-full max-w-xs" required />
                         <ErrorMessage name="email" class="text-red-500" />
                     </div>
                     <div class="w-full">
                         <label for="username" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Pseudo
                         </label>
-                        <Field v-model="form.username" name="username" type="text" rules="required" id="username" placeholder="Sarah"
-                            class="input input-bordered w-full max-w-xs" required />
+                        <Field v-model="form.username" name="username" type="text" rules="required" id="username"
+                            placeholder="Sarah" class="input input-bordered w-full max-w-xs" required />
                         <ErrorMessage name="username" class="text-red-500" />
                     </div>
                     <div class="sm:col-span-2">
@@ -25,10 +33,14 @@
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">
                             Avatar
                         </label>
-                        <Field name="media" v-slot="{ handleChange }" rules="image|max:2000">
-                            <input @change="handleChange" class="file-input file-input-bordered w-full"
-                                aria-describedby="user_avatar_help" accept="image/*" id="user_avatar" type="file">
-                        </Field>
+                        <Field
+                            name="media"
+                            accept="image/*"
+                            class="file-input file-input-bordered w-full"
+                            type="file"
+                            rules="image|max:2000"
+                            @change="displayAvatar"
+                        />
                         <ErrorMessage name="media" class="text-red-500" />
 
                     </div>
@@ -41,46 +53,44 @@
                             class="textarea textarea-bordered w-full" placeholder="Description du personnage"></textarea>
                     </div>
                 </div>
+
+                <Availabilities />
+
                 <div class="flex justify-end gap-x-4 mt-4">
-                    <button @click="editPassword" class="btn btn-warning">Modifier le mot de passe</button>
-                    <button class="btn btn-primary" type="submit">Enregistrer</button>
+                    <button @click.prevent="editPassword" class="btn btn-warning" :disabled="loading">Modifier le mot de
+                        passe</button>
+                    <button class="btn btn-primary" type="submit" :disabled="loading">Enregistrer</button>
                 </div>
-            </form>
+            </Form>
         </div>
 
-        <ChangePasswordModal />
+        
+
+        <ChangePasswordModal
+            :show="showPasswordModal"
+            @close="showPasswordModal = false"
+            @success="passwordChanged"
+        />
     </section>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { image, required, email, max } from '@vee-validate/rules'
-import { Field, ErrorMessage, defineRule, configure } from 'vee-validate'
+import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
 import ChangePasswordModal from '@/components/modal/ChangePasswordModal.vue'
-import { useBreadcrumbStore } from '@/stores/breadcrumb'
+import Availabilities from '@/components/modal/Availabilities.vue'
 import { useUserStore } from '@/stores/users'
 
 useHead({
     title: 'Profil',
 })
 
-const breadcrumb = useBreadcrumbStore()
-const { links } = storeToRefs(breadcrumb)
 
 const userStore = useUserStore()
 const { updateProfile } = userStore
 const { user } = storeToRefs(userStore)
-
-links.value = [
-    {
-        title: 'Accueil',
-        url: '/'
-    },
-    {
-        title: 'Profil'
-    }
-]
 
 defineRule('email', email)
 defineRule('required', required)
@@ -98,6 +108,9 @@ configure({
     }),
 })
 
+const loading = ref(false)
+const success = ref(false)
+const showPasswordModal = ref(false)
 const preview = ref('')
 
 const displayAvatar = (e: Event) => {
@@ -107,7 +120,6 @@ const displayAvatar = (e: Event) => {
         file.value = files[0]
         preview.value = URL.createObjectURL(files[0])
     }
-    console.log(file)
 }
 
 const file = ref<File | null>(null)
@@ -118,6 +130,7 @@ const form = reactive({
 })
 
 const submit = async () => {
+    loading.value = true
     const formData = new FormData()
     formData.append('session_id', user.value.session_id)
     formData.append('email', form.email)
@@ -128,17 +141,25 @@ const submit = async () => {
         formData.append('media', file.value)
     }
 
-    updateProfile(formData)
+    await updateProfile(formData)
+    success.value = true
+    loading.value = false
 }
 
 const editPassword = () => {
-    console.log('ui bjr')
+    showPasswordModal.value = !showPasswordModal.value
+}
+
+const passwordChanged = () => {
+    showPasswordModal.value = false
+    success.value = true
 }
 
 </script>
 
 <style scoped>
-    input, textarea {
-       @apply text-gray-900 dark:text-gray-100
-    }
+input,
+textarea {
+    @apply text-gray-900 dark:text-gray-100
+}
 </style>

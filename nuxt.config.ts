@@ -13,6 +13,10 @@ export default defineNuxtConfig({
         '~/assets/scss/main.scss'
     ],
 
+    pinia: {
+        autoImports: ['defineStore', 'acceptHMRUpdate'],
+    },
+
     app: {
         head: {
             htmlAttrs: {

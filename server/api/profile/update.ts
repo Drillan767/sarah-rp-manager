@@ -1,6 +1,8 @@
 import type { Database } from '@/types/supabase'
 import { serverSupabaseClient } from '#supabase/server'
 
+const supabaseUrl = process.env.SUPABASE_URL
+
 export default defineEventHandler(async (event) => {
     if (!isMethod(event, 'POST')) {
         throw createError({
@@ -19,30 +21,51 @@ export default defineEventHandler(async (event) => {
 
     const payload: Record<string, string> = {}
 
-    // file should be handled beforehand.
-    // If email, update supabase auth
-
     for (const field of body) {
-        payload[field.name!.toString()] = field.data.toString()
+        const fieldName = field.name!.toString()
+        if (fieldName !== 'media') {
+            payload[fieldName] = field.data.toString()
+        }
+    }
+
+    const mediaData = body.find((field) => field.name === 'media')
+
+    if (mediaData) {
+        const avatarPath = `avatars/${payload.session_id}/${mediaData.filename}`
+
+        // Cleanup user avatar directory
+        const { error: deleteError } = await supabase
+            .storage
+            .from('medias')
+            .remove([`avatars/${payload.session_id}`])
+
+        // Upload new avatar
+        const { error: uploadError } = await supabase
+            .storage
+            .from('medias')
+            .upload(avatarPath, mediaData.data)
+
+        console.log(deleteError, uploadError)
+
+        payload.image_url = `${supabaseUrl}/storage/v1/object/public/medias/${avatarPath}`
     }
 
     // Checks if user exists in database
-    
     const { count } = await supabase
         .from('users')
         .select('*', { count: 'exact', head: true })
 
     if (count && count > 0) {
-        const sessId = payload.session_id
-        delete(payload['session_id'])
+        const {session_id, ...fields } = payload
 
-        const { error } = await supabase
+        await supabase
             .from('users')
-            .update(payload)
-            .eq('session_id', sessId)
+            .update(fields)
+            .eq('session_id', session_id)
+
     } else {
         const { session_id, email, username, description } = payload
-        const { error } = await supabase
+        await supabase
             .from('users')
             .insert({
                 session_id,
@@ -53,9 +76,9 @@ export default defineEventHandler(async (event) => {
                 description,
                 created_at: new Date().toDateString()
             })
-        console.log(error)
+
     }
 
-    return { body }
+    return { payload }
 
 })

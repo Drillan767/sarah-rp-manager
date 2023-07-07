@@ -8,7 +8,6 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import { useBreadcrumbStore } from '@/stores/breadcrumb';
 import NavBar from '@/components/modal/NavBar.vue';
 // import { useUserStore } from '@/stores/users';
 
@@ -16,9 +15,7 @@ import NavBar from '@/components/modal/NavBar.vue';
 
 const router = useRouter()
 const userStore = useUserStore()
-const { links } = useBreadcrumbStore()
 
-const { logout } = userStore;
 const { loggedIn } = storeToRefs(userStore)
 
 watch(loggedIn, (newVal) => {

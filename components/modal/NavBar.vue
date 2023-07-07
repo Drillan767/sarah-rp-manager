@@ -9,11 +9,14 @@
             </RouterLink>
         </div>
         <div class="flex-none">
-            <span class="mr-2">{{ user.username }}</span>
+            <ClientOnly>
+                <span class="mr-2">{{ user.username }}</span>
+            </ClientOnly>
+            
             <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
-                        <img src="/default-avatar.webp" />
+                        <img :src="user.image_url" />
                     </div>
                 </label>
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-200 rounded-box w-52">
@@ -42,13 +45,13 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
 import { ArrowRightOnRectangleIcon, UserCircleIcon, LockClosedIcon } from '@heroicons/vue/24/solid'
 import { useUserStore } from '@/stores/users'
 
 const userStore = useUserStore()
 
-const { logout, initSession, user } = userStore
-
-onMounted(() => initSession())
+const { logout } = userStore
+const { user } = storeToRefs(userStore)
 
 </script>

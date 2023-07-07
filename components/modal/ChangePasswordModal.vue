@@ -1,42 +1,80 @@
 <template>
-    <p>Bjr ?</p>
+    <dialog id="my_modal_1" class="modal" :class="{ 'modal-open': show }">
+        <div class="modal-box">
+            <Form @submit="submit">
+                <h3 class="font-bold text-lg mb-4">Nouveau mot de passe</h3>
+                <div class="w-full mb-4">
+                    <label for="newPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Nouveau mot de passe
+                    </label>
+                    <Field v-model="newPassword" name="newPassword" type="password" rules="required|min:6" id="newPassword"
+                        placeholder="Mot de passe" class="input input-bordered w-full" required />
+                    <ErrorMessage name="newPassword" class="text-red-500" />
+                </div>
+                <div class="w-full mb-4">
+                    <label for="repeatPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Répéter le mot de passe
+                    </label>
+                    <Field v-model="repeatPassword" name="repeatPassword" type="password" rules="required|confirmed:@newPassword" id="repeatPassword"
+                        placeholder="Répéter mot de passe" class="input input-bordered w-full" required />
+                    <ErrorMessage name="repeatPassword" class="text-red-500" />
+                </div>
+                <p class="py-4">Press ESC key or click the button below to close</p>
+                <div class="modal-action">
+                    <button class="btn" @click.prevent="emit('close')">Fermer</button>
+                    <button class="btn btn-primary" type="submit" :disabled="loading">
+                        Enregistrer
+                    </button>
+                </div>
+            </Form>
+        </div>
+    </dialog>
 </template>
 
 <script setup lang="ts">
+import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
+import { localize } from '@vee-validate/i18n'
+import { required, confirmed, min } from '@vee-validate/rules'
+import { useUserStore } from '@/stores/users';
 
-/* 
+defineProps<{ show: boolean }>()
+const emit = defineEmits<{
+    (e: 'close'): void,
+    (e: 'success'): void,
+}>()
 
- <div class="w-full">
-                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Nouveau mot de passe
-                        </label>
-                        <input type="password" v-model="form.password" id="password" class="input" placeholder="Mot de passe">
-                            <p id="helper-text-explanation" class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                Laissez vide si vous souhaitez conserver votre mot de passe
-                            </p>
-                    </div>
-                    <div class="w-full">
-                        <label for="passwordRepeat" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Répéter le nouveau mot de passe
-                        </label>
-                        <input type="password" v-model="form.passwordRepeat" id="passwordRepeat" class="input" placeholder="Répéter le mot de passe">
-                    </div>*/
+defineRule('required', required)
+defineRule('confirmed', confirmed)
+defineRule('min', min)
 
-/* const validationSchema = yup.object({
-    email: yup.string().email().required(),
-    username: yup.string().required(),
-    password: yup.string().min(6).nullable(),
-    description: yup.string().nullable(),
-    confirmPassword: yup
-        .string()
-        .test(
-            'equal',
-            'Les mots de passe ne correspondent pas',
-            function(v) {
-                const ref = yup.ref('password')
-                return v !== this.resolve(ref)
-            }) ,
-    media: 
+configure({
+    generateMessage: localize('fr', {
+        messages: {
+            required: 'Le champ est requis',
+            confirmed: 'Les mots de passe ne correspondent pas',
+            min: 'Mot de passe trop court'
+        },
+    }),
 })
- */
+
+const userStore = useUserStore()
+
+const loading = ref(false)
+const newPassword = ref('')
+const repeatPassword = ref('')
+
+const { updatePassword } = userStore
+
+const submit = async () => {
+    loading.value = true
+    await updatePassword(newPassword.value)
+    loading.value = false
+    emit('success')
+}
+
+onMounted(() => {
+    addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') emit('close')
+    })
+})
 </script>
