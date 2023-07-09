@@ -7,13 +7,13 @@ const defaultUser = {
     description: '',
     image_url: 'https://sarah-rp-manager.vercel.app/default-avatar.webp',
     availability: {
-        monday: [],
-        tuesday: [],
-        wednesday: [],
-        thursday: [],
-        friday: [],
-        saturday: [],
-        sunday: [],
+        Lundi: [],
+        Mardi: [],
+        Mercredi: [],
+        Jeudi: [],
+        Vendredi: [],
+        Samedi: [],
+        Dimanche: [],
     }
 }
 

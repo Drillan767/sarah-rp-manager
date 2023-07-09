@@ -1,3 +1,5 @@
+export type DayOfWeek = "Lundi" | "Mardi" | "Mercredi" | "Jeudi" | "Vendredi" | "Samedi" | "Dimanche"
+
 export type User = {
     image_url: string,
     description: string,
@@ -5,13 +7,5 @@ export type User = {
     is_admin: boolean,
     session_id: string,
     email: string,
-    availability: {
-        monday: string[],
-        tuesday: string[],
-        wednesday: string[],
-        thursday: string[],
-        friday: string[],
-        saturday: string[],
-        sunday: string[],
-    },
+    availability: Record<DayOfWeek, string[]>,
 }

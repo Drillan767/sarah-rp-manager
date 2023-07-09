@@ -54,7 +54,9 @@
                     </div>
                 </div>
 
-                <Availabilities />
+                <Availabilities
+                    v-model="form.availability"
+                />
 
                 <div class="flex justify-end gap-x-4 mt-4">
                     <button @click.prevent="editPassword" class="btn btn-warning" :disabled="loading">Modifier le mot de
@@ -63,8 +65,6 @@
                 </div>
             </Form>
         </div>
-
-        
 
         <ChangePasswordModal
             :show="showPasswordModal"
@@ -75,6 +75,7 @@
 </template>
 
 <script setup lang="ts">
+import type { DayOfWeek, User } from 'types'
 import { storeToRefs } from 'pinia'
 import { image, required, email, max } from '@vee-validate/rules'
 import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
@@ -87,6 +88,15 @@ useHead({
     title: 'Profil',
 })
 
+const defaultAvailabilities: User['availability'] = {
+    Lundi: [],
+    Mardi: [],
+    Mercredi: [],
+    Jeudi: [],
+    Vendredi: [],
+    Samedi: [],
+    Dimanche: [],
+}
 
 const userStore = useUserStore()
 const { updateProfile } = userStore
@@ -123,10 +133,12 @@ const displayAvatar = (e: Event) => {
 }
 
 const file = ref<File | null>(null)
+
 const form = reactive({
-    email: user.value.email,
-    username: user.value.username,
-    description: user.value.description,
+    email: '',
+    username: '',
+    description: '',
+    availability: defaultAvailabilities,
 })
 
 const submit = async () => {
@@ -136,6 +148,7 @@ const submit = async () => {
     formData.append('email', form.email)
     formData.append('username', form.username)
     formData.append('description', form.description)
+    formData.append('availability', JSON.stringify(form.availability))
 
     if (file.value) {
         formData.append('media', file.value)
@@ -154,6 +167,13 @@ const passwordChanged = () => {
     showPasswordModal.value = false
     success.value = true
 }
+
+onMounted(() => {
+    form.email = user.value.email
+    form.username = user.value.username
+    form.description = user.value.description
+    form.availability = 'Lundi' in user.value.availability ? user.value.availability : defaultAvailabilities
+})
 
 </script>
 

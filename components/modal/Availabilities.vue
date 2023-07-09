@@ -5,71 +5,92 @@
             Disponibilités
         </div>
         <div class="collapse-content">
+            <button class="btn btn-sm btn-info" :class="{ 'btn-outline': weekendEnabled === false }"
+                @click.prevent="availableOnWeekEnds(!weekendEnabled)">
+                Disponible le week-end
+            </button>
+
+            <button class="btn btn-sm btn-info ml-2" :class="{ 'btn-outline': eveningEnabled === false }"
+                @click.prevent="availableTheEvenings(!eveningEnabled)">
+                Disponible en soirée
+            </button>
+
             <div v-for="(day, i) in (availabilies.days as DayOfWeek[])" class="mb-4" :key="i">
-                <h2 class="text-xl">{{ day }}</h2>
+                <h2 class="text-xl mb-2">{{ day }}</h2>
 
                 <div class="grid grid-cols-12 grid-rows-5 gap-2">
-                    <input
-                        v-for="(hour, i) in availabilies.hours"
-                        v-model="selectedTimes[day]"
-                        type="checkbox"
-                        class="btn btn-outline btn-xs"
-                        :aria-label="hour"
-                        :value="hour"
-                        :key="i"
-                    >
+                    <input v-for="(hour, i) in availabilies.hours" v-model="formProxy[day]" type="checkbox"
+                        class="btn btn-outline btn-xs" :aria-label="hour" :value="hour" :key="i">
                 </div>
             </div>
-            <!-- <div v-for="(hours, day) in []" class="mb-4" :key="day">
-                <h2>{{ day }}</h2>
-                <div class="grid grid-cols-12 grid-rows-5 gap-2">
-                    <input
-                    v-for="(hour, i) in hours"
-                    v-model="selectedTimes"
-                    type="checkbox"
-                    class="btn btn-outline btn-xs"
-                    :aria-label="hour"
-                    :value="hour"
-                    :key="i"
-                />
-                </div>
-            </div> -->
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import type { DayOfWeek, User } from 'types'
 import availabilies from '@/assets/availabilities.json'
 
-type DayOfWeek = "Lundi" | "Mardi" | "Mercredi" | "Jeudi" | "Vendredi" | "Samedi" | "Dimanche";
+const weekDays: DayOfWeek[] = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi']
+const eveningHours = [
+    "18:30",
+    "19:00",
+    "19:30",
+    "20:00",
+    "20:30",
+    "21:00",
+    "21:30",
+    "22:00",
+    "22:30",
+    "23:00",
+    "23:30"
+];
 
-type SelectedDates = {
-    Lundi: string[],
-    Mardi: string[],
-    Mercredi: string[],
-    Jeudi: string[],
-    Vendredi: string[],
-    Samedi: string[],
-    Dimanche: string[],
+const props = defineProps<{ modelValue: User['availability'] }>()
+
+const emit = defineEmits<{ (e: 'update:modelValue', value: User['availability']): void }>()
+
+const formProxy = computed({
+    get: () => props.modelValue,
+    set: (value) => emit('update:modelValue', value),
+})
+
+const weekendEnabled = computed(() => {
+    console.log(toRaw(props.modelValue).Samedi === availabilies.hours)
+    return toRaw(props.modelValue).Samedi === availabilies.hours &&
+    toRaw(props.modelValue).Dimanche === availabilies.hours
+})
+
+const eveningEnabled = computed(() => (true))
+
+/* 
+const weekendEnabled = ref(false)
+const eveningEnabled = ref(false) */
+
+const availableOnWeekEnds = (enable: boolean) => {
+    if (enable) {
+        formProxy.value.Samedi = availabilies.hours
+        formProxy.value.Dimanche = availabilies.hours
+    } else {
+        formProxy.value.Samedi = []
+        formProxy.value.Dimanche = []
+    }
+}
+
+const availableTheEvenings = (enable: boolean) => {
+    weekDays.forEach((day) => {
+        if (enable) {
+            formProxy.value[day] = eveningHours
+        } else {
+            formProxy.value[day] = formProxy.value[day].filter((d) => !eveningHours.includes(d))
+        }
+    })
 }
 
 // Add buttons to automatically fill checkboxes for specific scenarios
-// such as "completely free on the week end"
-// Or "Available after work"
-// The buttons will also be a checkbox refering a boolean, if the condition
 // is met manually, the checkbox will be "checked"
 // If the condition is partially checked, clicking on it will fill the rest of the condition
 
-
-const selectedTimes = ref<SelectedDates>({
-    Lundi: [],
-    Mardi: [],
-    Mercredi: [],
-    Jeudi: [],
-    Vendredi: [],
-    Samedi: [],
-    Dimanche: [],
-})
 
 </script>
 
