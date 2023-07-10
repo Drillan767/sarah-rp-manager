@@ -20,7 +20,7 @@ export default defineNuxtConfig({
     app: {
         head: {
             htmlAttrs: {
-                lang: 'fr'
+                lang: 'fr',
             },
             titleTemplate: '%s | Le Jardin de Sarah',
             link: [

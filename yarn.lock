@@ -1139,9 +1139,9 @@
     cross-fetch "^3.1.5"
 
 "@supabase/gotrue-js@^2.31.0":
-  version "2.39.1"
-  resolved "https://registry.yarnpkg.com/@supabase/gotrue-js/-/gotrue-js-2.39.1.tgz#bf405396f19415b2b0aac4441a9aa6585073d680"
-  integrity sha512-qRz9mBleA/QATGKOdMAUjpn+YcbZJrTHyWQCe2hAFqJo15JIe1XziD1ZeFraRpsXwja+vONslGeynGv7H8ZZeQ==
+  version "2.39.2"
+  resolved "https://registry.yarnpkg.com/@supabase/gotrue-js/-/gotrue-js-2.39.2.tgz#16dcbca7464839d6966409b6ed885777881d0afe"
+  integrity sha512-3M0P+0EP4cQLLsEhTxn17sP3riwZ37gWUv8k7s/4vBCMhRQR6PsF9RvybVyllPqm0Z9gfZAK3y1NUS53WqurcA==
   dependencies:
     cross-fetch "^3.1.5"
 
@@ -4969,9 +4969,9 @@ open@^9.1.0:
     is-wsl "^2.2.0"
 
 openapi-typescript@^6.2.8:
-  version "6.3.2"
-  resolved "https://registry.yarnpkg.com/openapi-typescript/-/openapi-typescript-6.3.2.tgz#457d9443faa99060a49c00a580c4182bedcca708"
-  integrity sha512-cvMRbO8vBQo+mdkY3vWtH3iCWw8D5MBvkZ3Mnpgk8AEqabhDMV6gu0TE2BrvG4RmEeajFRo1iornhOPxLm7PMg==
+  version "6.3.4"
+  resolved "https://registry.yarnpkg.com/openapi-typescript/-/openapi-typescript-6.3.4.tgz#5351a73666e876206c50d8c100c8e8b2e4718882"
+  integrity sha512-icWb7WBBFr8+RxX7NZC5ez0WkTSQAScLnI33vHRLvWxkpOGKLlp94C0wcicZWzh85EoIoFjO+tujcQxo7zeZdA==
   dependencies:
     ansi-colors "^4.1.3"
     fast-glob "^3.3.0"

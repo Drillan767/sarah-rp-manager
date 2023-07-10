@@ -24,7 +24,11 @@ export default defineEventHandler(async (event) => {
     for (const field of body) {
         const fieldName = field.name!.toString()
         if (fieldName !== 'media') {
-            payload[fieldName] = field.data.toString()
+            if (fieldName === 'availability') {
+                payload['availability'] = JSON.parse(field.data.toString())
+            } else {
+                payload[fieldName] = field.data.toString()
+            }
         }
     }
 
@@ -44,8 +48,6 @@ export default defineEventHandler(async (event) => {
             .storage
             .from('medias')
             .upload(avatarPath, mediaData.data)
-
-        console.log(deleteError, uploadError)
 
         payload.image_url = `${supabaseUrl}/storage/v1/object/public/medias/${avatarPath}`
     }
@@ -71,7 +73,7 @@ export default defineEventHandler(async (event) => {
                 session_id,
                 email,
                 is_admin: false,
-                availability: [],
+                availability: {},
                 username,
                 description,
                 created_at: new Date().toDateString()

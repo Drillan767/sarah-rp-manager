@@ -55,17 +55,17 @@ const formProxy = computed({
     set: (value) => emit('update:modelValue', value),
 })
 
-const weekendEnabled = computed(() => {
-    console.log(toRaw(props.modelValue).Samedi === availabilies.hours)
-    return toRaw(props.modelValue).Samedi === availabilies.hours &&
-    toRaw(props.modelValue).Dimanche === availabilies.hours
-})
+const weekendEnabled = computed(() => (
+    isContained(availabilies.hours, formProxy.value.Samedi) && isContained(availabilies.hours, formProxy.value.Dimanche)
+))
 
-const eveningEnabled = computed(() => (true))
-
-/* 
-const weekendEnabled = ref(false)
-const eveningEnabled = ref(false) */
+const eveningEnabled = computed(() => (
+    isContained(eveningHours, formProxy.value.Lundi) &&
+    isContained(eveningHours, formProxy.value.Mardi) &&
+    isContained(eveningHours, formProxy.value.Mercredi) &&
+    isContained(eveningHours, formProxy.value.Jeudi) &&
+    isContained(eveningHours, formProxy.value.Vendredi)
+))
 
 const availableOnWeekEnds = (enable: boolean) => {
     if (enable) {
@@ -85,6 +85,10 @@ const availableTheEvenings = (enable: boolean) => {
             formProxy.value[day] = formProxy.value[day].filter((d) => !eveningHours.includes(d))
         }
     })
+}
+
+const isContained = (hours: string[], day: string[]) => {
+    return hours.every((hour) => day.includes(hour))
 }
 
 // Add buttons to automatically fill checkboxes for specific scenarios

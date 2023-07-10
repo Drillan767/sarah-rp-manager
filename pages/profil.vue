@@ -134,7 +134,7 @@ const displayAvatar = (e: Event) => {
 
 const file = ref<File | null>(null)
 
-const form = reactive({
+const form = ref({
     email: '',
     username: '',
     description: '',
@@ -145,10 +145,10 @@ const submit = async () => {
     loading.value = true
     const formData = new FormData()
     formData.append('session_id', user.value.session_id)
-    formData.append('email', form.email)
-    formData.append('username', form.username)
-    formData.append('description', form.description)
-    formData.append('availability', JSON.stringify(form.availability))
+    formData.append('email', form.value.email)
+    formData.append('username', form.value.username)
+    formData.append('description', form.value.description)
+    formData.append('availability', JSON.stringify(form.value.availability))
 
     if (file.value) {
         formData.append('media', file.value)
@@ -169,10 +169,11 @@ const passwordChanged = () => {
 }
 
 onMounted(() => {
-    form.email = user.value.email
+    form.value = Object.assign({}, user.value)
+    /* form.email = user.value.email
     form.username = user.value.username
     form.description = user.value.description
-    form.availability = 'Lundi' in user.value.availability ? user.value.availability : defaultAvailabilities
+    form.availability = 'Lundi' in user.value.availability ? user.value.availability : defaultAvailabilities */
 })
 
 </script>

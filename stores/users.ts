@@ -69,8 +69,6 @@ export const useUserStore = defineStore('user', () => {
             user.value.email = data.value.payload.email
             user.value.username = data.value.payload.username
 
-            console.log(data.value.payload)
-
             if (data.value.payload.image_url) {
                 console.log('oui une image oui')
                 user.value.image_url = data.value.payload.image_url
