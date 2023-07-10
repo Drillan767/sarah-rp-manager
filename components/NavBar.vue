@@ -12,7 +12,7 @@
             <ClientOnly>
                 <span class="mr-2">{{ user.username }}</span>
             </ClientOnly>
-            
+
             <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
@@ -28,12 +28,15 @@
                             Profil
                         </RouterLink>
                     </li>
-                    <li v-if="user.is_admin">
-                        <RouterLink to="/admin">
-                            <LockClosedIcon class="h-4 w-4" />
-                            Administration
-                        </RouterLink>
-                    </li>
+                    <ClientOnly>
+                        <li v-if="user.is_admin">
+                            <RouterLink to="/admin">
+                                <LockClosedIcon class="h-4 w-4" />
+                                Administration
+                            </RouterLink>
+                        </li>
+                    </ClientOnly>
+
                     <li>
                         <span @click="logout()" class="cursor-pointer">
                             <ArrowRightOnRectangleIcon class="h-4 w-4" />

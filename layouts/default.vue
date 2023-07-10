@@ -8,7 +8,7 @@
 
 <script setup>
 import { storeToRefs } from 'pinia';
-import NavBar from '@/components/modal/NavBar.vue';
+import NavBar from '@/components/NavBar.vue';
 // import { useUserStore } from '@/stores/users';
 
 

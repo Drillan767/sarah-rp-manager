@@ -56,6 +56,15 @@ export default defineNuxtConfig({
         },
     },
 
+    supabase: {
+        client: {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+            }
+        }
+    },
+
     imports: {
         dirs: ['stores']
     },

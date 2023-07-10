@@ -34,7 +34,7 @@ export const useUserStore = defineStore('user', () => {
         })
 
         if (data.session || data.user) {
-            initSession()
+            await initSession()
             router.push('/')
         }
 

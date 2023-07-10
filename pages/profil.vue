@@ -81,7 +81,7 @@ import { image, required, email, max } from '@vee-validate/rules'
 import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
 import ChangePasswordModal from '@/components/modal/ChangePasswordModal.vue'
-import Availabilities from '@/components/modal/Availabilities.vue'
+import Availabilities from '@/components/Availabilities.vue'
 import { useUserStore } from '@/stores/users'
 
 useHead({
