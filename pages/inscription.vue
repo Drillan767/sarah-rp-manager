@@ -55,7 +55,6 @@ useHead({
     title: 'Inscription'
 })
 
-const router = useRouter();
 const supabase = useSupabaseAuthClient()
 
 const error = ref('');

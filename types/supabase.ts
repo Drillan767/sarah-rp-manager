@@ -13,35 +13,45 @@ export interface Database {
         Row: {
           id: number
           name: string
+          roleplay_id: number
         }
         Insert: {
           id?: number
           name: string
+          roleplay_id: number
         }
         Update: {
           id?: number
           name?: string
+          roleplay_id?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "channels_roleplay_id_fkey"
+            columns: ["roleplay_id"]
+            referencedRelation: "roleplays"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       channels_users: {
         Row: {
-          channel_id: number | null
+          channel_id: number
           created_at: string | null
           id: number
-          user_id: number | null
+          users_id: number
         }
         Insert: {
-          channel_id?: number | null
+          channel_id: number
           created_at?: string | null
           id?: number
-          user_id?: number | null
+          users_id: number
         }
         Update: {
-          channel_id?: number | null
+          channel_id?: number
           created_at?: string | null
           id?: number
-          user_id?: number | null
+          users_id?: number
         }
         Relationships: [
           {
@@ -51,8 +61,8 @@ export interface Database {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "channels_users_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "channels_users_users_id_fkey"
+            columns: ["users_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -89,55 +99,61 @@ export interface Database {
           }
         ]
       }
-      roles: {
+      roleplays: {
         Row: {
           created_at: string | null
+          description: string | null
           id: number
-          max_nb_users: number
-          name: string
-          public: boolean | null
+          message_board: string | null
+          roles: Json | null
+          title: string
         }
         Insert: {
           created_at?: string | null
+          description?: string | null
           id?: number
-          max_nb_users: number
-          name: string
-          public?: boolean | null
+          message_board?: string | null
+          roles?: Json | null
+          title: string
         }
         Update: {
           created_at?: string | null
+          description?: string | null
           id?: number
-          max_nb_users?: number
-          name?: string
-          public?: boolean | null
+          message_board?: string | null
+          roles?: Json | null
+          title?: string
         }
         Relationships: []
       }
-      roles_users: {
+      roleplays_users: {
         Row: {
+          created_at: string | null
           id: number
-          role_id: number | null
-          user_id: number | null
+          roleplay_id: number
+          user_id: number
         }
         Insert: {
+          created_at?: string | null
           id?: number
-          role_id?: number | null
-          user_id?: number | null
+          roleplay_id: number
+          user_id: number
         }
         Update: {
+          created_at?: string | null
           id?: number
-          role_id?: number | null
-          user_id?: number | null
+          roleplay_id?: number
+          user_id?: number
         }
         Relationships: [
           {
-            foreignKeyName: "roles_users_role_id_fkey"
-            columns: ["role_id"]
-            referencedRelation: "roles"
+            foreignKeyName: "roleplays_users_roleplay_id_fkey"
+            columns: ["roleplay_id"]
+            referencedRelation: "roleplays"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "roles_users_user_id_fkey"
+            foreignKeyName: "roleplays_users_user_id_fkey"
             columns: ["user_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -153,6 +169,7 @@ export interface Database {
           id: number
           image_url: string | null
           is_admin: boolean | null
+          is_sarah: boolean | null
           session_id: string | null
           username: string
         }
@@ -164,6 +181,7 @@ export interface Database {
           id?: number
           image_url?: string | null
           is_admin?: boolean | null
+          is_sarah?: boolean | null
           session_id?: string | null
           username: string
         }
@@ -175,6 +193,7 @@ export interface Database {
           id?: number
           image_url?: string | null
           is_admin?: boolean | null
+          is_sarah?: boolean | null
           session_id?: string | null
           username?: string
         }
