@@ -1,63 +1,33 @@
-# Nuxt 3 Minimal Starter
+# Sarah RP Manager
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Introduction 
 
-## Setup
+This projects aim for Sarah to be able to host RP sessions with the best experience possible. 
 
-Make sure to install the dependencies:
+## Stack
 
-```bash
-# npm
-npm install
+The project runs with Nuxt 3, hosted on Vercel. The backend / database is handled by Supabase. I chose Tailwind and DaisyUI as CSS frameworks to gain some time.
 
-# pnpm
-pnpm install
+## Features
 
-# yarn
-yarn install
-```
+### Users
 
-## Development Server
+A user can create an account, edit their informations, change their profile picture, email, password, etc
 
-Start the development server on `http://localhost:3000`:
+### Sarah
 
-```bash
-# npm
-npm run dev
+Sarah is a role on her own. She can create a RP, add infos in it (title, description, roles (name and how many people can have this role). She obviously can do what other admins can do too.
 
-# pnpm
-pnpm run dev
+### Admins
 
-# yarn
-yarn dev
-```
+Admins are elected by Sarah. They can manage (edit infos, delete) users, assign roles to users and make a user switch roles. Admins cannot add other admins nor remove the admin role from other users. Only Sarah is able to do so.
 
-## Production
+### Discussion channels
 
-Build the application for production:
+Once a RP is created, 2 channels are automatically created too. One is aimed for the scenario itself, the other for members to discuss what to do next, react, etc. Sarah and the administrators can create other channels related to the RP with the person of their choice (ie: for better coordination, to signal a problem, etc).
 
-```bash
-# npm
-npm run build
+In the disccusion channel, people with multiple roles can switch between them, and other members can see the switching in real time. Administrators can also lock out members that don't have the corresponding roles. For example, if admins decide that only the juge, the lawyers, the defendant and the victim can talk, then the members with any other active role won't be able to speak (the textarea used for sending messages will be disabled, and a role verification will be made before sending each message to the backend)
 
-# pnpm
-pnpm run build
+Also, every informations will be available: the RP's title and descriptions, but also each user's profile + roles to easily see who's who and who's supposed to do what.
 
-# yarn
-yarn build
-```
 
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
