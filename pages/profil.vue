@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DayOfWeek, User } from 'types'
+import type { User } from 'types'
 import { storeToRefs } from 'pinia'
 import { image, required, email, max } from '@vee-validate/rules'
 import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
@@ -170,10 +170,6 @@ const passwordChanged = () => {
 
 onMounted(() => {
     form.value = Object.assign({}, user.value)
-    /* form.email = user.value.email
-    form.username = user.value.username
-    form.description = user.value.description
-    form.availability = 'Lundi' in user.value.availability ? user.value.availability : defaultAvailabilities */
 })
 
 </script>
