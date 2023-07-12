@@ -1,5 +1,5 @@
 import type { Database } from '@/types/supabase'
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 
 const supabaseUrl = process.env.SUPABASE_URL
 
@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
 
     const body = await readMultipartFormData(event)
     const supabase = serverSupabaseClient<Database>(event)
+    const session = await serverSupabaseUser(event)
 
     if (!body) {
         throw createError({
@@ -56,6 +57,7 @@ export default defineEventHandler(async (event) => {
     const { count } = await supabase
         .from('users')
         .select('*', { count: 'exact', head: true })
+        .eq('session_id', session!.id)
 
     if (count && count > 0) {
         const {session_id, ...fields } = payload
@@ -66,19 +68,17 @@ export default defineEventHandler(async (event) => {
             .eq('session_id', session_id)
 
     } else {
-        const { session_id, email, username, description } = payload
-        await supabase
+        const { session_id, email, username, description, availability } = payload
+        const { error: userCreationError } = await supabase
             .from('users')
             .insert({
                 session_id,
                 email,
-                is_admin: false,
-                availability: {},
+                availability,
                 username,
                 description,
                 created_at: new Date().toDateString()
             })
-
     }
 
     return { payload }

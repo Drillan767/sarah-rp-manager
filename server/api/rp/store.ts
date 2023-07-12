@@ -1,6 +1,15 @@
 import type { Database } from '@/types/supabase'
 import { serverSupabaseClient } from '#supabase/server'
 
+type Request = {
+    title: string,
+    description: string,
+    start_date: string,
+    roles: {
+        name: string,
+        max_users: number
+    }[]
+}
 
 export default defineEventHandler(async (event) => {
     if (!isMethod(event, 'POST')) {
@@ -9,18 +18,26 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    const body = await readBody(event)
+    const { title, description, roles } = await readBody<Request>(event)
     const supabase = serverSupabaseClient<Database>(event)
 
-    const { data } = await supabase
+    const { data, error } = await supabase
         .from('roleplays')
-        .insert(body)
+        .insert({
+            title,
+            description
+        })
         .select('id')
 
     if (data) {
         const [{id: rpId}] = data
 
-        const { error } = await supabase
+        const { error: rolesError } = await supabase
+            .from('roles')
+            .insert(roles.map((r) => ({ ...r, roleplay_id: rpId })))
+
+
+        const { error: channelErrors } = await supabase
             .from('channels')
             .insert([
                 {

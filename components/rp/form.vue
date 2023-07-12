@@ -17,6 +17,15 @@
         </div>
 
         <div class="w-full mb-4">
+            <label for="start_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Date de début
+            </label>
+            <Field v-model="form.start_date" name="start_date" placeholder="Date de début" type="date" rules="required" id="start_date"
+                class="input input-bordered w-full" required />
+            <ErrorMessage name="start_date" class="text-red-500" />
+        </div>
+
+        <div class="w-full mb-4">
             <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                 Description
             </label>
@@ -35,9 +44,9 @@
                     <ErrorMessage :name="`name_${i}`" class="text-red-500" />
                 </div>
                 <div class="col-start-3">
-                    <Field v-model="role.maxUsers" :name="`maxUsers_${i}`" type="number" rules="required|min_value:1"
+                    <Field v-model="role.max_users" :name="`max_users_${i}`" type="number" rules="required|min_value:1"
                         class="input input-bordered w-full" required />
-                    <ErrorMessage :name="`maxUsers_${i}`" class="text-red-500" />
+                    <ErrorMessage :name="`max_users_${i}`" class="text-red-500" />
                 </div>
                 <div class="col-start-4 flex justify-end">
                     <button @click.prevent="removeRole(i)" class="btn btn-error">
@@ -79,10 +88,11 @@ configure({
 const form = ref({
     title: '',
     description: '',
+    start_date: '',
     roles: [
         {
             name: '',
-            maxUsers: 1,
+            max_users: 1,
         }
     ]
 })
@@ -92,7 +102,7 @@ const success = ref(false)
 const addRole = () => {
     form.value.roles.push({
         name: '',
-        maxUsers: 1,
+        max_users: 1,
     })
 }
 
@@ -102,8 +112,6 @@ const removeRole = (i: number) => {
 
 
 const submit = async () => {
-    console.log(form.value)
-
     await useFetch('/api/rp/store', {
         method: 'POST',
         body: form.value

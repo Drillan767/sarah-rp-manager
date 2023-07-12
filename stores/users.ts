@@ -3,7 +3,7 @@ import { defineStore } from "pinia"
 
 const defaultUser = {
     username: 'Utilisateur anonyme',
-    is_admin: false,
+    is_sarah: false,
     description: '',
     image_url: 'https://sarah-rp-manager.vercel.app/default-avatar.webp',
     availability: {
@@ -60,20 +60,12 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function updateProfile(formData: FormData) {
-        const { data } = await useFetch('/api/profile/update', {
+        await useFetch('/api/profile/update', {
             method: 'POST',
             body: formData
         })
 
-        if (data.value && data.value.payload) {
-            user.value.email = data.value.payload.email
-            user.value.username = data.value.payload.username
-
-            if (data.value.payload.image_url) {
-                console.log('oui une image oui')
-                user.value.image_url = data.value.payload.image_url
-            }
-        }
+        await initSession()
     }
 
     async function updatePassword(newPassword: string) {
@@ -98,5 +90,5 @@ export const useUserStore = defineStore('user', () => {
     {
         persist: {
             storage: persistedState.localStorage,
-          },
+        },
     })
