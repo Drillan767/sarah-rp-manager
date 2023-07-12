@@ -29,7 +29,7 @@
                         </RouterLink>
                     </li>
                     <ClientOnly>
-                        <li v-if="user.is_admin">
+                        <li v-if="user.is_sarah">
                             <RouterLink to="/admin">
                                 <LockClosedIcon class="h-4 w-4" />
                                 Administration
