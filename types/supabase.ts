@@ -13,17 +13,20 @@ export interface Database {
         Row: {
           id: number
           name: string
-          roleplay_id: number
+          private: boolean | null
+          roleplay_id: string
         }
         Insert: {
           id?: number
           name: string
-          roleplay_id: number
+          private?: boolean | null
+          roleplay_id: string
         }
         Update: {
           id?: number
           name?: string
-          roleplay_id?: number
+          private?: boolean | null
+          roleplay_id?: string
         }
         Relationships: [
           {
@@ -71,23 +74,29 @@ export interface Database {
       messages: {
         Row: {
           created_at: string | null
+          emojis: Json | null
           id: number
           image_url: string | null
           message: string
+          read_by: Json | null
           user_id: number | null
         }
         Insert: {
           created_at?: string | null
+          emojis?: Json | null
           id?: number
           image_url?: string | null
           message: string
+          read_by?: Json | null
           user_id?: number | null
         }
         Update: {
           created_at?: string | null
+          emojis?: Json | null
           id?: number
           image_url?: string | null
           message?: string
+          read_by?: Json | null
           user_id?: number | null
         }
         Relationships: [
@@ -102,24 +111,24 @@ export interface Database {
       roleplays: {
         Row: {
           created_at: string | null
-          description: string | null
-          id: number
+          description: string
+          id: string
           message_board: string | null
           start_date: string | null
           title: string
         }
         Insert: {
           created_at?: string | null
-          description?: string | null
-          id?: number
+          description: string
+          id: string
           message_board?: string | null
           start_date?: string | null
           title: string
         }
         Update: {
           created_at?: string | null
-          description?: string | null
-          id?: number
+          description?: string
+          id?: string
           message_board?: string | null
           start_date?: string | null
           title?: string
@@ -131,21 +140,21 @@ export interface Database {
           created_at: string | null
           id: number
           is_admin: boolean
-          roleplay_id: number
+          roleplay_id: string
           user_id: number
         }
         Insert: {
           created_at?: string | null
           id?: number
           is_admin?: boolean
-          roleplay_id: number
+          roleplay_id: string
           user_id: number
         }
         Update: {
           created_at?: string | null
           id?: number
           is_admin?: boolean
-          roleplay_id?: number
+          roleplay_id?: string
           user_id?: number
         }
         Relationships: [
@@ -169,21 +178,21 @@ export interface Database {
           id: number
           max_users: number | null
           name: string
-          roleplay_id: number | null
+          roleplay_id: string
         }
         Insert: {
           created_at?: string | null
           id?: number
           max_users?: number | null
           name: string
-          roleplay_id?: number | null
+          roleplay_id: string
         }
         Update: {
           created_at?: string | null
           id?: number
           max_users?: number | null
           name?: string
-          roleplay_id?: number | null
+          roleplay_id?: string
         }
         Relationships: [
           {
