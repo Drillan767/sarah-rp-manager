@@ -17,7 +17,7 @@
                             Adresse email
                         </label>
                         <Field v-model="form.email" name="email" type="email" rules="email|required" id="email"
-                            placeholder="sarah@gmail.com" class="input input-bordered w-full max-w-xs" required />
+                            placeholder="sarah@gmail.com" class="input input-bordered w-full" required />
                         <ErrorMessage name="email" class="text-red-500" />
                     </div>
                     <div class="w-full">
@@ -25,7 +25,7 @@
                             Pseudo
                         </label>
                         <Field v-model="form.username" name="username" type="text" rules="required" id="username"
-                            placeholder="Sarah" class="input input-bordered w-full max-w-xs" required />
+                            placeholder="Sarah" class="input input-bordered w-full" required />
                         <ErrorMessage name="username" class="text-red-500" />
                     </div>
                     <div class="sm:col-span-2">

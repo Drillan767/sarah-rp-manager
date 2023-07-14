@@ -5,20 +5,23 @@
             Disponibilités
         </div>
         <div class="collapse-content">
-            <button class="btn btn-sm btn-info" :class="{ 'btn-outline': weekendEnabled === false }"
-                @click.prevent="availableOnWeekEnds(!weekendEnabled)">
-                Disponible le week-end
-            </button>
 
-            <button class="btn btn-sm btn-info ml-2" :class="{ 'btn-outline': eveningEnabled === false }"
-                @click.prevent="availableTheEvenings(!eveningEnabled)">
-                Disponible en soirée
-            </button>
+            <div class="flex justify-between md:justify-normal mb-4">
+                <button class="btn btn-xs md:btn-sm btn-info" :class="{ 'btn-outline': weekendEnabled === false }"
+                    @click.prevent="availableOnWeekEnds(!weekendEnabled)">
+                    Disponible le week-end
+                </button>
+
+                <button class="btn btn-xs md:btn-sm btn-info ml-2" :class="{ 'btn-outline': eveningEnabled === false }"
+                    @click.prevent="availableTheEvenings(!eveningEnabled)">
+                    Disponible en soirée
+                </button>
+            </div>
 
             <div v-for="(day, i) in (availabilies.days as DayOfWeek[])" class="mb-4" :key="i">
                 <h2 class="text-xl mb-2">{{ day }}</h2>
 
-                <div class="grid grid-cols-12 grid-rows-5 gap-2">
+                <div class="grid grid-cols-6 md:grid-cols-12 grid-rows-5 gap-2">
                     <input v-for="(hour, i) in availabilies.hours" v-model="formProxy[day]" type="checkbox"
                         class="btn btn-outline btn-xs" :aria-label="hour" :value="hour" :key="i">
                 </div>
@@ -90,11 +93,6 @@ const availableTheEvenings = (enable: boolean) => {
 const isContained = (hours: string[], day: string[]) => {
     return hours.every((hour) => day.includes(hour))
 }
-
-// Add buttons to automatically fill checkboxes for specific scenarios
-// is met manually, the checkbox will be "checked"
-// If the condition is partially checked, clicking on it will fill the rest of the condition
-
 
 </script>
 
