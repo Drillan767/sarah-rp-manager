@@ -32,7 +32,7 @@
                 name="confirmPassword"
                 type="password"
                 class="field"
-                rules="required|min:6|confirmed"
+                rules="required|min:6|confirmed:@password"
                 v-model="confirmPassword"
                 placeholder="Répéter mot de passe"
             />
