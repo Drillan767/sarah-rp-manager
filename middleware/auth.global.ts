@@ -1,13 +1,8 @@
 export default defineNuxtRouteMiddleware((to, _from) => {
-    const authRoutes = [
-        '/inscription',
-        '/connexion',
-        '/oubli-mdp',
-        '/nouveau-mdp',
-    ]
+    const regex = /\/(oubli-mdp|connexion|inscription|nouveau-mdp)(\#.*)?/
     const user = useSupabaseUser()
 
-    if (!authRoutes.includes(to.fullPath) && (!user.value)) return navigateTo('/connexion')
+    if (!regex.test(to.fullPath) && (!user.value)) return navigateTo('/connexion')
 
-    if (authRoutes.includes(to.fullPath) && user.value) return navigateTo('/')
+    if (regex.test(to.fullPath) && user.value) return navigateTo('/')
 })

@@ -7,15 +7,11 @@
 <script setup>
 const route = useRoute();
 
-const whichLayout = computed(() => {
-  const authRoutes = [
-    '/connexion',
-    '/inscription',
-    '/oubli-mdp',
-    '/nouveau-mdp',
-  ]
+const regex = /\/(oubli-mdp|connexion|inscription|nouveau-mdp)(\#.*)?/
 
-  return authRoutes.includes(route.fullPath) ? 'auth' : 'default'
+const whichLayout = computed(() => {
+
+  return regex.test(route.fullPath) ? 'auth' : 'default'
 })
 
 </script>
