@@ -36,21 +36,23 @@ export default defineEventHandler(async (event) => {
     const mediaData = body.find((field) => field.name === 'media')
 
     if (mediaData) {
-        const avatarPath = `avatars/${payload.session_id}/${mediaData.filename}`
+        const avatarPath = `${payload.session_id}/profile/${mediaData.filename}`
 
         // Cleanup user avatar directory
         const { error: deleteError } = await supabase
             .storage
-            .from('medias')
-            .remove([`avatars/${payload.session_id}`])
+            .from('avatars')
+            .remove([`${payload.session_id}/profile`])
+
+        console.log({ deleteError })
 
         // Upload new avatar
         const { error: uploadError } = await supabase
             .storage
-            .from('medias')
+            .from('avatars')
             .upload(avatarPath, mediaData.data)
 
-        payload.image_url = `${supabaseUrl}/storage/v1/object/public/medias/${avatarPath}`
+        payload.image_url = `${supabaseUrl}/storage/v1/object/public/avatars/${avatarPath}`
     }
 
     // Checks if user exists in database

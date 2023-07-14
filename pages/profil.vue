@@ -61,7 +61,10 @@
                 <div class="flex justify-end gap-x-4 mt-4">
                     <button @click.prevent="editPassword" class="btn btn-warning" :disabled="loading">Modifier le mot de
                         passe</button>
-                    <button class="btn btn-primary" type="submit" :disabled="loading">Enregistrer</button>
+                    <button class="btn btn-primary" type="submit" :disabled="loading">
+                        <span v-if="loading" class="loading loading-spinner"></span>
+                        Enregistrer
+                    </button>
                 </div>
             </Form>
         </div>

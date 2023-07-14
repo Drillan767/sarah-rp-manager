@@ -113,6 +113,7 @@ export interface Database {
           created_at: string | null
           description: string
           id: string
+          illustration: string
           message_board: string | null
           start_date: string | null
           title: string
@@ -121,6 +122,7 @@ export interface Database {
           created_at?: string | null
           description: string
           id: string
+          illustration: string
           message_board?: string | null
           start_date?: string | null
           title: string
@@ -129,6 +131,7 @@ export interface Database {
           created_at?: string | null
           description?: string
           id?: string
+          illustration?: string
           message_board?: string | null
           start_date?: string | null
           title?: string
