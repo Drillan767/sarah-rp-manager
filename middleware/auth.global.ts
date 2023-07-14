@@ -1,9 +1,9 @@
 export default defineNuxtRouteMiddleware((to, _from) => {
     const authRoutes = [
-        '/reinitialiser-mot-de-passe',
-        '/oubli-mdp',
+        '/inscription',
         '/connexion',
-        '/inscription'
+        '/oubli-mdp',
+        '/nouveau-mdp',
     ]
     const user = useSupabaseUser()
 

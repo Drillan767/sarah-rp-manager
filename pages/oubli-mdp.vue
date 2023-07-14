@@ -1,23 +1,33 @@
 <template>
-    <form @submit.prevent="submit">
+    <Form @submit="submit">
         <h2
             class="text-center text-4xl mb-6 text-indigo-900 font-display font-semibold lg:text-left xl:text-5xl xl:text-bold">
             Oubli du mot de passe
         </h2>
-        <p v-if="success" class="bg-green-400 p-2 mb-4 text-white">
-            Un email vous permettantde modifier votre mot de passe a été envoyé à l'adresse email indiquée.
-        </p>
+        <div v-if="success" class="alert alert-success mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>
+                Un email vous permettant de réinitialiser votre mot de passe a été envoyé à l'adresse email indiquée.
+            </span>
+        </div>
         <div>
             <div class="text-sm font-bold text-gray-700 tracking-wide">Adresse email</div>
-            <input v-model="email"
-                class="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500" type="email"
-                placeholder="mike@gmail.com">
+            <Field
+                name="email"
+                type="email"
+                class="field"
+                rules="email|required"
+                v-model="form.email"
+                placeholder="sarah@gmail.com"
+            />
+            <ErrorMessage name="email" class="text-red-500" />
         </div>
 
-        <div class="mt-10">
-            <button class="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide
-                                font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-600 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none
-                                shadow-lg">
+        <div class="mt-10 flex justify-center">
+            <button class="btn-primary btn btn-wide">
                 Réinitialiser le mot de passe
             </button>
         </div>
@@ -27,28 +37,51 @@
                 Inscription
             </NuxtLink>
         </div>
-    </form>
+    </Form>
 </template>
 
 <script setup lang="ts">
-const client = useSupabaseAuthClient()
+import { required, email } from '@vee-validate/rules'
+import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
+import { localize } from '@vee-validate/i18n'
 
 useHead({
     title: 'Mot de passe oublié'
 })
 
-const success = ref(false)
-const email = ref('');
+defineRule('email', email)
+defineRule('required', required)
 
-const submit = async() => {
-    await client.auth.resetPasswordForEmail(email.value, {
+configure({
+    generateMessage: localize('fr', {
+        messages: {
+            required: 'Le champ est requis',
+            email: 'Format d\'email non valide',
+        },
+    }),
+})
+
+const client = useSupabaseAuthClient()
+
+const success = ref(false)
+const form = ref({
+    email: '',
+})
+
+const submit = async () => {
+    await client.auth.resetPasswordForEmail(form.value.email, {
         redirectTo: 'https://sarah-rp-manager.vercel.app/nouveau-mdp'
     });
 
-    email.value = '';
-
+    form.value.email = '';
     success.value = true;
-
 }
 
 </script>
+
+<style scoped>
+.field {
+    @apply w-full text-lg py-2 border-b text-gray-700 border-gray-300 focus:outline-none focus:border-indigo-500 bg-white;
+}
+
+</style>

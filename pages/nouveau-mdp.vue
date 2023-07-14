@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="submit">
+    <Form @submit="submit">
         <h2
             class="text-center text-4xl mb-6 text-indigo-900 font-display font-semibold lg:text-left xl:text-5xl xl:text-bold">
             Nouveau mot de passe
@@ -9,38 +9,68 @@
         </p>
         <div>
             <div class="text-sm font-bold text-gray-700 tracking-wide">Nouveau mot de passe</div>
-            <input v-model="password"
-                class="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500" type="email"
-                placeholder="mike@gmail.com">
+            <Field
+                name="password"
+                type="password"
+                class="field"
+                rules="required|min:6"
+                v-model="password"
+                placeholder="Nouveau mot de passe"
+            />
+            <ErrorMessage name="password" class="text-red-500" />
         </div>
 
         <div>
-            <div class="text-sm font-bold text-gray-700 tracking-wide">Nouveau mot de passe</div>
-            <input v-model="confirmPassword"
-                class="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500" type="email"
-                placeholder="mike@gmail.com">
+            <div class="text-sm font-bold text-gray-700 tracking-wide">Répéter le mot de passe</div>
+            <Field
+                name="confirmPassword"
+                type="password"
+                class="field"
+                rules="required|min:6|confirmed"
+                v-model="confirmPassword"
+                placeholder="Répéter mot de passe"
+            />
+            <ErrorMessage name="confirmPassword" class="text-red-500" />
         </div>
 
-        <div class="mt-10">
-            <button class="btn" :disabled="canSubmit">
+        <div class="mt-10 flex justify-center">
+            <button class="btn-primary btn btn-wide" :disabled="canSubmit">
                 Enregistrer
             </button>
         </div>
 
         <div class="mt-4 text-sm font-display font-semibold text-gray-700 text-center">
             <NuxtLink to="/connexion" class="cursor-pointer text-indigo-600 hover:text-indigo-800">
-                Inscription
+                Connexion
             </NuxtLink>
         </div>
-    </form>
+    </Form>
 </template>
 
 <script setup lang="ts">
-const client = useSupabaseAuthClient()
+import { required, confirmed, min } from '@vee-validate/rules'
+import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
+import { localize } from '@vee-validate/i18n'
 
 useHead({
     title: 'Mot de passe oublié'
 })
+
+defineRule('required', required)
+defineRule('confirmed', confirmed)
+defineRule('min', min)
+
+configure({
+    generateMessage: localize('fr', {
+        messages: {
+            required: 'Le champ est requis',
+            confirmed: 'Les mots de passe ne sont pas identiques',
+            min: 'Le mot de passe doit faire faire 6 '
+        },
+    }),
+})
+
+const client = useSupabaseAuthClient()
 
 const success = ref(false)
 const password = ref('');
@@ -60,19 +90,9 @@ const submit = async () => {
 </script>
 
 <style scoped lang="scss">
-    .btn {
-        @apply bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide font-semibold shadow-lg;
 
-        &:focus {
-            @apply outline-none;
-        }
+.field {
+    @apply w-full text-lg py-2 border-b text-gray-700 border-gray-300 focus:outline-none focus:border-indigo-500 bg-white;
+}
 
-        &:disabled {
-            @apply bg-slate-50 text-slate-500 border-slate-200 shadow-none;
-        }
-
-        &:hover {
-            @apply bg-indigo-600;
-        }
-    }
 </style>
