@@ -40,7 +40,7 @@
         </div>
 
         <div class="mt-10 flex justify-center">
-            <button class="btn-primary btn btn-wide" :disabled="canSubmit">
+            <button class="btn-primary btn btn-wide" :disabled="!canSubmit">
                 Enregistrer
             </button>
         </div>
