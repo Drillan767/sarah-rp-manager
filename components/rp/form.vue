@@ -1,17 +1,10 @@
 <template>
     <Form @submit="submit">
-        <div class="alert alert-success mb-4" v-if="success">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Informations sauvegardées</span>
-        </div>
         <div class="w-full mb-4">
             <label for="title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                 Titre
             </label>
-            <Field v-model="form.title" name="title" placeholder="Titre du RP" type="text" rules="required" id="title"
+            <Field v-model="formProxy.title" name="title" placeholder="Titre du RP" type="text" rules="required" id="title"
                 class="input input-bordered w-full" required />
             <ErrorMessage name="title" class="text-red-500" />
         </div>
@@ -20,19 +13,29 @@
             <label for="start_date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                 Date de début
             </label>
-            <Field v-model="form.start_date" name="start_date" placeholder="Date de début" type="date" rules="required" id="start_date"
-                class="input input-bordered w-full" required />
+            <Field v-model="formProxy.start_date" name="start_date" placeholder="Date de début" type="datetime-local"
+                id="start_date" class="input input-bordered w-full" required />
             <ErrorMessage name="start_date" class="text-red-500" />
+        </div>
+
+        <div class="w-full mb-4">
+            <img v-if="preview !== ''" :src="preview" alt="preview" class="w-full rounded-xl mb-2">
+            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">
+                Illustration
+            </label>
+            <Field name="media" accept="image/*" class="file-input file-input-bordered w-full" type="file"
+                rules="image|max:2000" @change="displayAvatar" />
+            <ErrorMessage name="media" class="text-red-500" />
         </div>
 
         <div class="w-full mb-4">
             <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                 Description
             </label>
-            <textarea v-model="form.description" id="description" rows="8" class="textarea textarea-bordered w-full"
+            <textarea v-model="formProxy.description" id="description" rows="8" class="textarea textarea-bordered w-full"
                 placeholder="Description du rp" />
         </div>
-        <div class="w-full mb-4">
+        <div class="w-full mb-4" v-if="!edit">
             <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                 Rôles
             </label>
@@ -61,7 +64,8 @@
             </div>
         </div>
         <div class="mb-4 flex justify-end">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" :disabled="loading">
+                <span class="loading loading-spinner" v-if="loading"></span>
                 Enregistrer
             </button>
         </div>
@@ -70,11 +74,24 @@
 
 <script setup lang="ts">
 import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
-import { required, min_value } from '@vee-validate/rules'
+import { required, min_value, image, max } from '@vee-validate/rules'
 import { localize } from '@vee-validate/i18n'
+
+type Form = {
+    title: string,
+    description: string,
+    illustration?: string,
+    start_date: string,
+    roles: {
+        name: string,
+        max_users: number,
+    }[]
+}
 
 defineRule('required', required)
 defineRule('min_value', min_value)
+defineRule('image', image)
+defineRule('max', max)
 
 configure({
     generateMessage: localize('fr', {
@@ -85,39 +102,56 @@ configure({
     }),
 })
 
-const form = ref({
-    title: '',
-    description: '',
-    start_date: '',
-    roles: [
-        {
-            name: '',
-            max_users: 1,
-        }
-    ]
+const props = defineProps<{
+    edit?: boolean | undefined,
+    form: Form,
+    loading: boolean,
+}>()
+
+const emit = defineEmits<{
+    (e: 'input', value: Form): void,
+    (e: 'fileChange', value: File): void,
+    (e: 'submit'): void,
+}>()
+
+const formProxy = computed({
+    get: () => props.form,
+    set: (value) => emit('input', value)
 })
 
-const success = ref(false)
+const preview = ref('')
 
 const addRole = () => {
-    form.value.roles.push({
+    formProxy.value.roles.push({
         name: '',
         max_users: 1,
     })
 }
 
 const removeRole = (i: number) => {
-    form.value.roles.splice(i, 1)
+    formProxy.value.roles.splice(i, 1)
 }
 
+const submit = () => emit('submit')
 
-const submit = async () => {
-    await useFetch('/api/rp/store', {
-        method: 'POST',
-        body: form.value
-    })
+const displayAvatar = (e: Event) => {
+    let files = (e.target as HTMLInputElement).files
 
-    success.value = true
+    if (files) {
+        emit('fileChange', files[0])
+        preview.value = URL.createObjectURL(files[0])
+    }
 }
+
+watch(() => props.form, (value) => {
+    preview.value = value.illustration ?? ''
+})
 
 </script>
+
+<style scoped>
+input,
+textarea {
+    @apply text-gray-900 dark:text-gray-100
+}
+</style>

@@ -1,7 +1,7 @@
 <template>
     <NavBar />
 
-    <main class="bg-base-200 min-h-screen">
+    <main class="bg-base-100 min-h-screen p-5">
         <slot />
     </main>
 </template>
