@@ -30,4 +30,8 @@ In the disccusion channel, people with multiple roles can switch between them, a
 
 Also, every informations will be available: the RP's title and descriptions, but also each user's profile + roles to easily see who's who and who's supposed to do what.
 
+## An email should be sent when:
+
+- [ ] Sarah makes the call to see who's here or not
+- [ ] The delay for the call is over and users with the "Plan B" role are asked to join
 
