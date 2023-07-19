@@ -86,12 +86,12 @@
                                     Jours
                                 </label>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <span>
+                                    <label>
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="week-days" /> Semaine
-                                    </span>
-                                    <span>
+                                    </label>
+                                    <label>
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="week-end" /> Week-end
-                                    </span>
+                                    </label>
                                 </div>
                             </div>
                             <div class="w-full">
@@ -99,18 +99,18 @@
                                     Heures
                                 </label>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <span>
+                                    <label>
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="morning" /> Matin
-                                    </span>
-                                    <span>
+                                    </label>
+                                    <label>
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="aftenoon" /> Après-midi
-                                    </span>
-                                    <span>
+                                    </label>
+                                    <label>
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="evening" /> Soirée
-                                    </span>
-                                    <span>
+                                    </label>
+                                    <label>
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="night" /> Nuit
-                                    </span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
