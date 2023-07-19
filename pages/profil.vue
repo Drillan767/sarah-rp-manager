@@ -211,31 +211,28 @@ const form = ref({
 const submit = async () => {
     loading.value = true
 
-    console.log(user);
-    console.log(form);
-
     if (isCreatingProfile) {
-        // Profile Creation
+        // Create accouht in Supabase
         await supabase.auth.signUp({
             email: form.value.email,
             password: form.value.password,
         })
-    } else {
-        // Profile Update
-        const formData = new FormData()
-
-        formData.append('session_id', user.value.session_id)
-        formData.append('email', form.value.email)
-        formData.append('username', form.value.username)
-        formData.append('description', form.value.description)
-        formData.append('availability', JSON.stringify(form.value.availability))
-
-        if (file.value) {
-            formData.append('media', file.value)
-        }
-
-        await updateProfile(formData)
     }
+
+    // Add / Update data to DB
+    const formData = new FormData()
+
+    formData.append('session_id', user.value.session_id)
+    formData.append('email', form.value.email)
+    formData.append('username', form.value.username)
+    formData.append('description', form.value.description)
+    formData.append('availability', JSON.stringify(form.value.availability))
+
+    if (file.value) {
+        formData.append('media', file.value)
+    }
+
+    await updateProfile(formData)
 
     success.value = true
     loading.value = false
