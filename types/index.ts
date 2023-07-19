@@ -7,5 +7,5 @@ export type User = {
     is_sarah: boolean,
     session_id: string,
     email: string,
-    availability: Record<DayOfWeek, string[]>,
+    availability: string[],
 }
