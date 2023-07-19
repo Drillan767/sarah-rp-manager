@@ -48,7 +48,7 @@
         <div class="mt-4 text-sm font-display font-semibold text-gray-700 text-center">
             <span>
                 Pas de compte ? 
-                <NuxtLink to="/inscription" class="cursor-pointer text-indigo-600 hover:text-indigo-800">
+                <NuxtLink to="/profil" class="cursor-pointer text-indigo-600 hover:text-indigo-800">
                     Inscription
                 </NuxtLink>
             </span>
