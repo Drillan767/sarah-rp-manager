@@ -86,10 +86,10 @@
                                     Jours
                                 </label>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <label>
+                                    <label class="cursor-pointer">
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="week-days" /> Semaine
                                     </label>
-                                    <label>
+                                    <label class="cursor-pointer">
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="week-end" /> Week-end
                                     </label>
                                 </div>
@@ -99,16 +99,16 @@
                                     Heures
                                 </label>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <label>
+                                    <label class="cursor-pointer">
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="morning" /> Matin
                                     </label>
-                                    <label>
+                                    <label class="cursor-pointer">
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="aftenoon" /> Après-midi
                                     </label>
-                                    <label>
+                                    <label class="cursor-pointer">
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="evening" /> Soirée
                                     </label>
-                                    <label>
+                                    <label class="cursor-pointer">
                                         <Field v-model="form.availability" name="availability" type="checkbox" value="night" /> Nuit
                                     </label>
                                 </div>
