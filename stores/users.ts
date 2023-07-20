@@ -1,20 +1,13 @@
 import type { User } from "types"
 import { defineStore } from "pinia"
 
-const defaultUser = {
-    username: 'Utilisateur anonyme',
+export const defaultUser = {
+    email: '',
+    username: '',
     is_sarah: false,
     description: '',
     image_url: 'https://sarah-rp-manager.vercel.app/default-avatar.webp',
-    availability: {
-        Lundi: [],
-        Mardi: [],
-        Mercredi: [],
-        Jeudi: [],
-        Vendredi: [],
-        Samedi: [],
-        Dimanche: [],
-    }
+    availability: []
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -74,6 +67,7 @@ export const useUserStore = defineStore('user', () => {
 
     async function logout() {
         await authClient.auth.signOut();
+        localStorage.clear();
         router.push('/connexion')
     }
 

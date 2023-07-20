@@ -10,10 +10,10 @@
         </div>
         <div class="flex-none">
             <ClientOnly>
-                <span class="mr-2">{{ user.username }}</span>
+                <span v-if="user.username" class="mr-2">{{ user.username }}</span>
             </ClientOnly>
 
-            <div class="dropdown dropdown-end">
+            <div v-if="user.username" class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
                         <ClientOnly>
