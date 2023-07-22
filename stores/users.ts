@@ -37,19 +37,21 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function initSession() {
-        const sessId = session.value!.id
-        const sessEmail = session.value?.email
-        const { data: fetchedUser } = await useAsyncData<User | null>('fetchedUser', async () => {
-            const { data } = await client
-                .from('users')
-                .select('*')
-                .eq('session_id', sessId)
-                .maybeSingle()
+        if (session.value) {
+            const sessId = session.value!.id
+            const sessEmail = session.value?.email
+            const { data: fetchedUser } = await useAsyncData<User | null>('fetchedUser', async () => {
+                const { data } = await client
+                    .from('users')
+                    .select('*')
+                    .eq('session_id', sessId)
+                    .maybeSingle()
 
-            return data
-        })
+                return data
+            })
 
-        user.value = fetchedUser.value ?? { ...defaultUser, session_id: sessId, email: sessEmail ?? '' }
+            user.value = fetchedUser.value ?? { ...defaultUser, session_id: sessId, email: sessEmail ?? '' }
+        }
     }
 
     async function updateProfile(formData: FormData) {
