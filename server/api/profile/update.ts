@@ -44,8 +44,6 @@ export default defineEventHandler(async (event) => {
             .from('avatars')
             .remove([`${payload.session_id}/profile`])
 
-        console.log({ deleteError })
-
         // Upload new avatar
         const { error: uploadError } = await supabase
             .storage
@@ -59,7 +57,7 @@ export default defineEventHandler(async (event) => {
     const { count } = await supabase
         .from('users')
         .select('*', { count: 'exact', head: true })
-        .eq('session_id', session!.id)
+        .eq('session_id', payload.session_id)
 
     if (count && count > 0) {
         const {session_id, ...fields } = payload
@@ -80,7 +78,7 @@ export default defineEventHandler(async (event) => {
                 username,
                 description,
                 created_at: new Date().toDateString()
-            })
+            });
     }
 
     return { payload }

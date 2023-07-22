@@ -12,6 +12,17 @@
                     <span v-if="isCreatingProfile">Un email vous a été envoyé, veuillez cliquer sur le lien pour activer votre compte.</span>
                     <span v-else>Informations sauvegardées.</span>
                 </div>
+
+                <div class="alert alert-error mb-4" v-if="error">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>
+                        Un erreur est survenue:<br />
+                        {errorMessage}
+                    </span>
+                </div>
+
                 <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
                     <div class="w-full">
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -184,6 +195,8 @@ configure({
 
 const loading = ref(false)
 const success = ref(false)
+const error = ref(false)
+const errorMessage = ref('')
 const showPasswordModal = ref(false)
 const preview = ref('')
 
@@ -211,18 +224,27 @@ const form = ref({
 const submit = async () => {
     loading.value = true
 
+    let signUpData;
     if (isCreatingProfile) {
-        // Create accouht in Supabase
-        await supabase.auth.signUp({
+        // Create account in Supabase
+        signUpData = await supabase.auth.signUp({
             email: form.value.email,
             password: form.value.password,
-        })
+        });
+
+        if (signUpData.error) {
+            success.value = false;
+            error.value = true;
+            errorMessage.value = signUpData.error.toString();
+            loading.value = false;
+            return;
+        }
     }
 
     // Add / Update data to DB
     const formData = new FormData()
 
-    formData.append('session_id', user.value.session_id)
+    formData.append('session_id', user.value.session_id ? user.value.session_id : signUpData.data.user.id)
     formData.append('email', form.value.email)
     formData.append('username', form.value.username)
     formData.append('description', form.value.description)
