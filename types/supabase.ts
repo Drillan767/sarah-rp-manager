@@ -13,19 +13,19 @@ export interface Database {
         Row: {
           id: number
           name: string
-          private: boolean | null
+          private: boolean
           roleplay_id: string
         }
         Insert: {
           id?: number
           name: string
-          private?: boolean | null
+          private?: boolean
           roleplay_id: string
         }
         Update: {
           id?: number
           name?: string
-          private?: boolean | null
+          private?: boolean
           roleplay_id?: string
         }
         Relationships: [
@@ -71,8 +71,46 @@ export interface Database {
           }
         ]
       }
+      invitations: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          role_id: number | null
+          roleplay_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          role_id?: number | null
+          roleplay_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          role_id?: number | null
+          roleplay_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_role_id_fkey"
+            columns: ["role_id"]
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_roleplay_id_fkey"
+            columns: ["roleplay_id"]
+            referencedRelation: "roleplays"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       messages: {
         Row: {
+          channel_id: number | null
           created_at: string | null
           emojis: Json | null
           id: number
@@ -82,6 +120,7 @@ export interface Database {
           user_id: number | null
         }
         Insert: {
+          channel_id?: number | null
           created_at?: string | null
           emojis?: Json | null
           id?: number
@@ -91,6 +130,7 @@ export interface Database {
           user_id?: number | null
         }
         Update: {
+          channel_id?: number | null
           created_at?: string | null
           emojis?: Json | null
           id?: number
@@ -100,6 +140,12 @@ export interface Database {
           user_id?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "messages_channel_id_fkey"
+            columns: ["channel_id"]
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "messages_user_id_fkey"
             columns: ["user_id"]
@@ -115,15 +161,17 @@ export interface Database {
           id: string
           illustration: string
           message_board: string | null
+          public: boolean | null
           start_date: string | null
           title: string
         }
         Insert: {
           created_at?: string | null
           description: string
-          id: string
+          id?: string
           illustration: string
           message_board?: string | null
+          public?: boolean | null
           start_date?: string | null
           title: string
         }
@@ -133,67 +181,31 @@ export interface Database {
           id?: string
           illustration?: string
           message_board?: string | null
+          public?: boolean | null
           start_date?: string | null
           title?: string
         }
         Relationships: []
       }
-      roleplays_users: {
-        Row: {
-          created_at: string | null
-          id: number
-          is_admin: boolean
-          roleplay_id: string
-          user_id: number
-        }
-        Insert: {
-          created_at?: string | null
-          id?: number
-          is_admin?: boolean
-          roleplay_id: string
-          user_id: number
-        }
-        Update: {
-          created_at?: string | null
-          id?: number
-          is_admin?: boolean
-          roleplay_id?: string
-          user_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "roleplays_users_roleplay_id_fkey"
-            columns: ["roleplay_id"]
-            referencedRelation: "roleplays"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "roleplays_users_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       roles: {
         Row: {
           created_at: string | null
           id: number
-          max_users: number | null
+          max_users: number
           name: string
           roleplay_id: string
         }
         Insert: {
           created_at?: string | null
           id?: number
-          max_users?: number | null
+          max_users?: number
           name: string
           roleplay_id: string
         }
         Update: {
           created_at?: string | null
           id?: number
-          max_users?: number | null
+          max_users?: number
           name?: string
           roleplay_id?: string
         }

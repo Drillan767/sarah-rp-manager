@@ -1,9 +1,9 @@
 <template>
     <div>
-        <RouterLink to="/admin" class="mb-4 btn btn-primary">
+        <button @click="router.back()" class="mb-4 btn btn-primary">
             <ArrowLeftIcon class="w-4 h-4" />
             Retour
-        </RouterLink>
+        </button>
         <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
             <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Nouveau RP</h2>
             <Form
@@ -17,6 +17,8 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { useUserStore } from '@/stores/users';
 import { ArrowLeftIcon } from '@heroicons/vue/24/solid'
 import Form from '@/components/rp/form.vue'
 
@@ -24,6 +26,8 @@ useHead({
     title: 'Nouveau RP'
 })
 
+const userStore = useUserStore()
+const { user } = storeToRefs(userStore)
 const router = useRouter()
 
 const file = ref<File | null>(null)
@@ -69,7 +73,7 @@ const submit = async () => {
     }
 
     if (data.value) {
-        router.push(`/admin/RP/${data.value.id}?created=1`)
+        router.push(`/roleplay/${data.value.id}?created=1`)
     }
 }
 </script>

@@ -65,6 +65,12 @@ export default defineNuxtConfig({
         }
     },
 
+    dayjs: {
+        locales: ['fr'],
+        defaultLocale: 'fr',
+        plugins: ['relativeTime', 'utc']
+    },
+
     imports: {
         dirs: ['stores']
     },

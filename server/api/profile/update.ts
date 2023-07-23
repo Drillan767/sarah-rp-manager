@@ -39,16 +39,19 @@ export default defineEventHandler(async (event) => {
         const avatarPath = `${payload.session_id}/profile/${mediaData.filename}`
 
         // Cleanup user avatar directory
-        const { error: deleteError } = await supabase
+        await supabase
             .storage
             .from('avatars')
             .remove([`${payload.session_id}/profile`])
 
-        // Upload new avatar
-        const { error: uploadError } = await supabase
+            // Upload new avatar
+        await supabase
             .storage
             .from('avatars')
-            .upload(avatarPath, mediaData.data)
+            .upload(avatarPath, mediaData.data, {
+                cacheControl: '3600',
+                contentType: `${mediaData.type};charset=UTF-8`
+            })
 
         payload.image_url = `${supabaseUrl}/storage/v1/object/public/avatars/${avatarPath}`
     }
