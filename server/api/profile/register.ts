@@ -32,36 +32,16 @@ export default defineEventHandler(async (event) => {
         }
     }
 
-    const mediaData = body.find((field) => field.name === 'media')
+    const { password, ...metaFields } = payload
+    await supabase.auth.signUp({
+        email: payload.email,
+        password: payload.password,
+        options: {
+            data: metaFields
+        }
+    })
 
-    if (mediaData) {
-        const avatarPath = `${payload.session_id}/profile/${mediaData.filename}`
-
-        // Cleanup user avatar directory
-        await supabase
-            .storage
-            .from('avatars')
-            .remove([`${payload.session_id}/profile`])
-
-            // Upload new avatar
-        await supabase
-            .storage
-            .from('avatars')
-            .upload(avatarPath, mediaData.data, {
-                cacheControl: '3600',
-                contentType: `${mediaData.type};charset=UTF-8`
-            })
-
-        payload.image_url = `${supabaseUrl}/storage/v1/object/public/avatars/${avatarPath}`
+    return {
+        payload,
     }
-
-    const {session_id, ...fields } = payload
-
-    const { error } = await supabase
-        .from('users')
-        .update(fields)
-        .eq('session_id', session_id)
-
-    return { payload }
-
 })

@@ -50,6 +50,10 @@ const userStore = useUserStore()
 const { user } = storeToRefs(userStore)
 const rpList = ref<Roleplay[]>([])
 
+const { logout } = userStore
+
+//onMounted(() => logout())
+
 const { data } = await supabase
     .from('roleplays')
     .select('id, title, illustration, description, start_date')

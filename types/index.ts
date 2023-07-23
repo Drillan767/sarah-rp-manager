@@ -7,7 +7,7 @@ export type User = {
     is_sarah: boolean,
     session_id: string,
     email: string,
-    availability: string[],
+    availability: any,
 }
 
 export type Roleplay = {

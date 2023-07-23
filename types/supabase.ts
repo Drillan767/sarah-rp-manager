@@ -71,6 +71,49 @@ export interface Database {
           }
         ]
       }
+      characters: {
+        Row: {
+          avatar: string | null
+          created_at: string | null
+          description: string | null
+          id: number
+          name: string | null
+          role_id: number | null
+          user_id: number
+        }
+        Insert: {
+          avatar?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name?: string | null
+          role_id?: number | null
+          user_id: number
+        }
+        Update: {
+          avatar?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          name?: string | null
+          role_id?: number | null
+          user_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "characters_role_id_fkey"
+            columns: ["role_id"]
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "characters_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       invitations: {
         Row: {
           created_at: string | null
@@ -218,49 +261,6 @@ export interface Database {
           }
         ]
       }
-      roles_users: {
-        Row: {
-          avatar: string | null
-          created_at: string | null
-          description: string | null
-          id: number
-          name: string | null
-          role_id: number
-          user_id: number
-        }
-        Insert: {
-          avatar?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: number
-          name?: string | null
-          role_id: number
-          user_id: number
-        }
-        Update: {
-          avatar?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: number
-          name?: string | null
-          role_id?: number
-          user_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "roles_users_role_id_fkey"
-            columns: ["role_id"]
-            referencedRelation: "roles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "roles_users_user_id_fkey"
-            columns: ["user_id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       users: {
         Row: {
           availability: Json | null
@@ -269,7 +269,7 @@ export interface Database {
           email: string
           id: number
           image_url: string | null
-          is_sarah: boolean | null
+          is_sarah: boolean
           session_id: string | null
           username: string
         }
@@ -280,7 +280,7 @@ export interface Database {
           email: string
           id?: number
           image_url?: string | null
-          is_sarah?: boolean | null
+          is_sarah?: boolean
           session_id?: string | null
           username: string
         }
@@ -291,7 +291,7 @@ export interface Database {
           email?: string
           id?: number
           image_url?: string | null
-          is_sarah?: boolean | null
+          is_sarah?: boolean
           session_id?: string | null
           username?: string
         }

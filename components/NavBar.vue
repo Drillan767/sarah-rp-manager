@@ -17,7 +17,7 @@
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
                         <ClientOnly>
-                            <img :src="user.image_url ? user.image_url : defaultUser.image_url" />
+                            <img :src="user.image_url" />
                         </ClientOnly>
                     </div>
                 </label>
@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { ArrowRightOnRectangleIcon, UserCircleIcon, LockClosedIcon } from '@heroicons/vue/24/solid'
-import { useUserStore, defaultUser } from '@/stores/users'
+import { useUserStore } from '@/stores/users'
 
 const userStore = useUserStore()
 
