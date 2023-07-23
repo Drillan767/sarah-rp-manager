@@ -66,6 +66,7 @@ export const useUserStore = defineStore('user', () => {
                     .from('users')
                     .insert(payload)
 
+                // Removing user_metadata.
                 await client.auth.updateUser({})
 
                 user.value = payload

@@ -278,8 +278,6 @@ onMounted(() => {
             availability, 
         })
     }
-    // form.value = Object.assign(form.value, user.value)
-    // form.value = Object.assign(form.value, defaultUser, user.value)
 })
 </script>
 
