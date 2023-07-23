@@ -5,17 +5,21 @@
             <h2 v-else class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Informations du profil</h2>
             <Form @submit="submit">
                 <div class="alert alert-success mb-4" v-if="success">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span v-if="isCreatingProfile">Un email vous a été envoyé, veuillez cliquer sur le lien pour activer votre compte.</span>
+                    <span v-if="isCreatingProfile">Un email vous a été envoyé, veuillez cliquer sur le lien pour activer
+                        votre compte.</span>
                     <span v-else>Informations sauvegardées.</span>
                 </div>
 
                 <div class="alert alert-error mb-4" v-if="error">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none"
+                        viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>
                         Un erreur est survenue:<br />
@@ -28,8 +32,9 @@
                         <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Adresse email
                         </label>
-                        <Field v-model="form.email" name="email" type="email" rules="email|required" id="email" 
-                            placeholder="sarah@gmail.com" class="input input-bordered w-full" required :disabled="!isCreatingProfile" />
+                        <Field v-model="form.email" name="email" type="email" rules="email|required" id="email"
+                            placeholder="sarah@gmail.com" class="input input-bordered w-full" required
+                            :disabled="!isCreatingProfile" />
                         <ErrorMessage name="email" class="text-red-500" />
                     </div>
                     <div class="w-full">
@@ -44,19 +49,20 @@
                         <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Mot de passe
                         </label>
-                        <Field v-model="form.password" name="password" type="password" rules="password|required" id="password"
-                            class="input input-bordered w-full" ref="password" required />
+                        <Field v-model="form.password" name="password" type="password" rules="password|required"
+                            id="password" class="input input-bordered w-full" ref="password" required />
                         <ErrorMessage name="password" class="text-red-500" />
                     </div>
                     <div v-if="isCreatingProfile" class="w-full">
                         <label for="confirm_password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Confirmation mot de passe
                         </label>
-                        <Field v-model="form.confirm_password" name="confirm_password" type="password" rules="confirm_password|required" id="confirm_password"
-                            class="input input-bordered w-full" required />
+                        <Field v-model="form.confirm_password" name="confirm_password" type="password"
+                            rules="confirm_password|required" id="confirm_password" class="input input-bordered w-full"
+                            required />
                         <ErrorMessage name="confirm_password" class="text-red-500" />
                     </div>
-                    <div class="sm:col-span-2">
+                    <div class="sm:col-span-2" v-if="!isCreatingProfile">
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                             Avatar
                         </label>
@@ -67,14 +73,8 @@
                                     <img :src="form.image_url" />
                                 </div>
                             </div>
-                            <Field
-                                name="media"
-                                accept="image/*"
-                                class="file-input file-input-bordered w-auto"
-                                type="file"
-                                rules="image|max:2000"
-                                @change="displayAvatar"
-                            />
+                            <Field name="media" accept="image/*" class="file-input file-input-bordered w-auto" type="file"
+                                rules="image|max:2000" @change="displayAvatar" />
                             <ErrorMessage name="media" class="text-red-500" />
                         </div>
                     </div>
@@ -93,34 +93,42 @@
                         </label>
                         <div class="grid grid-cols-2 gap-6">
                             <div class="w-full">
-                                <label for="availability" class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                                <label for="availability"
+                                    class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
                                     Jours
                                 </label>
                                 <div class="grid grid-cols-2 gap-3">
                                     <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox" value="week-days" /> Semaine
+                                        <Field v-model="form.availability" name="availability" type="checkbox"
+                                            value="week-days" /> Semaine
                                     </label>
                                     <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox" value="week-end" /> Week-end
+                                        <Field v-model="form.availability" name="availability" type="checkbox"
+                                            value="week-end" /> Week-end
                                     </label>
                                 </div>
                             </div>
                             <div class="w-full">
-                                <label for="availability" class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
+                                <label for="availability"
+                                    class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
                                     Heures
                                 </label>
                                 <div class="grid grid-cols-2 gap-3">
                                     <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox" value="morning" /> Matin
+                                        <Field v-model="form.availability" name="availability" type="checkbox"
+                                            value="morning" /> Matin
                                     </label>
                                     <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox" value="aftenoon" /> Après-midi
+                                        <Field v-model="form.availability" name="availability" type="checkbox"
+                                            value="aftenoon" /> Après-midi
                                     </label>
                                     <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox" value="evening" /> Soirée
+                                        <Field v-model="form.availability" name="availability" type="checkbox"
+                                            value="evening" /> Soirée
                                     </label>
                                     <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox" value="night" /> Nuit
+                                        <Field v-model="form.availability" name="availability" type="checkbox"
+                                            value="night" /> Nuit
                                     </label>
                                 </div>
                             </div>
@@ -145,11 +153,7 @@
             </Form>
         </div>
 
-        <ChangePasswordModal
-            :show="showPasswordModal"
-            @close="showPasswordModal = false"
-            @success="passwordChanged"
-        />
+        <ChangePasswordModal :show="showPasswordModal" @close="showPasswordModal = false" @success="passwordChanged" />
     </section>
 </template>
 
@@ -159,18 +163,16 @@ import { image, required, email, max } from '@vee-validate/rules'
 import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
 import ChangePasswordModal from '@/components/modal/ChangePasswordModal.vue'
-import { useUserStore, defaultUser } from '@/stores/users'
+import { useUserStore } from '@/stores/users'
 
 const userStore = useUserStore()
 const { updateProfile } = userStore
 const { user } = storeToRefs(userStore)
 
-const supabase = useSupabaseAuthClient()
-
-const isCreatingProfile = Object.keys(user.value).length === 0 && user.value.constructor === Object;
+const isCreatingProfile = computed(() => Object.keys(user.value).length === 0 && user.value.constructor === Object);
 
 useHead({
-    title: isCreatingProfile ? 'Inscription' : 'Edition profil',
+    title: isCreatingProfile.value ? 'Inscription' : 'Edition profil',
 })
 
 defineRule('email', email)
@@ -211,50 +213,43 @@ const displayAvatar = (e: Event) => {
 
 const file = ref<File | null>(null)
 
-const form = ref({
+const form = ref<any>({
     email: '',
     username: '',
-    password: '',
-    confirm_password: '',
     description: '',
-    image_url: '',
-    availability: [],
 })
 
 const submit = async () => {
     loading.value = true
+    success.value = false
+    errorMessage.value = ''
 
-    let signUpData;
-    if (isCreatingProfile) {
-        // Create account in Supabase
-        signUpData = await supabase.auth.signUp({
-            email: form.value.email,
-            password: form.value.password,
-        });
-
-        if (signUpData.error) {
-            success.value = false;
-            error.value = true;
-            errorMessage.value = signUpData.error.toString();
-            loading.value = false;
-            return;
-        }
-    }
-
-    // Add / Update data to DB
     const formData = new FormData()
 
-    formData.append('session_id', user.value.session_id ? user.value.session_id : signUpData.data.user.id)
     formData.append('email', form.value.email)
     formData.append('username', form.value.username)
+
+    if (isCreatingProfile.value) {
+        formData.append('password', form.value.password)
+    } else {
+        formData.append('session_id', user.value.session_id)
+        formData.append('availability', JSON.stringify(form.value.availability))
+    }
+
     formData.append('description', form.value.description)
-    formData.append('availability', JSON.stringify(form.value.availability))
 
     if (file.value) {
         formData.append('media', file.value)
     }
 
-    await updateProfile(formData)
+    if (isCreatingProfile.value) {
+        await useFetch('/api/profile/register', {
+            method: 'POST',
+            body: formData
+        })
+    } else {
+        await updateProfile(formData)
+    }
 
     success.value = true
     loading.value = false
@@ -270,7 +265,19 @@ const passwordChanged = () => {
 }
 
 onMounted(() => {
-    form.value = Object.assign(form.value, defaultUser, user.value)
+    if (isCreatingProfile.value) {
+        form.value.password = ''
+        form.value.confirm_password = ''
+    } else {
+        const { email, username, image_url, description, availability } = user.value
+        form.value = Object.assign(form.value, {
+            email,
+            username,
+            image_url,
+            description,
+            availability, 
+        })
+    }
 })
 </script>
 
@@ -278,5 +285,4 @@ onMounted(() => {
 input,
 textarea {
     @apply text-gray-900 dark:text-gray-100
-}
-</style>
+}</style>
