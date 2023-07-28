@@ -87,53 +87,10 @@
                             class="textarea textarea-bordered w-full" placeholder="Description du personnage"></textarea>
                     </div>
 
-                    <div class="sm:col-span-2">
-                        <label for="availability" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Disponibilités
-                        </label>
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="w-full">
-                                <label for="availability"
-                                    class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-                                    Jours
-                                </label>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox"
-                                            value="week-days" /> Semaine
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox"
-                                            value="week-end" /> Week-end
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="w-full">
-                                <label for="availability"
-                                    class="block mb-2 text-xs font-medium text-gray-900 dark:text-white">
-                                    Heures
-                                </label>
-                                <div class="grid grid-cols-2 gap-3">
-                                    <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox"
-                                            value="morning" /> Matin
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox"
-                                            value="aftenoon" /> Après-midi
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox"
-                                            value="evening" /> Soirée
-                                    </label>
-                                    <label class="cursor-pointer">
-                                        <Field v-model="form.availability" name="availability" type="checkbox"
-                                            value="night" /> Nuit
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <Availability
+                        v-if="form.availability"
+                        :form="form.availability"
+                    />
                 </div>
 
                 <div v-if="isCreatingProfile" class="flex justify-end gap-x-4 mt-8">
@@ -162,6 +119,7 @@ import { storeToRefs } from 'pinia'
 import { image, required, email, max } from '@vee-validate/rules'
 import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
+import Availability from '@/components/profile/Availability.vue'
 import ChangePasswordModal from '@/components/modal/ChangePasswordModal.vue'
 import { useUserStore } from '@/stores/users'
 
