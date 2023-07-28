@@ -1,5 +1,23 @@
 export type DayOfWeek = "Lundi" | "Mardi" | "Mercredi" | "Jeudi" | "Vendredi" | "Samedi" | "Dimanche"
 
+export type SpecificDate = {
+    isSpecific: true
+    begin: string
+    end: string
+}
+
+export type GenericDate = {
+    isSpecific: false
+    begin: {
+        day: string
+        hour: string
+    }
+    end: {
+        day: string
+        hour: string
+    }
+}
+
 export type User = {
     image_url: string,
     description: string,
