@@ -1,6 +1,6 @@
+import { defineStore } from 'pinia'
 import type { Database } from '@/types/supabase'
 import type { Roleplay, RoleplayDetail } from '@/types'
-import { defineStore } from "pinia"
 
 export const useRoleplayStore = defineStore('roleplay', () => {
     const supabase = useSupabaseClient<Database>()
@@ -32,22 +32,23 @@ export const useRoleplayStore = defineStore('roleplay', () => {
         const rps: Roleplay[] = []
         const { data } = await supabase
             .from('roleplays')
-            .select(`id, title, illustration, start_date, description, roles(roleplay_id, max_users, roles_users(id))`)
+            .select('id, title, illustration, start_date, description, roles(roleplay_id, max_users, roles_users(id))')
 
         if (data) {
             data.forEach((rp) => {
-                let roleplay: Roleplay = {
+                const roleplay: Roleplay = {
                     id: rp.id,
                     description: rp.description,
                     illustration: rp.illustration,
                     start_date: rp.start_date ?? '',
                     title: rp.title,
                     totalUsers: 0,
-                    nbCurrentUsers: 0
+                    nbCurrentUsers: 0,
                 }
 
                 rp.roles.forEach((role) => {
-                    if (role.max_users) roleplay.totalUsers += role.max_users
+                    if (role.max_users)
+                        roleplay.totalUsers += role.max_users
                     roleplay.nbCurrentUsers += role.roles_users.length
                 })
 
@@ -56,13 +57,12 @@ export const useRoleplayStore = defineStore('roleplay', () => {
         }
 
         rpList.value = rps
-
     }
 
     async function updateRP(formData: FormData) {
         await useFetch('/api/rp/update', {
             method: 'POST',
-            body: formData
+            body: formData,
         })
     }
 

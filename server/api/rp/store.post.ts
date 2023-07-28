@@ -1,15 +1,10 @@
+import * as process from 'node:process'
 import type { Database } from '@/types/supabase'
 import { serverSupabaseClient } from '#supabase/server'
 
-const supabaseUrl = process.env.SUPABASE_URL + '/storage/v1/object/public/roleplays'
+const supabaseUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/roleplays`
 
 export default defineEventHandler(async (event) => {
-    if (!isMethod(event, 'POST')) {
-        throw createError({
-            statusCode: 404,
-        })
-    }
-
     const body = await readMultipartFormData(event)
 
     if (!body) {
@@ -21,16 +16,15 @@ export default defineEventHandler(async (event) => {
     const supabase = serverSupabaseClient<Database>(event)
 
     const payload: Record<string, string> = {}
-    let roleList: { name: string, max_users: number }[] = []
+    let roleList: { name: string; max_users: number }[] = []
 
     for (const field of body) {
         const fieldName = field.name!.toString()
         if (fieldName !== 'illustration') {
-            if (fieldName === 'roles') {
+            if (fieldName === 'roles')
                 roleList = JSON.parse(field.data.toString())
-            } else {
+            else
                 payload[fieldName] = field.data.toString()
-            }
         }
     }
 
@@ -45,7 +39,6 @@ export default defineEventHandler(async (event) => {
         })
         .select('id')
 
-
     if (!data) {
         throw createError({
             statusCode: 400,
@@ -54,8 +47,7 @@ export default defineEventHandler(async (event) => {
 
     const [{ id: rpId }] = data
 
-
-    const mediaData = body.find((field) => field.name === 'illustration')!
+    const mediaData = body.find(field => field.name === 'illustration')!
 
     const rpPath = `${rpId}/${mediaData.filename}`
 
@@ -64,27 +56,27 @@ export default defineEventHandler(async (event) => {
         .from('roleplays')
         .upload(rpPath, mediaData.data, {
             cacheControl: '3600',
-            contentType: `${mediaData.type};charset=UTF-8`
+            contentType: `${mediaData.type};charset=UTF-8`,
         })
 
     if (uploadError) {
         throw createError({
             statusCode: 400,
-            message: uploadError.message
+            message: uploadError.message,
         })
     }
 
     const { error: rpError } = await supabase
         .from('roleplays')
         .update({
-            illustration: `${supabaseUrl}/${rpPath}`
+            illustration: `${supabaseUrl}/${rpPath}`,
         })
         .eq('id', rpId)
 
     if (rpError) {
         throw createError({
             statusCode: 400,
-            message: rpError.message
+            message: rpError.message,
         })
     }
 
@@ -100,17 +92,17 @@ export default defineEventHandler(async (event) => {
                 name: 'Secondaire',
                 roleplay_id: rpId,
                 private: false,
-            }
+            },
         ])
 
     if (channelError) {
         throw createError({
             statusCode: 400,
-            message: channelError.message
+            message: channelError.message,
         })
     }
 
-    const roles = roleList.map((r) => ({
+    const roles = roleList.map(r => ({
         name: r.name,
         max_users: r.max_users,
         roleplay_id: rpId,
@@ -123,11 +115,11 @@ export default defineEventHandler(async (event) => {
     if (roleError) {
         throw createError({
             statusCode: 400,
-            message: roleError.message
+            message: roleError.message,
         })
     }
 
     return {
-        id: rpId
+        id: rpId,
     }
 })

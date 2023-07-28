@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import process from 'node:process'
+
 export default defineNuxtConfig({
     modules: [
         '@nuxtjs/supabase',
@@ -10,7 +12,7 @@ export default defineNuxtConfig({
     ],
 
     css: [
-        '~/assets/scss/main.scss'
+        '~/assets/scss/main.scss',
     ],
 
     pinia: {
@@ -27,26 +29,26 @@ export default defineNuxtConfig({
                 {
                     rel: 'apple-touch-icon',
                     sizes: '180x180',
-                    href: '/favicon/apple-touch-icon.png'
+                    href: '/favicon/apple-touch-icon.png',
                 },
                 {
                     rel: 'icon',
                     type: 'image/png',
                     sizes: '32x32',
-                    href: '/favicon/favicon-32x32.png'
+                    href: '/favicon/favicon-32x32.png',
                 },
                 {
                     rel: 'icon',
                     type: 'image/png',
                     sizes: '16x16x',
-                    href: '/favicon/favicon-16x16.png'
+                    href: '/favicon/favicon-16x16.png',
                 },
                 {
                     rel: 'manifest',
                     href: '/favicon/site.manifest',
-                }
-            ]
-        }
+                },
+            ],
+        },
     },
 
     runtimeConfig: {
@@ -61,19 +63,19 @@ export default defineNuxtConfig({
             auth: {
                 persistSession: true,
                 autoRefreshToken: true,
-            }
-        }
+            },
+        },
     },
 
     dayjs: {
         locales: ['fr'],
         defaultLocale: 'fr',
-        plugins: ['relativeTime', 'utc']
+        plugins: ['relativeTime', 'utc'],
     },
 
     imports: {
-        dirs: ['stores']
+        dirs: ['stores'],
     },
 
-    devtools: { enabled: true }
+    devtools: { enabled: true },
 })

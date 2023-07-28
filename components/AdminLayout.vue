@@ -1,17 +1,34 @@
+<script setup lang="ts">
+import {
+    BookmarkSquareIcon,
+    ChatBubbleBottomCenterTextIcon,
+    UsersIcon,
+} from '@heroicons/vue/24/solid'
+</script>
+
 <template>
     <div class="drawer lg:drawer-open">
-        <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+        <input
+            id="my-drawer-2"
+            type="checkbox"
+            class="drawer-toggle"
+        >
         <div class="drawer-content bg-base-100">
             <!-- Page content here -->
-            <label for="my-drawer-2" class="btn btn-primary drawer-button lg:hidden">Open drawer</label>
+            <label
+                for="my-drawer-2"
+                class="btn btn-primary drawer-button lg:hidden"
+            >Open drawer</label>
 
             <div class="m-4">
                 <slot />
             </div>
-
         </div>
         <div class="drawer-side bg-base-300">
-            <label for="my-drawer-2" class="drawer-overlay"></label>
+            <label
+                for="my-drawer-2"
+                class="drawer-overlay"
+            />
             <ul class="menu p-4 w-60 h-full bg-base-200 text-base-content">
                 <!-- Sidebar content here -->
                 <li>
@@ -33,19 +50,9 @@
                     </a>
                 </li>
             </ul>
-
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import {
-    ChatBubbleBottomCenterTextIcon,
-    UsersIcon,
-    BookmarkSquareIcon
-} from '@heroicons/vue/24/solid'
-
-</script>
 
 <style scoped>
 .router-link-exact-active {

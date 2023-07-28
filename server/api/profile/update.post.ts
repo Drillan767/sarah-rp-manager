@@ -1,15 +1,10 @@
+import * as process from 'node:process'
 import type { Database } from '@/types/supabase'
-import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
+import { serverSupabaseClient } from '#supabase/server'
 
 const supabaseUrl = process.env.SUPABASE_URL
 
 export default defineEventHandler(async (event) => {
-    if (!isMethod(event, 'POST')) {
-        throw createError({
-            statusCode: 404,
-        })
-    }
-
     const body = await readMultipartFormData(event)
     const supabase = serverSupabaseClient<Database>(event)
 
@@ -24,15 +19,14 @@ export default defineEventHandler(async (event) => {
     for (const field of body) {
         const fieldName = field.name!.toString()
         if (fieldName !== 'media') {
-            if (fieldName === 'availability') {
-                payload['availability'] = JSON.parse(field.data.toString())
-            } else {
+            if (fieldName === 'availability')
+                payload.availability = JSON.parse(field.data.toString())
+            else
                 payload[fieldName] = field.data.toString()
-            }
         }
     }
 
-    const mediaData = body.find((field) => field.name === 'media')
+    const mediaData = body.find(field => field.name === 'media')
 
     if (mediaData) {
         const avatarPath = `${payload.session_id}/profile/${mediaData.filename}`
@@ -43,25 +37,24 @@ export default defineEventHandler(async (event) => {
             .from('avatars')
             .remove([`${payload.session_id}/profile`])
 
-            // Upload new avatar
+        // Upload new avatar
         await supabase
             .storage
             .from('avatars')
             .upload(avatarPath, mediaData.data, {
                 cacheControl: '3600',
-                contentType: `${mediaData.type};charset=UTF-8`
+                contentType: `${mediaData.type};charset=UTF-8`,
             })
 
         payload.image_url = `${supabaseUrl}/storage/v1/object/public/avatars/${avatarPath}`
     }
 
-    const {session_id, ...fields } = payload
+    const { session_id, ...fields } = payload
 
-    const { error } = await supabase
+    await supabase
         .from('users')
         .update(fields)
         .eq('session_id', session_id)
 
     return { payload }
-
 })

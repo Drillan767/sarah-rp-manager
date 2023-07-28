@@ -1,18 +1,13 @@
+import * as process from 'node:process'
 import type { Database } from '@/types/supabase'
 import { serverSupabaseClient } from '#supabase/server'
 
-const supabaseUrl = process.env.SUPABASE_URL + '/storage/v1/object/public/roleplays'
+const supabaseUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/roleplays`
 
 // TODO: si nouvelle image, l'uploader
 // Sinon updater tout sauf roles et illustration
 
 export default defineEventHandler(async (event) => {
-    if (!isMethod(event, 'POST')) {
-        throw createError({
-            statusCode: 404,
-        })
-    }
-
     const body = await readMultipartFormData(event)
 
     if (!body) {
@@ -27,15 +22,13 @@ export default defineEventHandler(async (event) => {
 
     for (const field of body) {
         const fieldName = field.name!.toString()
-        if (fieldName !== 'illustration') {
+        if (fieldName !== 'illustration')
             payload[fieldName] = field.data.toString()
-        }
     }
 
-    const mediaData = body.find((field) => field.name === 'illustration')
+    const mediaData = body.find(field => field.name === 'illustration')
 
     if (mediaData) {
-
         // List all files from directory
         const { data: files } = await supabase
             .storage
@@ -51,12 +44,12 @@ export default defineEventHandler(async (event) => {
         })
 
         // Upload new illustration
-        const { error: uploadError } = await supabase
+        await supabase
             .storage
             .from('roleplays')
             .upload(`${payload.id}/${mediaData.filename}`, mediaData.data, {
                 cacheControl: '3600',
-                contentType: `${mediaData.type};charset=UTF-8`
+                contentType: `${mediaData.type};charset=UTF-8`,
             })
 
         payload.illustration = `${supabaseUrl}/${payload.id}/${mediaData.filename}`
@@ -65,12 +58,12 @@ export default defineEventHandler(async (event) => {
     const rpId = payload.id
     delete payload.id
 
-    const { error: updateError } = await supabase
+    await supabase
         .from('roleplays')
         .update(payload)
         .eq('id', rpId)
 
     return {
-        payload
+        payload,
     }
 })
