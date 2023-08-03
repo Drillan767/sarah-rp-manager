@@ -4,7 +4,6 @@ import { defineStore } from "pinia"
 
 export const useUserStore = defineStore('user', () => {
 
-    const authClient = useSupabaseAuthClient()
     const client = useSupabaseClient<Database>()
     const session = useSupabaseUser();
     const router = useRouter()
@@ -13,7 +12,7 @@ export const useUserStore = defineStore('user', () => {
     const loggedIn = computed(() => session !== null)
 
     async function login(email: string, password: string) {
-        const { error: errResponse, data } = await authClient.auth.signInWithPassword({
+        const { error: errResponse, data } = await client.auth.signInWithPassword({
             email,
             password
         })
@@ -84,11 +83,11 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function updatePassword(newPassword: string) {
-        await authClient.auth.updateUser({ password: newPassword })
+        await client.auth.updateUser({ password: newPassword })
     }
 
     async function logout() {
-        await authClient.auth.signOut();
+        await client.auth.signOut();
         localStorage.clear();
         router.push('/connexion')
     }

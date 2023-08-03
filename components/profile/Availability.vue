@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { days, hours } from '@/assets/json/availability-time.json'
+import { Field, ErrorMessage, defineRule, configure } from 'vee-validate'
+import { localize } from '@vee-validate/i18n'
 
 interface SpecificDate {
     isSpecific: true
@@ -27,6 +29,39 @@ interface Props {
         unavailable: (GenericDate | SpecificDate)[]
     }
 }
+
+configure({
+    generateMessage: localize('fr', {
+        messages: {
+            required: 'Le champ est requis',
+            email: 'Format d\'email non valide',
+            image: 'Veuillez sélectionner une image',
+            max: 'Le fichier ne doit pas faire plus de 2 mo',
+            password: 'Le mot de passe doit faire 6 caractères minimum',
+            confirm_password: 'Les mots de passe ne correspondent pas'
+        },
+    }),
+})
+
+defineRule('available', (value, [beginDay, beginHour, endDay]) => {
+    // https://vee-validate.logaretm.com/v4/guide/global-validators#cross-field-validation
+    // lundi = 1    mardi = 2     224-24+11 et 124-24+12  ======>  35 et 12  35 - 12 = 23  23>15  --> message d'erreur
+
+    const maxHours = 15
+    console.log(value, beginDay, beginHour, endDay)
+    // Retrieve index of the first value.
+    // Retrieve index of the last value.
+    // Try to find a way to count hours between both values.
+    // If max hour, increment day, then start from index 0.
+    // Incremented day should be the same as target day,
+    // other wise it means that I'm being bamboozled
+
+});
+
+defineRule('isAfter', (value, [target], ctx) => {
+    console.log(value, target, ctx)
+    // Transform into dayjs, check if one is after the other, boom.
+});
 
 const props = defineProps<Props>()
 const emit = defineEmits<{ (e: 'input', value: Props['form']): void }>()
@@ -115,8 +150,7 @@ function removeDate(type: 'available' | 'unavailable', index: number) {
 }
 
 onMounted(() => {
-
-    onMounted(() => formProxy.value = props.form)
+    formProxy.value = props.form
 
     addEventListener('keydown', (e) => {
         if (e.key === 'Escape')
@@ -260,17 +294,26 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                             </label>
                             <div class="flex gap-x-2">
                                 <template v-if="a.isSpecific">
-                                    <input
+                                    <Field
+                                        v-model="a.begin"
+                                        type="datetime-local"
+                                        :name="`begin-specific-${i}`"
+                                        :min="minDate"
+                                        class="input input-bordered w-full max-w-xs"
+                                    />
+                                    <!-- <input
                                         v-model="a.begin"
                                         type="datetime-local"
                                         :min="minDate"
                                         class="input input-bordered w-full max-w-xs"
-                                    >
+                                    > -->
                                 </template>
                                 <template v-else>
-                                    <select
+                                    <Field
+                                        :name="`begin-generic-day-${i}`"
                                         v-model="a.begin.day"
                                         class="select select-bordered w-1/2 max-w-xs"
+                                        as="select"
                                     >
                                         <option
                                             v-for="(day, j) in days"
@@ -280,10 +323,19 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                                         >
                                             {{ day }}
                                         </option>
-                                    </select>
-                                    <select
+                                    </Field>
+    <!--                                 <select
+                                        v-model="a.begin.day"
+                                        class="select select-bordered w-1/2 max-w-xs"
+                                    >
+                                       
+                                    </select> -->
+
+                                    <Field
+                                        :name="`begin-generic-hour-${i}`"
                                         v-model="a.begin.hour"
                                         class="select select-bordered w-1/2 max-w-xs"
+                                        as="select"
                                     >
                                         <option
                                             v-for="(hour, j) in hours"
@@ -293,7 +345,13 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                                         >
                                             {{ hour }}
                                         </option>
-                                    </select>
+                                    </Field>
+                                    <!-- <select
+                                        v-model="a.begin.hour"
+                                        class="select select-bordered w-1/2 max-w-xs"
+                                    >
+                                        
+                                    </select> -->
                                 </template>
                             </div>
                         </div>
@@ -305,17 +363,27 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                             </label>
                             <div class="flex gap-x-2">
                                 <template v-if="a.isSpecific">
-                                    <input
+                                    <Field
+                                        v-model="a.end"
+                                        type="datetime-local"
+                                        :name="`end-specific-${i}`"
+                                        :min="minDate"
+                                        class="input input-bordered w-full max-w-xs"
+                                        :rules="`isAfter:@begin-specific-${i}`"
+                                    />
+                                   <!--  <input
                                         v-model="a.end"
                                         type="datetime-local"
                                         :min="minDate"
                                         class="input input-bordered w-full max-w-xs"
-                                    >
+                                    > -->
                                 </template>
                                 <template v-else>
-                                    <select
+                                    <Field
+                                        :name="`end-generic-day-${i}`"
                                         v-model="a.end.day"
                                         class="select select-bordered w-1/2 max-w-xs"
+                                        as="select"
                                     >
                                         <option
                                             v-for="(day, j) in days"
@@ -325,10 +393,18 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                                         >
                                             {{ day }}
                                         </option>
-                                    </select>
-                                    <select
+                                    </Field>
+                                    <!-- <select
+                                        v-model="a.end.day"
+                                        class="select select-bordered w-1/2 max-w-xs"
+                                    >
+                                    </select> -->
+                                    <Field
+                                        :name="`end-generic-hour-${i}`"
                                         v-model="a.end.hour"
                                         class="select select-bordered w-1/2 max-w-xs"
+                                        as="select"
+                                        :rules="`available:@begin-generic-day-${i},@begin-generic-hour-${i},@end-generic-day-${i}`"
                                     >
                                         <option
                                             v-for="(hour, j) in hours"
@@ -338,7 +414,13 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                                         >
                                             {{ hour }}
                                         </option>
-                                    </select>
+                                    </Field>
+                                    <!-- <select
+                                        v-model="a.end.hour"
+                                        class="select select-bordered w-1/2 max-w-xs"
+                                    >
+                                        
+                                    </select> -->
                                 </template>
                             </div>
                         </div>

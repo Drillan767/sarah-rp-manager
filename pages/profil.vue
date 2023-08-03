@@ -58,7 +58,7 @@
                             Confirmation mot de passe
                         </label>
                         <Field v-model="form.confirm_password" name="confirm_password" type="password"
-                            rules="confirm_password|required" id="confirm_password" class="input input-bordered w-full"
+                            rules="confirmed:@password|required" id="confirm_password" class="input input-bordered w-full"
                             required />
                         <ErrorMessage name="confirm_password" class="text-red-500" />
                     </div>
@@ -116,7 +116,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { image, required, email, max } from '@vee-validate/rules'
+import { image, required, email, max, confirmed } from '@vee-validate/rules'
 import { Form, Field, ErrorMessage, defineRule, configure } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
 import Availability from '@/components/profile/Availability.vue'
@@ -138,7 +138,7 @@ defineRule('required', required)
 defineRule('image', image)
 defineRule('max', max)
 defineRule('password', (value: string) => { return value && value.length >= 6 })
-defineRule('confirm_password', (value: string) => { return value && value === form.value.password })
+defineRule('confirmed', confirmed)
 
 configure({
     generateMessage: localize('fr', {
