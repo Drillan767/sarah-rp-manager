@@ -37,8 +37,6 @@ export const useUserStore = defineStore('user', () => {
                 .eq('session_id', sessId)
                 .maybeSingle()
 
-            console.log(data)
-
             if (data) {
                 const { image_url, description, session_id, availability, ...fields } = data
                 user.value = {
