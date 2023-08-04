@@ -49,6 +49,8 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
     const halfHours = maxHours * 2
     const bdIndex = days.findIndex((d) => d === beginDay)
 
+    console.log(value, beginDay, beginHour, endDay)
+
     if (beginDay === endDay && beginHour === value) {
         return 'Veuillez sélectionner une période d\'au moins 30mn'
     }
@@ -67,6 +69,14 @@ defineRule('isAfter', (value: string, [target]: [string]) => {
 
     if (after.isBefore(before)) {
         return 'La date de fin ne doit pas être avant la date de début'
+    }
+
+    if (after.diff(before, 'm') < 30) {
+        return 'Veuillez chosir une période d\'au moins 30mn'
+    }
+
+    if (dayjs().isBefore(before) || dayjs().isBefore(after)) {
+        return 'La date choisie doit être dans le futur'
     }
 
     if (after.diff(before, 'h') > maxHours) {
@@ -187,7 +197,6 @@ function halfHoursBetween(beginTimeStr: typeof hours[number], endTimeStr: typeof
 
     return { newDay, halfHours }
 }
-
 
 onMounted(() => {
     formProxy.value = props.form
@@ -323,7 +332,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                                     <template v-if="a.isSpecific">
                                         <Field v-model="a.end" type="datetime-local" :name="`end-available-specific-${i}`"
                                             :min="minDate" class="input input-bordered w-full max-w-xs"
-                                            :rules="`isAfter:@begin-unavailable-specific-${i}`" />
+                                            :rules="`isAfter:@begin-available-specific-${i}`" />
                                     </template>
                                     <template v-else>
                                         <Field :name="`end-available-generic-day-${i}`" v-model="a.end.day"
@@ -349,7 +358,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                             </button>
                         </div>
                     </div>
-                    <ErrorMessage v-if="a.isSpecific" class="text-red-500" :name="`end-available-generic-hour-${i}`" />
+                    <ErrorMessage v-if="a.isSpecific" class="text-red-500" :name="`end-available-specific-${i}`" />
                     <ErrorMessage v-else class="text-red-500" :name="`end-available-generic-hour-${i}`" />
                 </template>
 
@@ -369,7 +378,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                             <div class="form-control">
                                 <label class="label cursor-pointer">
                                     <input v-model="u.isSpecific" class="btn btn-outline btn-neutral btn-xs" type="checkbox"
-                                        aria-label="Date spécifique" @input="changeSpecific($event, ['available', i])">
+                                        aria-label="Date spécifique" @input="changeSpecific($event, ['unavailable', i])">
                                 </label>
                             </div>
                         </div>
@@ -408,8 +417,9 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                                 </label>
                                 <div class="flex gap-x-2">
                                     <template v-if="u.isSpecific">
-                                        <Field v-model="u.begin" type="datetime-local" :name="`end-specific-${i}`"
-                                            :min="minDate" class="input input-bordered w-full max-w-xs" />
+                                        <Field v-model="u.end" type="datetime-local" :name="`end-unavailable-specific-${i}`"
+                                            :min="minDate" class="input input-bordered w-full max-w-xs"
+                                            :rules="`isAfter:@begin-unavailable-specific-${i}`" />
                                     </template>
                                     <template v-else>
                                         <Field :name="`end-unavailable-generic-day-${i}`" v-model="u.end.day"
@@ -421,7 +431,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                                         <Field :name="`end-unavailable-generic-hour-${i}`" v-model="u.end.hour"
                                             class="select select-bordered w-1/2 max-w-xs" as="select"
                                             :rules="`available:@begin-unavailable-generic-day-${i},@begin-unavailable-generic-hour-${i},@end-unavailable-generic-day-${i}`">
->
+
                                             <option v-for="(hour, j) in hours" :key="j" :value="hour" :selected="j === 0">
                                                 {{ hour }}
                                             </option>
@@ -436,8 +446,8 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                             </button>
                         </div>
                     </div>
-                    <ErrorMessage v-if="u.isSpecific" class="text-red-500" :name="`end-specific-${i}`" />
-                    <ErrorMessage v-else class="text-red-500" :name="`end-generic-hour-${i}`" />
+                    <ErrorMessage v-if="u.isSpecific" class="text-red-500" :name="`end-unavailable-specific-${i}`" />
+                    <ErrorMessage v-else class="text-red-500" :name="`end-unavailable-generic-hour-${i}`" />
                 </template>
 
                 <div class="flex justify-end">
