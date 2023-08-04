@@ -9,16 +9,12 @@
             </RouterLink>
         </div>
         <div class="flex-none">
-            <ClientOnly>
-                <span v-if="user.username" class="mr-2">{{ user.username }}</span>
-            </ClientOnly>
+            <span v-if="user.username" class="mr-2">{{ user.username }}</span>
 
             <div v-if="user.username" class="dropdown dropdown-end z-20">
                 <label tabindex="0" class="btn btn-ghost btn-circle avatar">
                     <div class="w-10 rounded-full">
-                        <ClientOnly>
-                            <img :src="user.image_url" />
-                        </ClientOnly>
+                        <img :src="user.image_url" />
                     </div>
                 </label>
                 <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-200 rounded-box w-52">
