@@ -79,6 +79,7 @@ defineRule('isAfter', (value: string, [target]: [string]) => {
         return 'La date choisie doit être dans le futur'
 
     if (after.diff(before, 'h') > maxHours)
+
         return `Veuillez choisir une période de ${maxHours}h maximum`
 
     return true
