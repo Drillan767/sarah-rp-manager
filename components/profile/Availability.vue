@@ -74,11 +74,11 @@ defineRule('isAfter', (value: string, [target]: [string]) => {
     if (after.diff(before, 'm') < 30) {
         return 'Veuillez chosir une période d\'au moins 30mn'
     }
-
+/*
     if (dayjs().isBefore(before) || dayjs().isBefore(after)) {
         return 'La date choisie doit être dans le futur'
     }
-
+*/
     if (after.diff(before, 'h') > maxHours) {
         return `Veuillez choisir une période de ${maxHours}h maximum`
     }
