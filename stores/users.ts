@@ -1,11 +1,10 @@
-import type { Database } from "types/supabase"
-import type { User } from "types"
-import { defineStore } from "pinia"
+import type { Database } from 'types/supabase'
+import type { User } from 'types'
+import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('user', () => {
-
     const client = useSupabaseClient<Database>()
-    const session = useSupabaseUser();
+    const session = useSupabaseUser()
     const router = useRouter()
 
     const user = ref<User>({} as User)
@@ -14,7 +13,7 @@ export const useUserStore = defineStore('user', () => {
     async function login(email: string, password: string) {
         const { error: errResponse, data } = await client.auth.signInWithPassword({
             email,
-            password
+            password,
         })
 
         if (data.session || data.user) {
@@ -22,9 +21,8 @@ export const useUserStore = defineStore('user', () => {
             router.push('/')
         }
 
-        if (errResponse) {
+        if (errResponse)
             return errResponse.message
-        }
     }
 
     async function initSession() {
@@ -38,15 +36,16 @@ export const useUserStore = defineStore('user', () => {
                 .maybeSingle()
 
             if (data) {
-                const { image_url, description, session_id, availability, ...fields } = data
+                const { image_url, description, session_id: _, availability, ...fields } = data
                 user.value = {
                     description: description ?? '',
                     session_id: sessId,
                     image_url: image_url ?? 'https://sarah-rp-manager.vercel.app/default-avatar.webp',
                     availability,
-                    ...fields
+                    ...fields,
                 }
-            } else {
+            }
+            else {
                 const { user_metadata } = session.value
 
                 const payload = {
@@ -74,7 +73,7 @@ export const useUserStore = defineStore('user', () => {
     async function updateProfile(formData: FormData) {
         await useFetch('/api/profile/update', {
             method: 'POST',
-            body: formData
+            body: formData,
         })
 
         await initSession()
@@ -85,8 +84,8 @@ export const useUserStore = defineStore('user', () => {
     }
 
     async function logout() {
-        await client.auth.signOut();
-        localStorage.clear();
+        await client.auth.signOut()
+        localStorage.clear()
         router.push('/connexion')
     }
 
@@ -100,8 +99,8 @@ export const useUserStore = defineStore('user', () => {
         logout,
     }
 },
-    {
-        persist: {
-            storage: persistedState.localStorage,
-        },
-    })
+{
+    persist: {
+        storage: persistedState.localStorage,
+    },
+})

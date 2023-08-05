@@ -2,7 +2,7 @@
 module.exports = {
     darkMode: 'media',
     content: [],
-/*     theme: {
+    /*     theme: {
         extend: {
             colors: {
                 primary: {
@@ -21,5 +21,5 @@ module.exports = {
             }
         }
     }, */
-    plugins: [require("daisyui")],
-};
+    plugins: [require('daisyui')],
+}
