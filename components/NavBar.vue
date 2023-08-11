@@ -18,7 +18,7 @@ onMounted(async () => {
     if (user.value) {
         const { data } = await client
             .from('users')
-            .select('*')
+            .select('username, is_sarah, image_url')
             .eq('session_id', user.value.id)
             .single()
 

@@ -46,8 +46,6 @@ async function signin() {
     }
     catch (e: any) {
         error.value = e.message
-    }
-    finally {
         loading.value = false
     }
 }
