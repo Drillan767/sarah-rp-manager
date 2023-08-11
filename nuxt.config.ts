@@ -59,11 +59,15 @@ export default defineNuxtConfig({
     },
 
     supabase: {
-        client: {
-            auth: {
-                persistSession: true,
-                autoRefreshToken: true,
-            },
+        redirectOptions: {
+            login: '/connexion',
+            callback: '/callback',
+            exclude: [
+                '/inscription',
+                '/oubli-mdp',
+                '/nouveau-mdp',
+                '/profil',
+            ],
         },
     },
 

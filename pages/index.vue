@@ -1,3 +1,4 @@
+<!--
 <script setup lang="ts">
 import type { Database } from 'types/supabase'
 import { storeToRefs } from 'pinia'
@@ -88,3 +89,12 @@ const truncate = (str: string) => (str.length > 100) ? `${str.slice(0, 99)}...` 
     @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 grid-rows-1 gap-2;
 }
 </style>
+ -->
+
+<script setup lang="ts">
+
+</script>
+
+<template>
+    <h1>Bjr les ptits amis</h1>
+</template>

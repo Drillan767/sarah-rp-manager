@@ -1,12 +1,31 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
 import { ArrowRightOnRectangleIcon, LockClosedIcon, UserCircleIcon } from '@heroicons/vue/24/solid'
-import { useUserStore } from '@/stores/users'
+import type { Database } from '@/types/supabase'
 
-const userStore = useUserStore()
+const router = useRouter()
+const user = useSupabaseUser()
+const client = useSupabaseClient<Database>()
 
-const { logout } = userStore
-const { user } = storeToRefs(userStore)
+const userData = ref<any>(null)
+
+async function logout() {
+    await client.auth.signOut()
+    localStorage.removeItem('user')
+    router.push('/connexion')
+}
+
+onMounted(async () => {
+    if (user.value) {
+        const { data } = await client
+            .from('users')
+            .select('*')
+            .eq('session_id', user.value.id)
+            .single()
+
+        if (data)
+            userData.value = data
+    }
+})
 </script>
 
 <template>
@@ -25,14 +44,17 @@ const { user } = storeToRefs(userStore)
                 </span>
             </RouterLink>
         </div>
-        <div class="flex-none">
+        <div
+            v-if="userData"
+            class="flex-none"
+        >
             <span
-                v-if="user.username"
+                v-if="userData.username"
                 class="mr-2"
-            >{{ user.username }}</span>
+            >{{ userData.username }}</span>
 
             <div
-                v-if="user.username"
+                v-if="userData.username"
                 class="dropdown dropdown-end z-20"
             >
                 <label
@@ -40,7 +62,7 @@ const { user } = storeToRefs(userStore)
                     class="btn btn-ghost btn-circle avatar"
                 >
                     <div class="w-10 rounded-full">
-                        <img :src="user.image_url">
+                        <img :src="userData.image_url">
                     </div>
                 </label>
                 <ul
@@ -53,14 +75,12 @@ const { user } = storeToRefs(userStore)
                             Profil
                         </RouterLink>
                     </li>
-                    <ClientOnly>
-                        <li v-if="user.is_sarah">
-                            <RouterLink to="/admin">
-                                <LockClosedIcon class="h-4 w-4" />
-                                Administration
-                            </RouterLink>
-                        </li>
-                    </ClientOnly>
+                    <li v-if="userData.is_sarah">
+                        <RouterLink to="/admin">
+                            <LockClosedIcon class="h-4 w-4" />
+                            Administration
+                        </RouterLink>
+                    </li>
 
                     <li>
                         <span

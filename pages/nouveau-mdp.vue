@@ -21,7 +21,7 @@ configure({
     }),
 })
 
-const client = useSupabaseAuthClient()
+const client = useSupabaseClient()
 
 const success = ref(false)
 const password = ref('')
