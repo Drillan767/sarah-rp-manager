@@ -123,7 +123,7 @@ async function signin() {
             <span>
                 Pas de compte ?
                 <NuxtLink
-                    to="/profil"
+                    to="/inscription"
                     class="cursor-pointer text-indigo-600 hover:text-indigo-800"
                 >
                     Inscription
