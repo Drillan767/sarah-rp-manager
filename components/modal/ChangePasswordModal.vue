@@ -102,9 +102,6 @@ onMounted(() => {
                         class="text-red-500"
                     />
                 </div>
-                <p class="py-4">
-                    Press ESC key or click the button below to close
-                </p>
                 <div class="modal-action">
                     <button
                         class="btn"

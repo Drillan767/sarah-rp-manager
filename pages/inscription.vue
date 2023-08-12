@@ -58,7 +58,7 @@ async function signup() {
         if (emailCount && emailCount > 0)
             throw new Error('Un utilisateur existe déjà avec cet email.')
 
-        const { data: signupData, error: signUpError } = await supabase
+        const { data: signupData } = await supabase
             .auth
             .signUp({
                 email: form.value.email,
@@ -66,15 +66,15 @@ async function signup() {
             })
 
         const { error: insertError } = await supabase
-                .from('users')
-                .insert({
-                    email: form.value.email,
-                    session_id: signupData.user!.id,
-                    username: form.value.username,
-                })
+            .from('users')
+            .insert({
+                email: form.value.email,
+                session_id: signupData.user!.id,
+                username: form.value.username,
+            })
 
-            if (insertError)
-                throw insertError
+        if (insertError)
+            throw insertError
 
         success.value = true
     }

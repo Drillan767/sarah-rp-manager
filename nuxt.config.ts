@@ -66,7 +66,6 @@ export default defineNuxtConfig({
                 '/inscription',
                 '/oubli-mdp',
                 '/nouveau-mdp',
-                '/profil',
             ],
         },
     },

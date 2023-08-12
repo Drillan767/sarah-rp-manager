@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type { Database } from 'types/supabase'
-import { email, image, max, required } from '@vee-validate/rules'
+import { confirmed, email, image, max, required } from '@vee-validate/rules'
+import { ErrorMessage, Field, Form, configure, defineRule } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
-import { Field, Form, configure, defineRule } from 'vee-validate'
-import type { ProfileFormType } from '@/types'
+import type { Database } from 'types/supabase'
 import Availability from '@/components/profile/Availability.vue'
 import ChangePasswordModal from '@/components/modal/ChangePasswordModal.vue'
 
@@ -11,6 +10,8 @@ defineRule('email', email)
 defineRule('required', required)
 defineRule('image', image)
 defineRule('max', max)
+// defineRule('password', (value: string) => value && value.length >= 6)
+defineRule('confirmed', confirmed)
 
 configure({
     generateMessage: localize('fr', {
@@ -25,30 +26,36 @@ configure({
     }),
 })
 
+const supabase = useSupabaseClient<Database>()
+const session = useSupabaseUser()
+
+const form = ref<any>({
+    email: '',
+    username: '',
+    description: '',
+    availability: {},
+})
+
 useHead({
     title: 'Profil',
 })
 
-const defaultAvatar = 'https://sarah-rp-manager.vercel.app/default-avatar.webp'
-
-const supabase = useSupabaseClient<Database>()
-const session = useSupabaseUser()
+const loading = ref(false)
+const success = ref(false)
+const error = ref(false)
+const errorMessage = ref('')
 const showPasswordModal = ref(false)
 const preview = ref('')
 const file = ref<File | null>(null)
-const loading = ref(false)
-const success = ref(false)
 
-const form = ref<ProfileFormType>({
-    email: '',
-    username: '',
-    description: '',
-    availability: {
-        weekdays: false,
-        weekends: false,
-        available: [],
-        unavailble: [],
-    },
+onMounted(async () => {
+    const { data: userData } = await supabase
+        .from('users')
+        .select('email, username, availability, image_url, description')
+        .eq('session_id', session.value.id)
+        .single()
+
+    console.log(userData)
 })
 
 function displayAvatar(e: Event) {
@@ -60,36 +67,34 @@ function displayAvatar(e: Event) {
     }
 }
 
+async function submit() {
+    loading.value = true
+    success.value = false
+    errorMessage.value = ''
+
+    const formData = new FormData()
+
+    formData.append('email', form.value.email)
+    formData.append('username', form.value.username)
+    formData.append('session_id', session.value.id)
+    formData.append('availability', JSON.stringify(form.value.availability))
+
+    formData.append('description', form.value.description)
+
+    if (file.value)
+        formData.append('media', file.value)
+
+    success.value = true
+    loading.value = false
+}
+
 function editPassword() {
     showPasswordModal.value = !showPasswordModal.value
 }
 
-onMounted(async () => {
-    const { data: userData } = await supabase
-        .from('users')
-        .select('email, username, availability, image_url, description')
-        .eq('session_id', session.value.id)
-        .single()
-
-    if (userData) {
-        form.value.email = userData.email
-        form.value.username = userData.username
-        form.value.description = userData.description ?? ''
-        form.value.availability = userData.availability
-
-        preview.value = userData.image_url ?? defaultAvatar
-    }
-})
-
 function passwordChanged() {
     showPasswordModal.value = false
     success.value = true
-}
-
-async function submit() {
-    loading.value = true
-    success.value = false
-    console.log('oué')
 }
 </script>
 
@@ -121,8 +126,9 @@ async function submit() {
                     </svg>
                     <span>Informations sauvegardées.</span>
                 </div>
+
                 <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                    <div>
+                    <div class="w-full">
                         <label
                             for="email"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -140,7 +146,7 @@ async function submit() {
                             disabled
                         />
                     </div>
-                    <div>
+                    <div class="w-full">
                         <label
                             for="username"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -170,11 +176,15 @@ async function submit() {
                         </label>
                         <div class="flex justify-evenly items-center">
                             <div
-                                v-if="preview !== ''"
+                                v-if="(form.image_url && form.image_url !== '') || preview !== ''"
                                 class="avatar"
                             >
                                 <div class="w-20 rounded-full">
-                                    <img :src="preview">
+                                    <img
+                                        v-if="preview !== ''"
+                                        :src="preview"
+                                    >
+                                    <img :src="form.image_url">
                                 </div>
                             </div>
                             <Field
@@ -191,6 +201,7 @@ async function submit() {
                             />
                         </div>
                     </div>
+
                     <div class="sm:col-span-2">
                         <label
                             for="description"
@@ -206,11 +217,12 @@ async function submit() {
                             placeholder="Description du personnage"
                         />
                     </div>
+
                     <Availability
+                        v-if="form.availability"
                         :form="form.availability"
                     />
                 </div>
-
                 <div
                     class="flex justify-end gap-x-4 mt-8"
                 >
@@ -236,6 +248,7 @@ async function submit() {
                 </div>
             </Form>
         </div>
+
         <ChangePasswordModal
             :show="showPasswordModal"
             @close="showPasswordModal = false"
@@ -243,3 +256,10 @@ async function submit() {
         />
     </section>
 </template>
+
+<style scoped>
+input,
+textarea {
+    @apply text-gray-900 dark:text-gray-100
+}
+</style>
