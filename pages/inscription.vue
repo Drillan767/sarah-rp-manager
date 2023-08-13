@@ -38,6 +38,7 @@ const error = ref('')
 
 async function signup() {
     error.value = ''
+    success.value = false
     loading.value = true
 
     try {
@@ -57,33 +58,25 @@ async function signup() {
         if (emailCount && emailCount > 0)
             throw new Error('Un utilisateur existe déjà avec cet email.')
 
-        /*         const { data, error: signUpError } = await supabase
+        const { data: signupData, error: signUpError } = await supabase
             .auth
             .signUp({
                 email: form.value.email,
                 password: form.value.password,
-                options: {
-                    data: {
-                        username: form.value.username,
-                    },
-                },
             })
 
-        if (signUpError) {
-            throw error
-        }
-        else {
-            const { error: insertError } = await supabase
+        const { error: insertError } = await supabase
                 .from('users')
                 .insert({
                     email: form.value.email,
-                    session_id: data.user!.id,
+                    session_id: signupData.user!.id,
                     username: form.value.username,
                 })
 
             if (insertError)
                 throw insertError
-        } */
+
+        success.value = true
     }
     catch (e: any) {
         error.value = e.message
@@ -130,12 +123,14 @@ async function signup() {
                 class="stroke-current shrink-0 h-6 w-6"
                 fill="none"
                 viewBox="0 0 24 24"
-            ><path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            /></svg>
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+            </svg>
             <span>{{ error }}</span>
         </div>
         <div class="mb-4">
