@@ -2,6 +2,9 @@
 import { confirmed, email, min, required } from '@vee-validate/rules'
 import { ErrorMessage, Field, Form, configure, defineRule } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
+import type { Database } from '@/types/supabase'
+
+const supabase = useSupabaseClient<Database>()
 
 defineRule('email', email)
 defineRule('required', required)
@@ -34,15 +37,107 @@ const success = ref(false)
 const error = ref('')
 
 async function signup() {
-    console.log('bjr')
+    error.value = ''
+    loading.value = true
+
+    try {
+        const { count: userCount } = await supabase
+            .from('users')
+            .select('*', { count: 'exact', head: true })
+            .eq('username', form.value.username)
+
+        if (userCount && userCount > 0)
+            throw new Error('Un utilisateur existe déjà avec cet identifiant.')
+
+        const { count: emailCount } = await supabase
+            .from('users')
+            .select('*', { count: 'exact', head: true })
+            .eq('email', form.value.email)
+
+        if (emailCount && emailCount > 0)
+            throw new Error('Un utilisateur existe déjà avec cet email.')
+
+        /*         const { data, error: signUpError } = await supabase
+            .auth
+            .signUp({
+                email: form.value.email,
+                password: form.value.password,
+                options: {
+                    data: {
+                        username: form.value.username,
+                    },
+                },
+            })
+
+        if (signUpError) {
+            throw error
+        }
+        else {
+            const { error: insertError } = await supabase
+                .from('users')
+                .insert({
+                    email: form.value.email,
+                    session_id: data.user!.id,
+                    username: form.value.username,
+                })
+
+            if (insertError)
+                throw insertError
+        } */
+    }
+    catch (e: any) {
+        error.value = e.message
+    }
+    finally {
+        loading.value = false
+    }
 }
 </script>
 
 <template>
-    <Form @submit="signup">
+    <Form
+        v-slot="{ errors }"
+        @submit="signup"
+    >
         <h2 class="text-center mb-6 text-4xl text-indigo-900 font-display font-semibold lg:text-left xl:text-5xl xl:text-bold">
             Inscription
         </h2>
+        <div
+            v-if="success"
+            class="alert alert-success mb-4"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+            ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            /></svg>
+            <span>
+                Inscription effectuée avec succès, veuillez activer votre grâce au lien envoyé par email.
+            </span>
+        </div>
+        <div
+            v-if="error !== ''"
+            class="alert alert-error clear-left mb-4"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="stroke-current shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+            ><path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            /></svg>
+            <span>{{ error }}</span>
+        </div>
         <div class="mb-4">
             <p class="text-sm font-bold text-gray-900 tracking-wide">
                 Adresse email
@@ -114,7 +209,7 @@ async function signup() {
         <div class="mt-10 flex justify-center">
             <button
                 class="btn-primary btn btn-wide"
-                :disabled="loading"
+                :disabled="loading || Object.keys(errors).length > 0"
             >
                 <span
                     v-if="loading"
