@@ -6,6 +6,7 @@ import { Field, Form, configure, defineRule } from 'vee-validate'
 import type { ProfileFormType } from '@/types'
 import Availability from '@/components/profile/Availability.vue'
 import ChangePasswordModal from '@/components/modal/ChangePasswordModal.vue'
+import { useCurrentUser } from '@/composables/currentUser'
 
 defineRule('email', email)
 defineRule('required', required)
@@ -33,6 +34,7 @@ const defaultAvatar = 'https://sarah-rp-manager.vercel.app/default-avatar.webp'
 
 const supabase = useSupabaseClient<Database>()
 const session = useSupabaseUser()
+const currentUser = useCurrentUser()
 const showPasswordModal = ref(false)
 const preview = ref('')
 const file = ref<File | null>(null)
@@ -68,7 +70,7 @@ onMounted(async () => {
     const { data: userData } = await supabase
         .from('users')
         .select('email, username, availability, image_url, description')
-        .eq('session_id', session.value.id)
+        .eq('session_id', session.value!.id)
         .single()
 
     if (userData) {
@@ -89,7 +91,29 @@ function passwordChanged() {
 async function submit() {
     loading.value = true
     success.value = false
-    console.log('oué')
+
+    const formData = new FormData()
+    formData.append('email', form.value.email)
+    formData.append('username', form.value.username)
+    formData.append('session_id', session.value!.id)
+    formData.append('availability', JSON.stringify(form.value.availability))
+
+    formData.append('description', form.value.description)
+
+    if (file.value)
+        formData.append('media', file.value)
+
+    const { data } = await useFetch('/api/profile/update', {
+        method: 'POST',
+        body: formData,
+    })
+
+    currentUser.value.username = form.value.username
+    if (data.value && data.value.payload.image_url)
+        currentUser.value.image_url = data.value.payload.image_url
+
+    success.value = true
+    loading.value = false
 }
 </script>
 

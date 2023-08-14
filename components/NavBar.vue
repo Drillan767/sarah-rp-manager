@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ArrowRightOnRectangleIcon, LockClosedIcon, UserCircleIcon } from '@heroicons/vue/24/solid'
 import type { Database } from '@/types/supabase'
+import { useCurrentUser } from '@/composables/currentUser'
 
 const router = useRouter()
 const user = useSupabaseUser()
 const client = useSupabaseClient<Database>()
+const currentUser = useCurrentUser()
 
 const userData = ref<any>(null)
 
@@ -22,8 +24,13 @@ onMounted(async () => {
             .eq('session_id', user.value.id)
             .single()
 
-        if (data)
+        if (data) {
             userData.value = data
+            currentUser.value.username = data.username
+
+            if (data.image_url)
+                currentUser.value.image_url = data.image_url
+        }
     }
 })
 </script>
@@ -51,7 +58,9 @@ onMounted(async () => {
             <span
                 v-if="userData.username"
                 class="mr-2"
-            >{{ userData.username }}</span>
+            >
+                {{ currentUser.username }}
+            </span>
 
             <div
                 v-if="userData.username"
@@ -62,7 +71,7 @@ onMounted(async () => {
                     class="btn btn-ghost btn-circle avatar"
                 >
                     <div class="w-10 rounded-full">
-                        <img :src="userData.image_url">
+                        <img :src="currentUser.image_url">
                     </div>
                 </label>
                 <ul

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    const supabase = serverSupabaseClient<Database>(event)
+    const supabase = await serverSupabaseClient<Database>(event)
 
     const payload: Record<string, string> = {}
     let roleList: { name: string; max_users: number }[] = []

@@ -6,7 +6,7 @@ const supabaseUrl = process.env.SUPABASE_URL
 
 export default defineEventHandler(async (event) => {
     const body = await readMultipartFormData(event)
-    const supabase = serverSupabaseClient<Database>(event)
+    const supabase = await serverSupabaseClient<Database>(event)
 
     if (!body) {
         throw createError({
@@ -31,11 +31,19 @@ export default defineEventHandler(async (event) => {
     if (mediaData) {
         const avatarPath = `${payload.session_id}/profile/${mediaData.filename}`
 
-        // Cleanup user avatar directory
-        await supabase
+        // List all files from directory
+        const { data: files } = await supabase
             .storage
             .from('avatars')
-            .remove([`${payload.session_id}/profile`])
+            .list(`${payload.session_id}/profile`)
+
+        // Cleanup roleplay's storage directory
+        files?.forEach(async (file) => {
+            await supabase
+                .storage
+                .from('avatars')
+                .remove([`${payload.session_id}/profile/${file.name}`])
+        })
 
         // Upload new avatar
         await supabase
