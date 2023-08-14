@@ -1,6 +1,6 @@
 import * as process from 'node:process'
 import type { Database } from '@/types/supabase'
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseServiceRole } from '#supabase/server'
 
 const supabaseUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/roleplays`
 
@@ -16,7 +16,8 @@ export default defineEventHandler(async (event) => {
         })
     }
 
-    const supabase = serverSupabaseClient<Database>(event)
+    const client = await serverSupabaseClient<Database>(event)
+    const service = serverSupabaseServiceRole(event)
 
     const payload: Record<string, string> = {}
 
@@ -30,21 +31,21 @@ export default defineEventHandler(async (event) => {
 
     if (mediaData) {
         // List all files from directory
-        const { data: files } = await supabase
+        const { data: files } = await service
             .storage
             .from('roleplays')
             .list(`${payload.id}`)
 
         // Cleanup roleplay's storage directory
         files?.forEach(async (file) => {
-            await supabase
+            await service
                 .storage
                 .from('roleplays')
                 .remove([`${payload.id}/${file.name}`])
         })
 
         // Upload new illustration
-        await supabase
+        await service
             .storage
             .from('roleplays')
             .upload(`${payload.id}/${mediaData.filename}`, mediaData.data, {
@@ -58,7 +59,7 @@ export default defineEventHandler(async (event) => {
     const rpId = payload.id
     delete payload.id
 
-    await supabase
+    await client
         .from('roleplays')
         .update(payload)
         .eq('id', rpId)

@@ -1,33 +1,17 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { confirmed, email, image, max, required } from '@vee-validate/rules'
-import { ErrorMessage, Field, Form, configure, defineRule } from 'vee-validate'
+import type { Database } from 'types/supabase'
+import { email, image, max, required } from '@vee-validate/rules'
 import { localize } from '@vee-validate/i18n'
+import { Field, Form, configure, defineRule } from 'vee-validate'
+import type { ProfileFormType } from '@/types'
 import Availability from '@/components/profile/Availability.vue'
 import ChangePasswordModal from '@/components/modal/ChangePasswordModal.vue'
-import { useUserStore } from '@/stores/users'
-
-const userStore = useUserStore()
-const { updateProfile } = userStore
-const { user } = storeToRefs(userStore)
-const form = ref<any>({
-    email: '',
-    username: '',
-    description: '',
-})
-
-const isCreatingProfile = computed(() => Object.keys(user.value).length === 0 && user.value.constructor === Object)
-
-useHead({
-    title: isCreatingProfile.value ? 'Inscription' : 'Edition profil',
-})
+import { useCurrentUser } from '@/composables/currentUser'
 
 defineRule('email', email)
 defineRule('required', required)
 defineRule('image', image)
 defineRule('max', max)
-defineRule('password', (value: string) => value && value.length >= 6)
-defineRule('confirmed', confirmed)
 
 configure({
     generateMessage: localize('fr', {
@@ -42,13 +26,32 @@ configure({
     }),
 })
 
-const loading = ref(false)
-const success = ref(false)
-const error = ref(false)
-const errorMessage = ref('')
+useHead({
+    title: 'Profil',
+})
+
+const defaultAvatar = 'https://sarah-rp-manager.vercel.app/default-avatar.webp'
+
+const supabase = useSupabaseClient<Database>()
+const session = useSupabaseUser()
+const currentUser = useCurrentUser()
 const showPasswordModal = ref(false)
 const preview = ref('')
 const file = ref<File | null>(null)
+const loading = ref(false)
+const success = ref(false)
+
+const form = ref<ProfileFormType>({
+    email: '',
+    username: '',
+    description: '',
+    availability: {
+        weekdays: false,
+        weekends: false,
+        available: [],
+        unavailble: [],
+    },
+})
 
 function displayAvatar(e: Event) {
     const files = (e.target as HTMLInputElement).files
@@ -59,81 +62,65 @@ function displayAvatar(e: Event) {
     }
 }
 
-async function submit() {
-    loading.value = true
-    success.value = false
-    errorMessage.value = ''
-
-    const formData = new FormData()
-
-    formData.append('email', form.value.email)
-    formData.append('username', form.value.username)
-
-    if (isCreatingProfile.value) {
-        formData.append('password', form.value.password)
-    }
-    else {
-        formData.append('session_id', user.value.session_id)
-        formData.append('availability', JSON.stringify(form.value.availability))
-    }
-
-    formData.append('description', form.value.description)
-
-    if (file.value)
-        formData.append('media', file.value)
-
-    if (isCreatingProfile.value) {
-        await useFetch('/api/profile/register', {
-            method: 'POST',
-            body: formData,
-        })
-    }
-    else {
-        await updateProfile(formData)
-    }
-
-    success.value = true
-    loading.value = false
-}
-
 function editPassword() {
     showPasswordModal.value = !showPasswordModal.value
 }
+
+onMounted(async () => {
+    const { data: userData } = await supabase
+        .from('users')
+        .select('email, username, availability, image_url, description')
+        .eq('session_id', session.value!.id)
+        .single()
+
+    if (userData) {
+        form.value.email = userData.email
+        form.value.username = userData.username
+        form.value.description = userData.description ?? ''
+        form.value.availability = userData.availability
+
+        preview.value = userData.image_url ?? defaultAvatar
+    }
+})
 
 function passwordChanged() {
     showPasswordModal.value = false
     success.value = true
 }
 
-onMounted(() => {
-    if (isCreatingProfile.value) {
-        form.value.password = ''
-        form.value.confirm_password = ''
-    }
-    else {
-        const { email, username, image_url, description, availability } = user.value
-        form.value = Object.assign(form.value, {
-            email,
-            username,
-            image_url,
-            description,
-            availability,
-        })
-    }
-})
+async function submit() {
+    loading.value = true
+    success.value = false
+
+    const formData = new FormData()
+    formData.append('email', form.value.email)
+    formData.append('username', form.value.username)
+    formData.append('session_id', session.value!.id)
+    formData.append('availability', JSON.stringify(form.value.availability))
+
+    formData.append('description', form.value.description)
+
+    if (file.value)
+        formData.append('media', file.value)
+
+    const { data } = await useFetch('/api/profile/update', {
+        method: 'POST',
+        body: formData,
+    })
+
+    currentUser.value.username = form.value.username
+    if (data.value && data.value.payload.image_url)
+        currentUser.value.image_url = data.value.payload.image_url
+
+    success.value = true
+    loading.value = false
+}
 </script>
 
 <template>
     <section>
         <div class="py-8 px-4 mx-auto max-w-2xl lg:py-16">
             <h2
-                v-if="isCreatingProfile"
-                class="mb-4 text-xl font-bold text-gray-900 dark:text-white"
-            >
-                Nouveau profil
-            </h2>
-            <h2
-                v-else
                 class="mb-4 text-xl font-bold text-gray-900 dark:text-white"
             >
                 Informations du profil
@@ -156,36 +143,10 @@ onMounted(() => {
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                     </svg>
-                    <span v-if="isCreatingProfile">Un email vous a été envoyé, veuillez cliquer sur le lien pour activer
-                        votre compte.</span>
-                    <span v-else>Informations sauvegardées.</span>
+                    <span>Informations sauvegardées.</span>
                 </div>
-
-                <div
-                    v-if="error"
-                    class="alert alert-error mb-4"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="stroke-current shrink-0 h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                    </svg>
-                    <span>
-                        Un erreur est survenue:<br>
-                        {errorMessage}
-                    </span>
-                </div>
-
                 <div class="grid gap-4 sm:grid-cols-2 sm:gap-6">
-                    <div class="w-full">
+                    <div>
                         <label
                             for="email"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -200,15 +161,10 @@ onMounted(() => {
                             rules="email|required"
                             placeholder="sarah@gmail.com"
                             class="input input-bordered w-full"
-                            required
-                            :disabled="!isCreatingProfile"
-                        />
-                        <ErrorMessage
-                            name="email"
-                            class="text-red-500"
+                            disabled
                         />
                     </div>
-                    <div class="w-full">
+                    <div>
                         <label
                             for="username"
                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -231,55 +187,6 @@ onMounted(() => {
                         />
                     </div>
                     <div
-                        v-if="isCreatingProfile"
-                        class="w-full"
-                    >
-                        <label
-                            for="password"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                        >
-                            Mot de passe
-                        </label>
-                        <Field
-                            id="password"
-                            v-model="form.password"
-                            name="password"
-                            type="password"
-                            rules="password|required"
-                            class="input input-bordered w-full"
-                            required
-                        />
-                        <ErrorMessage
-                            name="password"
-                            class="text-red-500"
-                        />
-                    </div>
-                    <div
-                        v-if="isCreatingProfile"
-                        class="w-full"
-                    >
-                        <label
-                            for="confirm_password"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                        >
-                            Confirmation mot de passe
-                        </label>
-                        <Field
-                            id="confirm_password"
-                            v-model="form.confirm_password"
-                            name="confirm_password"
-                            type="password"
-                            rules="confirmed:@password|required"
-                            class="input input-bordered w-full"
-                            required
-                        />
-                        <ErrorMessage
-                            name="confirm_password"
-                            class="text-red-500"
-                        />
-                    </div>
-                    <div
-                        v-if="!isCreatingProfile"
                         class="sm:col-span-2"
                     >
                         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -287,15 +194,11 @@ onMounted(() => {
                         </label>
                         <div class="flex justify-evenly items-center">
                             <div
-                                v-if="(form.image_url && form.image_url !== '') || preview !== ''"
+                                v-if="preview !== ''"
                                 class="avatar"
                             >
                                 <div class="w-20 rounded-full">
-                                    <img
-                                        v-if="preview !== ''"
-                                        :src="preview"
-                                    >
-                                    <img :src="form.image_url">
+                                    <img :src="preview">
                                 </div>
                             </div>
                             <Field
@@ -312,7 +215,6 @@ onMounted(() => {
                             />
                         </div>
                     </div>
-
                     <div class="sm:col-span-2">
                         <label
                             for="description"
@@ -328,31 +230,12 @@ onMounted(() => {
                             placeholder="Description du personnage"
                         />
                     </div>
-
                     <Availability
-                        v-if="form.availability"
                         :form="form.availability"
                     />
                 </div>
 
                 <div
-                    v-if="isCreatingProfile"
-                    class="flex justify-end gap-x-4 mt-8"
-                >
-                    <button
-                        class="btn btn-primary"
-                        type="submit"
-                        :disabled="loading"
-                    >
-                        <span
-                            v-if="loading"
-                            class="loading loading-spinner"
-                        />
-                        Créer le profil
-                    </button>
-                </div>
-                <div
-                    v-else
                     class="flex justify-end gap-x-4 mt-8"
                 >
                     <button
@@ -377,7 +260,6 @@ onMounted(() => {
                 </div>
             </Form>
         </div>
-
         <ChangePasswordModal
             :show="showPasswordModal"
             @close="showPasswordModal = false"
@@ -385,10 +267,3 @@ onMounted(() => {
         />
     </section>
 </template>
-
-<style scoped>
-input,
-textarea {
-    @apply text-gray-900 dark:text-gray-100
-}
-</style>

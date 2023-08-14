@@ -18,6 +18,20 @@ export interface GenericDate {
     }
 }
 
+export interface Availability {
+    weekdays: boolean
+    weekends: boolean
+    available: (SpecificDate | GenericDate)[]
+    unavailble: SpecificDate[]
+}
+
+export interface ProfileFormType {
+    email: string
+    username: string
+    description: string
+    availability: any
+}
+
 export interface User {
     image_url: string
     description: string

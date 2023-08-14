@@ -2,7 +2,9 @@
 import { email, required } from '@vee-validate/rules'
 import { ErrorMessage, Field, Form, configure, defineRule } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
-import { useUserStore } from '@/stores/users'
+
+const client = useSupabaseClient()
+const router = useRouter()
 
 useHead({
     title: 'Connexion',
@@ -20,25 +22,32 @@ configure({
     }),
 })
 
-const userStore = useUserStore()
-
 const form = ref({
     email: '',
     password: '',
 })
 
+const loading = ref(false)
 const error = ref('')
 
-const { login } = userStore
-
 async function signin() {
-    const errorMessage = await login(
-        form.value.email,
-        form.value.password,
-    )
+    error.value = ''
+    loading.value = true
+    try {
+        const { error } = await client.auth.signInWithPassword({
+            email: form.value.email,
+            password: form.value.password,
+        })
 
-    if (errorMessage)
-        error.value = errorMessage
+        if (error)
+            throw error
+
+        router.push('/')
+    }
+    catch (e: any) {
+        error.value = e.message
+        loading.value = false
+    }
 }
 </script>
 
@@ -98,7 +107,14 @@ async function signin() {
             />
         </div>
         <div class="mt-10 flex justify-center">
-            <button class="btn-primary btn btn-wide">
+            <button
+                class="btn-primary btn btn-wide"
+                :disabled="loading"
+            >
+                <span
+                    v-if="loading"
+                    class="loading loading-spinner"
+                />
                 Connexion
             </button>
         </div>
@@ -107,7 +123,7 @@ async function signin() {
             <span>
                 Pas de compte ?
                 <NuxtLink
-                    to="/profil"
+                    to="/inscription"
                     class="cursor-pointer text-indigo-600 hover:text-indigo-800"
                 >
                     Inscription

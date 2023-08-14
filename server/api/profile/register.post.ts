@@ -1,9 +1,9 @@
 import type { Database } from '@/types/supabase'
-import { serverSupabaseClient } from '#supabase/server'
+import { serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
     const body = await readMultipartFormData(event)
-    const supabase = serverSupabaseClient<Database>(event)
+    const supabase = serverSupabaseServiceRole<Database>(event)
 
     if (!body) {
         throw createError({

@@ -19,7 +19,7 @@ configure({
     }),
 })
 
-const client = useSupabaseAuthClient()
+const client = useSupabaseClient()
 
 const success = ref(false)
 const form = ref({
@@ -93,7 +93,7 @@ async function submit() {
                 to="/connexion"
                 class="cursor-pointer text-indigo-600 hover:text-indigo-800"
             >
-                Inscription
+                Connexion
             </NuxtLink>
         </div>
     </Form>
