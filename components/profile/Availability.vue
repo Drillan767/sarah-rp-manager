@@ -59,17 +59,26 @@ const summary = computed(() => {
 })
 
 function addDate(type: 'available' | 'unavailable') {
-    formProxy.value[type].push({
-        begin: {
-            day: 'Lundi',
-            hour: '00:00',
-        },
-        end: {
-            day: 'Lundi',
-            hour: '00:00',
-        },
-        isSpecific: false,
-    })
+    if (type === 'available') {
+        formProxy.value.available.push({
+            begin: {
+                day: 'Lundi',
+                hour: '00:00',
+            },
+            end: {
+                day: 'Lundi',
+                hour: '00:00',
+            },
+            isSpecific: false,
+        })
+    }
+    else {
+        formProxy.value.unavailable.push({
+            begin: '',
+            end: '',
+            isSpecific: true,
+        })
+    }
 }
 
 const summaryAvailable = computed(() => getSummary(formProxy.value.available, 'available'))
@@ -292,19 +301,6 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                     :key="i"
                 >
                     <div class="flex gap-4 mb-4">
-                        <div class="flex items-center">
-                            <div class="form-control">
-                                <label class="label cursor-pointer">
-                                    <input
-                                        v-model="u.isSpecific"
-                                        class="btn btn-outline btn-neutral btn-xs"
-                                        type="checkbox"
-                                        aria-label="Date spécifique"
-                                        @input="changeSpecific($event, ['unavailable', i])"
-                                    >
-                                </label>
-                            </div>
-                        </div>
                         <AvailabilitySpecificRow
                             v-if="u.isSpecific"
                             :min-date="minDate"
