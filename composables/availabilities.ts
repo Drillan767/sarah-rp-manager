@@ -1,4 +1,4 @@
-import type { GenericDate, SpecificDate } from '@/types'
+import type { Availability, GenericDate, SpecificDate } from '@/types'
 
 export default function useAvailabilities() {
     const dayjs = useDayjs()
@@ -8,45 +8,64 @@ export default function useAvailabilities() {
         return hour * 60 + minute
     }
 
-    function calculateOverlap(periods: (SpecificDate | GenericDate)[]) {
-        const overlaps = []
-        console.log('test ?')
+    function halfHoursBetween(beginTimeStr: string, endTimeStr: string) {
+        const beginMinutes = parseTime(beginTimeStr)
+        const endMinutes = parseTime(endTimeStr)
 
-        for (let i = 0; i < periods.length; i++) {
-            if (periods[i].isSpecific) {
-                const specificPeriod = periods[i] as SpecificDate
-                console.log(specificPeriod.begin)
-                // ...
-            }
-            else {
-                console.log(periods)
-                for (let j = i + 1; j < periods.length; j++) {
-                    console.log({ i, j })
-                    const genericStartPeriod = periods[i] as GenericDate
-                    const genericEndPeriod = periods[j] as GenericDate
-                    const start1 = parseTime(genericStartPeriod.begin.hour)
-                    const end1 = parseTime(genericStartPeriod.end.hour)
-                    const start2 = parseTime(genericEndPeriod.begin.hour)
-                    const end2 = parseTime(genericEndPeriod.end.hour)
+        // Assuming that both the beginTime and endTime are in the same day
+        const timeDifference = endMinutes - beginMinutes
 
-                    console.log({ start1, start2, end1, end2 })
+        // Calculate the number of half hours
+        const halfHours = Math.floor(timeDifference / 30)
 
-                    if (end1 > start2 && end2 > start1) {
-                        const overlapStart = Math.max(start1, start2)
-                        const overlapEnd = Math.min(end1, end2)
-                        const overlapDuration = overlapEnd - overlapStart
+        return halfHours
+    }
 
-                        overlaps.push({
-                            period1: genericStartPeriod,
-                            period2: genericEndPeriod,
-                            duration: overlapDuration,
-                        })
-                    }
-                }
+    function calculateOverlap(availability: Availability, nbWeek?: number) {
+        const currentWeek = nbWeek ?? dayjs().week()
+
+        // One day (24h) has 48 half hours.
+        // 48 x 7 = 336.
+        const grid = Array.from(Array(336).keys(), () => 0)
+        const { weekdays, weekends, available, unavailable } = availability
+
+        if (weekdays) {
+            const eveningHours = ['22:00', '22:30', '23:00', '23:30'].map(h => halfHoursBetween('00:00', h))
+
+            for (let i = 0; i < 5; i++) {
+                eveningHours.forEach((eh) => {
+                    const gridIndex = i * 48 + eh
+                    grid[gridIndex] = 1
+                })
             }
         }
 
-        return overlaps
+        if (weekends) {
+            const saturday = 48 * 5
+            for (let i = saturday; i < 336; i++)
+                grid[i] = 1
+        }
+
+        available.forEach((a) => {
+            if (a.isSpecific) {
+                const begin = dayjs(a.begin)
+                const end = dayjs(a.end)
+
+                // TODO: check if begin or end or both are in the current week
+                if (end.isAfter(dayjs())) {
+                    const beginIndex = 48 * (begin.get('d') - 1) + halfHoursBetween('00:00', begin.format('HH:mm'))
+                    const endIndex = 48 * (end.get('d') - 1) + halfHoursBetween('00:00', end.format('HH:mm'))
+
+                    for (let i = beginIndex; i <= endIndex; i++)
+                        grid[i] += 1
+                }
+            }
+            else {
+                // ...
+            }
+        })
+
+        return grid
     }
 
     function retrieveDate(a: GenericDate | SpecificDate) {
@@ -67,7 +86,8 @@ export default function useAvailabilities() {
     }
 
     function getSummary(data: (GenericDate | SpecificDate)[], type: 'available' | 'unavailable') {
-        if (data[type].length === 0)
+
+        /* if (data[type].length === 0)
             return null
         let response = type === 'available' ? 'Disponible ' : 'Indisponible '
         if (data.length === 1) {
@@ -84,7 +104,7 @@ export default function useAvailabilities() {
             })
 
             return response
-        }
+        } */
     }
 
     return {

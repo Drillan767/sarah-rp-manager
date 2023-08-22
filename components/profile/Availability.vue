@@ -11,7 +11,7 @@ interface Props {
         weekdays: boolean
         weekends: boolean
         available: (GenericDate | SpecificDate)[]
-        unavailable: (GenericDate | SpecificDate)[]
+        unavailable: SpecificDate[]
     }
 }
 
@@ -85,7 +85,10 @@ const summaryAvailable = computed(() => getSummary(formProxy.value.available, 'a
 
 const summaryUnavailable = computed(() => getSummary(formProxy.value.unavailable, 'unavailable'))
 
-const availableOverlapping = computed(() => calculateOverlap(formProxy.value.available))
+const availableOverlapping = computed(() => {
+    const grid = calculateOverlap(formProxy.value)
+    return grid.includes(2)
+})
 
 function getSummary(data: (GenericDate | SpecificDate)[], type: 'available' | 'unavailable') {
     if (formProxy.value.available.length === 0)
@@ -129,7 +132,9 @@ function removeDate(type: 'available' | 'unavailable', index: number) {
     formProxy.value[type].splice(index, 1)
 }
 
-onMounted(() => formProxy.value = props.form)
+onMounted(() => {
+    formProxy.value = props.form
+})
 
 function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
     const [type, index] = params
@@ -193,6 +198,9 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                 v-slot="{ errors }"
                 class="modal-box w-11/12 max-w-5xl"
             >
+                <div v-if="availableOverlapping">
+                    <p>Y'a un soucis</p>
+                </div>
                 <h3 class="font-bold text-lg mb-4">
                     Disponibilités générales
                 </h3>
@@ -302,17 +310,6 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                 >
                     <div class="flex gap-4 mb-4">
                         <AvailabilitySpecificRow
-                            v-if="u.isSpecific"
-                            :min-date="minDate"
-                            :max-hours="maxHours"
-                            section="unavailable"
-                            :index="i"
-                            :fields="u"
-                            @remove-date="removeDate('unavailable', i)"
-                        />
-
-                        <AvailabilityGenericRow
-                            v-else
                             :min-date="minDate"
                             :max-hours="maxHours"
                             section="unavailable"

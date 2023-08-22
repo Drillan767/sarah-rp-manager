@@ -73,7 +73,7 @@ export default defineNuxtConfig({
     dayjs: {
         locales: ['fr'],
         defaultLocale: 'fr',
-        plugins: ['relativeTime', 'utc'],
+        plugins: ['relativeTime', 'utc', 'weekOfYear'],
     },
 
     imports: {

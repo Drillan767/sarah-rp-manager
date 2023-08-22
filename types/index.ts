@@ -22,7 +22,7 @@ export interface Availability {
     weekdays: boolean
     weekends: boolean
     available: (SpecificDate | GenericDate)[]
-    unavailble: SpecificDate[]
+    unavailable: SpecificDate[]
 }
 
 export interface ProfileFormType {

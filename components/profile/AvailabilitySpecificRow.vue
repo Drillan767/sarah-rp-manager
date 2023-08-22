@@ -53,8 +53,7 @@ defineRule('available', (value: string, [target]: [string]) => {
     if (dayjs().isAfter(before) || dayjs().isAfter(after))
         return 'La date choisie doit être dans le futur'
 
-    if (after.diff(before, 'h') > props.maxHours)
-
+    if (props.section === 'available' && after.diff(before, 'h') > props.maxHours)
         return `Veuillez choisir une période de ${props.maxHours}h maximum`
 
     return true

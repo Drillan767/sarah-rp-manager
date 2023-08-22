@@ -49,7 +49,7 @@ const form = ref<ProfileFormType>({
         weekdays: false,
         weekends: false,
         available: [],
-        unavailble: [],
+        unavailable: [],
     },
 })
 
