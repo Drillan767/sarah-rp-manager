@@ -54,7 +54,7 @@ export default function useAvailabilities() {
 
                 if ([begin.week(), end.week()].includes(currentWeek)) {
                     const beginIndex = 48 * (begin.get('d') - 1) + halfHoursBetween('00:00', begin.format('HH:mm'))
-                    const endIndex = 48 * (end.get('d') - 1) + halfHoursBetween('00:00', end.format('HH:mm'))
+                    const endIndex = 48 * (end.get('d') - 1) + halfHoursBetween('00:00', end.format('HH:mm')) - 1
 
                     // We are about to reach the end of the grid.
                     if (beginIndex > endIndex) {
@@ -72,7 +72,7 @@ export default function useAvailabilities() {
             }
             else {
                 const beginIndex = 48 * days.indexOf(a.begin.day) + halfHoursBetween('00:00', a.begin.hour)
-                const endIndex = 48 * days.indexOf(a.end.day) + halfHoursBetween('00:00', a.end.hour)
+                const endIndex = 48 * days.indexOf(a.end.day) + halfHoursBetween('00:00', a.end.hour) - 1
 
                 // We are about to reach the end of the grid.
                 if (beginIndex > endIndex) {
@@ -95,7 +95,7 @@ export default function useAvailabilities() {
 
             if ([begin.week(), end.week()].includes(currentWeek)) {
                 const beginIndex = 48 * (begin.get('d') - 1) + halfHoursBetween('00:00', begin.format('HH:mm'))
-                const endIndex = 48 * (end.get('d') - 1) + halfHoursBetween('00:00', end.format('HH:mm'))
+                const endIndex = 48 * (end.get('d') - 1) + halfHoursBetween('00:00', end.format('HH:mm')) - 1
 
                 // We are about to reach the end of the grid.
                 if (beginIndex > endIndex) {
