@@ -1,32 +1,17 @@
 <script setup lang="ts">
-import { ErrorMessage, Field, Form, configure, defineRule } from 'vee-validate'
+import { Form, configure } from 'vee-validate'
 import { localize } from '@vee-validate/i18n'
-import { days, hours } from '@/assets/json/availability-time.json'
-
-interface SpecificDate {
-    isSpecific: true
-    begin: string
-    end: string
-}
-
-interface GenericDate {
-    isSpecific: false
-    begin: {
-        day: string
-        hour: string
-    }
-    end: {
-        day: string
-        hour: string
-    }
-}
+import AvailabilityGenericRow from './AvailabilityGenericRow.vue'
+import AvailabilitySpecificRow from './AvailabilitySpecificRow.vue'
+import type { GenericDate, SpecificDate } from '@/types'
+import useAvailabilities from '@/composables/availabilities'
 
 interface Props {
     form: {
         weekdays: boolean
         weekends: boolean
         available: (GenericDate | SpecificDate)[]
-        unavailable: (GenericDate | SpecificDate)[]
+        unavailable: SpecificDate[]
     }
 }
 
@@ -35,6 +20,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{ (e: 'input', value: Props['form']): void }>()
 
 const dayjs = useDayjs()
+const { calculateOverlap } = useAvailabilities()
 
 const maxHours = 15
 
@@ -49,40 +35,6 @@ configure({
             confirm_password: 'Les mots de passe ne correspondent pas',
         },
     }),
-})
-
-defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, string, string]) => {
-    const halfHours = maxHours * 2
-    const bdIndex = days.findIndex(d => d === beginDay)
-
-    if (beginDay === endDay && beginHour === value)
-        return 'Veuillez sélectionner une période d\'au moins 30mn'
-
-    const { newDay, halfHours: nbHalfHours } = halfHoursBetween(beginHour, value)
-    if ((newDay && days[bdIndex + 1] !== endDay) || nbHalfHours > halfHours)
-        return `Veuillez choisir une période de ${maxHours}h maximum`
-
-    return true
-})
-
-defineRule('isAfter', (value: string, [target]: [string]) => {
-    const before = dayjs(target)
-    const after = dayjs(value)
-
-    if (after.isBefore(before))
-        return 'La date de fin ne doit pas être avant la date de début'
-
-    if (after.diff(before, 'm') < 30)
-        return 'Veuillez chosir une période d\'au moins 30mn'
-
-    if (dayjs().isAfter(before) || dayjs().isAfter(after))
-        return 'La date choisie doit être dans le futur'
-
-    if (after.diff(before, 'h') > maxHours)
-
-        return `Veuillez choisir une période de ${maxHours}h maximum`
-
-    return true
 })
 
 const minDate = dayjs().format('YYYY-MM-DDT00:00')
@@ -107,22 +59,36 @@ const summary = computed(() => {
 })
 
 function addDate(type: 'available' | 'unavailable') {
-    formProxy.value[type].push({
-        begin: {
-            day: 'Lundi',
-            hour: '00:00',
-        },
-        end: {
-            day: 'Lundi',
-            hour: '00:00',
-        },
-        isSpecific: false,
-    })
+    if (type === 'available') {
+        formProxy.value.available.push({
+            begin: {
+                day: 'Lundi',
+                hour: '00:00',
+            },
+            end: {
+                day: 'Lundi',
+                hour: '00:00',
+            },
+            isSpecific: false,
+        })
+    }
+    else {
+        formProxy.value.unavailable.push({
+            begin: '',
+            end: '',
+            isSpecific: true,
+        })
+    }
 }
 
 const summaryAvailable = computed(() => getSummary(formProxy.value.available, 'available'))
 
 const summaryUnavailable = computed(() => getSummary(formProxy.value.unavailable, 'unavailable'))
+
+const availableOverlapping = computed(() => {
+    const grid = calculateOverlap(formProxy.value)
+    return grid.includes(2)
+})
 
 function getSummary(data: (GenericDate | SpecificDate)[], type: 'available' | 'unavailable') {
     if (formProxy.value.available.length === 0)
@@ -166,39 +132,8 @@ function removeDate(type: 'available' | 'unavailable', index: number) {
     formProxy.value[type].splice(index, 1)
 }
 
-function timeToMinutes(timeStr: typeof hours[number]) {
-    const [hours, minutes] = timeStr.split(':').map(Number)
-    return hours * 60 + minutes
-}
-
-function halfHoursBetween(beginTimeStr: typeof hours[number], endTimeStr: typeof hours[number]) {
-    const beginMinutes = timeToMinutes(beginTimeStr)
-    const endMinutes = timeToMinutes(endTimeStr)
-    let newDay = false
-    let nextDayOffset = 0
-
-    // Check if the endTime is before the beginTime (spans across two days)
-    if (endMinutes < beginMinutes) {
-        nextDayOffset = 24 * 60
-        newDay = true
-    }
-
-    // Assuming both times are within the same 24-hour period
-    const timeDifference = endMinutes + nextDayOffset - beginMinutes
-
-    // Calculate the number of half hours
-    const halfHours = Math.floor(timeDifference / 30)
-
-    return { newDay, halfHours }
-}
-
 onMounted(() => {
-    onMounted(() => formProxy.value = props.form)
-
-    addEventListener('keydown', (e) => {
-        if (e.key === 'Escape')
-            openModal.value = false
-    })
+    formProxy.value = props.form
 })
 
 function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
@@ -263,6 +198,28 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                 v-slot="{ errors }"
                 class="modal-box w-11/12 max-w-5xl"
             >
+                <div
+                    v-if="availableOverlapping"
+                    class="alert alert-error mb-4"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="stroke-current shrink-0 h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    ><path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    /></svg>
+                    <span>
+                        Au moins deux périodes se chevauchent. <br>
+                        <template v-if="formProxy.weekdays || formProxy.weekends">
+                            Vérifiez qu'une nouvelle période ajoutée n'entre pas en conflit avec vos disponibilités générales.
+                        </template>
+                    </span>
+                </div>
                 <h3 class="font-bold text-lg mb-4">
                     Disponibilités générales
                 </h3>
@@ -281,7 +238,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                             <span class="label-text ml-">Disponible en semaine</span>
                         </label>
                         <label class="label">
-                            <span class="label-text-alt ml-9">Du Lundi au Vendredi aux environs de 22h</span>
+                            <span class="label-text-alt ml-9">Du Lundi au Vendredi de 22h à minuit</span>
                         </label>
                     </div>
 
@@ -302,7 +259,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                         </label>
                         <label class="label">
                             <span class="label-text-alt ml-9">
-                                Du samedi au dimanche à n'importe quelle heure
+                                Du samedi au dimanche, toute la journée
                             </span>
                         </label>
                     </div>
@@ -316,8 +273,8 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                     v-for="(a, i) in formProxy.available"
                     :key="i"
                 >
-                    <div class="grid grid-cols-6 grid-rows-1 gap-4 mb-4">
-                        <div class="flex items-end">
+                    <div class="flex gap-4 mb-4">
+                        <div class="flex items-center">
                             <div class="form-control">
                                 <label class="label cursor-pointer">
                                     <input
@@ -331,129 +288,26 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                             </div>
                         </div>
 
-                        <div class="col-span-2">
-                            <div class="form-control w-full max-w-xs">
-                                <label class="label">
-                                    <span class="label-text">Début</span>
-                                </label>
-                                <div class="flex gap-x-2">
-                                    <template v-if="a.isSpecific">
-                                        <Field
-                                            v-model="a.begin"
-                                            type="datetime-local"
-                                            :name="`begin-available-specific-${i}`"
-                                            :min="minDate"
-                                            class="input input-bordered w-full max-w-xs"
-                                        />
-                                    </template>
-                                    <template v-else>
-                                        <Field
-                                            v-model="a.begin.day"
-                                            :name="`begin-available-generic-day-${i}`"
-                                            class="select select-bordered w-1/2 max-w-xs"
-                                            as="select"
-                                        >
-                                            <option
-                                                v-for="(day, j) in days"
-                                                :key="j"
-                                                :value="day"
-                                                :selected="j === 0"
-                                            >
-                                                {{ day }}
-                                            </option>
-                                        </Field>
-                                        <Field
-                                            v-model="a.begin.hour"
-                                            :name="`begin-available-generic-hour-${i}`"
-                                            class="select select-bordered w-1/2 max-w-xs"
-                                            as="select"
-                                        >
-                                            <option
-                                                v-for="(hour, j) in hours"
-                                                :key="j"
-                                                :value="hour"
-                                                :selected="j === 0"
-                                            >
-                                                {{ hour }}
-                                            </option>
-                                        </Field>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-span-2 col-start-4">
-                            <div class="form-control w-full max-w-xs">
-                                <label class="label">
-                                    <span class="label-text">Fin</span>
-                                </label>
-                                <div class="flex gap-x-2">
-                                    <template v-if="a.isSpecific">
-                                        <Field
-                                            v-model="a.end"
-                                            type="datetime-local"
-                                            :name="`end-available-specific-${i}`"
-                                            :min="minDate"
-                                            class="input input-bordered w-full max-w-xs"
-                                            :rules="`isAfter:@begin-available-specific-${i}`"
-                                        />
-                                    </template>
-                                    <template v-else>
-                                        <Field
-                                            v-model="a.end.day"
-                                            :name="`end-available-generic-day-${i}`"
-                                            class="select select-bordered w-1/2 max-w-xs"
-                                            as="select"
-                                        >
-                                            <option
-                                                v-for="(day, j) in days"
-                                                :key="j"
-                                                :value="day"
-                                                :selected="j === 0"
-                                            >
-                                                {{ day }}
-                                            </option>
-                                        </Field>
-                                        <Field
-                                            v-model="a.end.hour"
-                                            :name="`end-available-generic-hour-${i}`"
-                                            class="select select-bordered w-1/2 max-w-xs"
-                                            as="select"
-                                            :rules="`available:@begin-available-generic-day-${i},@begin-available-generic-hour-${i},@end-available-generic-day-${i}`"
-                                        >
-                                            <option
-                                                v-for="(hour, j) in hours"
-                                                :key="j"
-                                                :value="hour"
-                                                :selected="j === 0"
-                                            >
-                                                {{ hour }}
-                                            </option>
-                                        </Field>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-start-6 flex items-end justify-end">
-                            <button
-                                class="btn btn-outline btn-error btn-md"
-                                @click.prevent="removeDate('available', i)"
-                            >
-                                Retirer
-                            </button>
-                        </div>
+                        <AvailabilitySpecificRow
+                            v-if="a.isSpecific"
+                            :min-date="minDate"
+                            :max-hours="maxHours"
+                            section="available"
+                            :index="i"
+                            :fields="a"
+                            @remove-date="removeDate('available', i)"
+                        />
+
+                        <AvailabilityGenericRow
+                            v-else
+                            :min-date="minDate"
+                            :max-hours="maxHours"
+                            section="available"
+                            :index="i"
+                            :fields="a"
+                            @remove-date="removeDate('available', i)"
+                        />
                     </div>
-                    <ErrorMessage
-                        v-if="a.isSpecific"
-                        :key="`if-${i}`"
-                        class="text-red-500"
-                        :name="`end-available-specific-${i}`"
-                    />
-                    <ErrorMessage
-                        v-else
-                        :key="`else-${i}`"
-                        class="text-red-500"
-                        :name="`end-available-generic-hour-${i}`"
-                    />
                 </template>
 
                 <div class="flex justify-end">
@@ -473,144 +327,16 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                     v-for="(u, i) in formProxy.unavailable"
                     :key="i"
                 >
-                    <div class="grid grid-cols-6 grid-rows-1 gap-4 mb-4">
-                        <div class="flex items-end">
-                            <div class="form-control">
-                                <label class="label cursor-pointer">
-                                    <input
-                                        v-model="u.isSpecific"
-                                        class="btn btn-outline btn-neutral btn-xs"
-                                        type="checkbox"
-                                        aria-label="Date spécifique"
-                                        @input="changeSpecific($event, ['unavailable', i])"
-                                    >
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="col-span-2">
-                            <div class="form-control w-full max-w-xs">
-                                <label class="label">
-                                    <span class="label-text">Début</span>
-                                </label>
-                                <div class="flex gap-x-2">
-                                    <template v-if="u.isSpecific">
-                                        <Field
-                                            v-model="u.begin"
-                                            type="datetime-local"
-                                            :name="`begin-unavailable-specific-${i}`"
-                                            :min="minDate"
-                                            class="input input-bordered w-full max-w-xs"
-                                        />
-                                    </template>
-                                    <template v-else>
-                                        <Field
-                                            v-model="u.begin.day"
-                                            :name="`begin-unavailable-generic-day-${i}`"
-                                            class="select select-bordered w-1/2 max-w-xs"
-                                            as="select"
-                                        >
-                                            <option
-                                                v-for="(day, j) in days"
-                                                :key="j"
-                                                :value="day"
-                                                :selected="j === 0"
-                                            >
-                                                {{ day }}
-                                            </option>
-                                        </Field>
-                                        <Field
-                                            v-model="u.begin.hour"
-                                            :name="`begin-unavailable-generic-hour-${i}`"
-                                            class="select select-bordered w-1/2 max-w-xs"
-                                            as="select"
-                                        >
-                                            <option
-                                                v-for="(hour, j) in hours"
-                                                :key="j"
-                                                :value="hour"
-                                                :selected="j === 0"
-                                            >
-                                                {{ hour }}
-                                            </option>
-                                        </Field>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-span-2 col-start-4">
-                            <div class="form-control w-full max-w-xs">
-                                <label class="label">
-                                    <span class="label-text">Fin</span>
-                                </label>
-                                <div class="flex gap-x-2">
-                                    <template v-if="u.isSpecific">
-                                        <Field
-                                            v-model="u.end"
-                                            type="datetime-local"
-                                            :name="`end-unavailable-specific-${i}`"
-                                            :min="minDate"
-                                            class="input input-bordered w-full max-w-xs"
-                                            :rules="`isAfter:@begin-unavailable-specific-${i}`"
-                                        />
-                                    </template>
-                                    <template v-else>
-                                        <Field
-                                            v-model="u.end.day"
-                                            :name="`end-unavailable-generic-day-${i}`"
-                                            class="select select-bordered w-1/2 max-w-xs"
-                                            as="select"
-                                        >
-                                            <option
-                                                v-for="(day, j) in days"
-                                                :key="j"
-                                                :value="day"
-                                                :selected="j === 0"
-                                            >
-                                                {{ day }}
-                                            </option>
-                                        </Field>
-                                        <Field
-                                            v-model="u.end.hour"
-                                            :name="`end-unavailable-generic-hour-${i}`"
-                                            class="select select-bordered w-1/2 max-w-xs"
-                                            as="select"
-                                            :rules="`available:@begin-unavailable-generic-day-${i},@begin-unavailable-generic-hour-${i},@end-unavailable-generic-day-${i}`"
-                                        >
-                                            <option
-                                                v-for="(hour, j) in hours"
-                                                :key="j"
-                                                :value="hour"
-                                                :selected="j === 0"
-                                            >
-                                                {{ hour }}
-                                            </option>
-                                        </Field>
-                                    </template>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-start-6 flex items-end justify-end">
-                            <button
-                                class="btn btn-outline btn-error btn-md"
-                                @click.prevent="removeDate('unavailable', i)"
-                            >
-                                Retirer
-                            </button>
-                        </div>
+                    <div class="flex gap-4 mb-4">
+                        <AvailabilitySpecificRow
+                            :min-date="minDate"
+                            :max-hours="maxHours"
+                            section="unavailable"
+                            :index="i"
+                            :fields="u"
+                            @remove-date="removeDate('unavailable', i)"
+                        />
                     </div>
-                    <ErrorMessage
-                        v-if="u.isSpecific"
-                        :key="`if-${i}`"
-                        class="text-red-500"
-                        :name="`end-unavailable-specific-${i}`"
-                    />
-                    <ErrorMessage
-                        v-else
-                        :key="`else-${i}`"
-                        class="text-red-500"
-                        :name="`end-unavailable-generic-hour-${i}`"
-                    />
                 </template>
 
                 <div class="flex justify-end">
@@ -625,7 +351,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                 <div class="modal-action">
                     <button
                         class="btn"
-                        :disabled="Object.keys(errors).length > 0"
+                        :disabled="Object.keys(errors).length > 0 || availableOverlapping"
                         @click.prevent="openModal = false"
                     >
                         Enregistrer
