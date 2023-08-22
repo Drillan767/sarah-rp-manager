@@ -198,8 +198,27 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                 v-slot="{ errors }"
                 class="modal-box w-11/12 max-w-5xl"
             >
-                <div v-if="availableOverlapping">
-                    <p>Y'a un soucis</p>
+                <div
+                    v-if="availableOverlapping"
+                    class="alert alert-error mb-4"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="stroke-current shrink-0 h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    ><path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    /></svg>
+                    <span>
+                        Au moins deux périodes se chevauchent. <br>
+                        <template v-if="formProxy.weekdays || formProxy.weekends">
+                            Vérifiez qu'une nouvelle période ajoutée n'entre pas en conflit avec vos disponibilités générales.
+                        </template>
+                    </span>
                 </div>
                 <h3 class="font-bold text-lg mb-4">
                     Disponibilités générales
@@ -219,7 +238,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                             <span class="label-text ml-">Disponible en semaine</span>
                         </label>
                         <label class="label">
-                            <span class="label-text-alt ml-9">Du Lundi au Vendredi aux environs de 22h</span>
+                            <span class="label-text-alt ml-9">Du Lundi au Vendredi de 22h à minuit</span>
                         </label>
                     </div>
 
@@ -240,7 +259,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                         </label>
                         <label class="label">
                             <span class="label-text-alt ml-9">
-                                Du samedi au dimanche à n'importe quelle heure
+                                Du samedi au dimanche, toute la journée
                             </span>
                         </label>
                     </div>
@@ -332,7 +351,7 @@ function changeSpecific(e: any, params: ['available' | 'unavailable', number]) {
                 <div class="modal-action">
                     <button
                         class="btn"
-                        :disabled="Object.keys(errors).length > 0"
+                        :disabled="Object.keys(errors).length > 0 || availableOverlapping"
                         @click.prevent="openModal = false"
                     >
                         Enregistrer

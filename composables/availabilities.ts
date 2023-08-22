@@ -1,4 +1,5 @@
 import type { Availability, GenericDate, SpecificDate } from '@/types'
+import { days } from '@/assets/json/availability-time.json'
 
 export default function useAvailabilities() {
     const dayjs = useDayjs()
@@ -51,17 +52,63 @@ export default function useAvailabilities() {
                 const begin = dayjs(a.begin)
                 const end = dayjs(a.end)
 
-                // TODO: check if begin or end or both are in the current week
-                if (end.isAfter(dayjs())) {
+                if ([begin.week(), end.week()].includes(currentWeek)) {
                     const beginIndex = 48 * (begin.get('d') - 1) + halfHoursBetween('00:00', begin.format('HH:mm'))
                     const endIndex = 48 * (end.get('d') - 1) + halfHoursBetween('00:00', end.format('HH:mm'))
 
+                    // We are about to reach the end of the grid.
+                    if (beginIndex > endIndex) {
+                        for (let i = beginIndex; i <= 335; i++)
+                            grid[i] += 1
+
+                        for (let j = 0; j <= endIndex; j++)
+                            grid[j] += 1
+                    }
+                    else {
+                        for (let i = beginIndex; i <= endIndex; i++)
+                            grid[i] += 1
+                    }
+                }
+            }
+            else {
+                const beginIndex = 48 * days.indexOf(a.begin.day) + halfHoursBetween('00:00', a.begin.hour)
+                const endIndex = 48 * days.indexOf(a.end.day) + halfHoursBetween('00:00', a.end.hour)
+
+                // We are about to reach the end of the grid.
+                if (beginIndex > endIndex) {
+                    for (let i = beginIndex; i <= 335; i++)
+                        grid[i] += 1
+
+                    for (let j = 0; j <= endIndex; j++)
+                        grid[j] += 1
+                }
+                else {
                     for (let i = beginIndex; i <= endIndex; i++)
                         grid[i] += 1
                 }
             }
-            else {
-                // ...
+        })
+
+        unavailable.forEach((u) => {
+            const begin = dayjs(u.begin)
+            const end = dayjs(u.end)
+
+            if ([begin.week(), end.week()].includes(currentWeek)) {
+                const beginIndex = 48 * (begin.get('d') - 1) + halfHoursBetween('00:00', begin.format('HH:mm'))
+                const endIndex = 48 * (end.get('d') - 1) + halfHoursBetween('00:00', end.format('HH:mm'))
+
+                // We are about to reach the end of the grid.
+                if (beginIndex > endIndex) {
+                    for (let i = beginIndex; i <= 335; i++)
+                        grid[i] = grid[i] > 0 ? grid[i] - 1 : 0
+
+                    for (let j = 0; j <= endIndex; j++)
+                        grid[j] = grid[j] > 0 ? grid[j] - 1 : 0
+                }
+                else {
+                    for (let i = beginIndex; i <= endIndex; i++)
+                        grid[i] = grid[i] > 0 ? grid[i] - 1 : 0
+                }
             }
         })
 
