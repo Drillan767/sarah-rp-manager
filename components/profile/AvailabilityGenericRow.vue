@@ -59,7 +59,11 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
     const differentDays = newDay === false && beginDay !== endDay
 
     // Returns true if newDay is true, but beginDay and endDay are not following each other.
-    const daysNotFollowing = newDay && days[bdIndex + 1] !== endDay
+    const daysNotFollowing = newDay && (
+        bdIndex !== days.length - 1
+            ? days[bdIndex + 1] !== endDay
+            : endDay !== days[0]
+    )
 
     // Returns true if nbHalfHours exceeds max halfHours.
     const tooMuchHours = nbHalfHours > halfHours
