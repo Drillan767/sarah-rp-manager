@@ -72,10 +72,10 @@ export default function useAvailabilities() {
             }
             else {
                 const beginIndex = 48 * days.indexOf(a.begin.day) + halfHoursBetween('00:00', a.begin.hour)
-                const endIndex = 48 * days.indexOf(a.end.day) + halfHoursBetween('00:00', a.end.hour) - 1
+                const endIndex = 48 * days.indexOf(a.end.day) + halfHoursBetween('00:00', a.end.hour)
 
                 // We are about to reach the end of the grid.
-                if (endIndex > 0 && beginIndex > endIndex) {
+                if (endIndex >= 0 && beginIndex > endIndex) {
                     for (let i = beginIndex; i <= 335; i++)
                         grid[i] += 1
 
