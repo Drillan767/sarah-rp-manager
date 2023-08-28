@@ -1,19 +1,29 @@
-import type { Database } from 'types/supabase'
-import type { User } from 'types'
-import { defineStore } from 'pinia'
+import type { User } from "types"
+import { defineStore } from "pinia"
+
+export const defaultUser = {
+    email: '',
+    username: '',
+    is_sarah: false,
+    description: '',
+    image_url: 'https://sarah-rp-manager.vercel.app/default-avatar.webp',
+    availability: []
+}
 
 export const useUserStore = defineStore('user', () => {
-    const client = useSupabaseClient<Database>()
-    const session = useSupabaseUser()
+
+    const authClient = useSupabaseAuthClient()
+    const client = useSupabaseClient()
+    const session = useSupabaseUser();
     const router = useRouter()
 
     const user = ref<User>({} as User)
     const loggedIn = computed(() => session !== null)
 
     async function login(email: string, password: string) {
-        const { error: errResponse, data } = await client.auth.signInWithPassword({
+        const { error: errResponse, data } = await authClient.auth.signInWithPassword({
             email,
-            password,
+            password
         })
 
         if (data.session || data.user) {
@@ -21,71 +31,46 @@ export const useUserStore = defineStore('user', () => {
             router.push('/')
         }
 
-        if (errResponse)
+        if (errResponse) {
             return errResponse.message
+        }
     }
 
     async function initSession() {
-        if (session.value) {
-            const sessId = session.value.id
-
-            const { data } = await client
-                .from('users')
-                .select('*')
-                .eq('session_id', sessId)
-                .maybeSingle()
-
-            if (data) {
-                const { image_url, description, session_id: _, availability, ...fields } = data
-                user.value = {
-                    description: description ?? '',
-                    session_id: sessId,
-                    image_url: image_url ?? 'https://sarah-rp-manager.vercel.app/default-avatar.webp',
-                    availability,
-                    ...fields,
-                }
-            }
-            else {
-                const { user_metadata } = session.value
-
-                const payload = {
-                    is_sarah: false,
-                    session_id: sessId,
-                    email: user_metadata.email,
-                    username: user_metadata.username,
-                    description: user_metadata.description,
-                    availability: user_metadata.availability,
-                    image_url: 'https://sarah-rp-manager.vercel.app/default-avatar.webp',
-                }
-
-                await client
+        if (session.value) 
+        {
+            const sessId = session.value!.id
+            const sessEmail = session.value?.email
+            const { data: fetchedUser } = await useAsyncData<User | null>('fetchedUser', async () => {
+                const { data } = await client
                     .from('users')
-                    .insert(payload)
+                    .select('*')
+                    .eq('session_id', sessId)
+                    .maybeSingle()
 
-                // Removing user_metadata.
-                await client.auth.updateUser({})
+                return data
+            })
 
-                user.value = payload
-            }
+            user.value = fetchedUser.value ?? { ...defaultUser, session_id: sessId, email: sessEmail ?? '' }
         }
     }
 
     async function updateProfile(formData: FormData) {
         await useFetch('/api/profile/update', {
             method: 'POST',
-            body: formData,
+            body: formData
         })
 
         await initSession()
     }
 
     async function updatePassword(newPassword: string) {
-        await client.auth.updateUser({ password: newPassword })
+        await authClient.auth.updateUser({ password: newPassword })
     }
 
     async function logout() {
-        await client.auth.signOut()
-        localStorage.clear()
+        await authClient.auth.signOut();
+        localStorage.clear();
         router.push('/connexion')
     }
 
@@ -99,8 +84,8 @@ export const useUserStore = defineStore('user', () => {
         logout,
     }
 },
-{
-    persist: {
-        storage: persistedState.localStorage,
-    },
-})
+    {
+        persist: {
+            storage: persistedState.localStorage,
+        },
+    })
