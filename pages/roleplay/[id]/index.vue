@@ -16,7 +16,7 @@ const router = useRouter()
 const route = useRoute()
 const userStore = useUserStore()
 const roleplayStore = useRoleplayStore()
-const { query, params } = route
+const { query, params: { id: paramsId } } = route
 
 const { loadSingleRP } = roleplayStore
 const { roleplay } = storeToRefs(roleplayStore)
@@ -31,12 +31,12 @@ if (Object.prototype.hasOwnProperty.call(query, 'created'))
 if (Object.prototype.hasOwnProperty.call(query, 'updated'))
     updated.value = true
 
-const { id } = params
+onMounted(async () => {
+    await loadSingleRP(paramsId.toString())
 
-onMounted(async () => loadSingleRP(id.toString()))
-
-useHead({
-    title: roleplay.value.title,
+    useHead({
+        title: roleplay.value.title,
+    })
 })
 </script>
 
@@ -73,7 +73,7 @@ useHead({
             <ClientOnly>
                 <RouterLink
                     v-if="user.is_sarah"
-                    :to="`/admin/RP/${id}/modifier`"
+                    :to="`/admin/RP/${paramsId}/modifier`"
                     class="btn btn-secondary"
                 >
                     Modifier

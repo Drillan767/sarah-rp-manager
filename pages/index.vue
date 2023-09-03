@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Database } from 'types/supabase'
 import { storeToRefs } from 'pinia'
+import type { Database } from '@/types/supabase'
 import { useUserStore } from '@/stores/users'
 
 interface Roleplay {

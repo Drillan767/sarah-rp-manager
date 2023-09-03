@@ -73,43 +73,68 @@ export interface Database {
             }
             characters: {
                 Row: {
-                    avatar: string | null
+                    avatar: string
                     created_at: string | null
-                    description: string | null
+                    description: string
                     id: number
-                    name: string | null
-                    role_id: number | null
+                    name: string
                     user_id: number
                 }
                 Insert: {
-                    avatar?: string | null
+                    avatar: string
                     created_at?: string | null
-                    description?: string | null
+                    description: string
                     id?: number
-                    name?: string | null
-                    role_id?: number | null
+                    name: string
                     user_id: number
                 }
                 Update: {
-                    avatar?: string | null
+                    avatar?: string
                     created_at?: string | null
-                    description?: string | null
+                    description?: string
                     id?: number
-                    name?: string | null
-                    role_id?: number | null
+                    name?: string
                     user_id?: number
                 }
                 Relationships: [
                     {
-                        foreignKeyName: 'characters_role_id_fkey'
-                        columns: ['role_id']
-                        referencedRelation: 'roles'
-                        referencedColumns: ['id']
-                    },
-                    {
                         foreignKeyName: 'characters_user_id_fkey'
                         columns: ['user_id']
                         referencedRelation: 'users'
+                        referencedColumns: ['id']
+                    },
+                ]
+            }
+            characters_roles: {
+                Row: {
+                    character_id: number | null
+                    created_at: string
+                    id: number
+                    role_id: number | null
+                }
+                Insert: {
+                    character_id?: number | null
+                    created_at?: string
+                    id?: number
+                    role_id?: number | null
+                }
+                Update: {
+                    character_id?: number | null
+                    created_at?: string
+                    id?: number
+                    role_id?: number | null
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: 'characters_roles_character_id_fkey'
+                        columns: ['character_id']
+                        referencedRelation: 'characters'
+                        referencedColumns: ['id']
+                    },
+                    {
+                        foreignKeyName: 'characters_roles_role_id_fkey'
+                        columns: ['role_id']
+                        referencedRelation: 'roles'
                         referencedColumns: ['id']
                     },
                 ]

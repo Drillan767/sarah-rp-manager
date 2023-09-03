@@ -11,11 +11,12 @@ interface Role {
 
 interface Props {
     description?: string
-    editable: boolean
+    editable?: boolean
     roles?: Role[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    editable: false,
     roles: () => ([]),
 })
 const route = useRoute()
