@@ -15,6 +15,13 @@ export default defineNuxtConfig({
         '~/assets/scss/main.scss',
     ],
 
+    postcss: {
+        plugins: {
+            tailwindcss: {},
+            autoprefixer: {},
+        },
+    },
+
     pinia: {
         autoImports: ['defineStore', 'acceptHMRUpdate'],
     },
