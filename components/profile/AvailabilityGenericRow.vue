@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { defineRule } from 'vee-validate'
-import type { GenericDate } from 'types'
+import type { GenericDate } from '@/types'
 import { days, hours } from '@/assets/json/availability-time.json'
 
 interface Props {
@@ -49,11 +48,24 @@ function halfHoursBetween(beginTimeStr: typeof hours[number], endTimeStr: typeof
     return { newDay, halfHours }
 }
 
-defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, string, string]) => {
+const invalidRange = computed(() => {
     const halfHours = props.maxHours * 2
+
+    /* const beginDay = fieldsProxy.value.begin.day
+    const beginHour = fieldsProxy.value.begin.hour
+    const endDay = fieldsProxy.value.end.day
+    const endHour = fieldsProxy.value.end.hour */
+
+    const {
+        begin: { day: beginDay, hour: beginHour },
+        end: { day: endDay, hour: endHour },
+    } = fieldsProxy.value
+
     const bdIndex = days.findIndex(d => d === beginDay)
 
-    const { newDay, halfHours: nbHalfHours } = halfHoursBetween(beginHour, value)
+    const { newDay, halfHours: nbHalfHours } = halfHoursBetween(beginHour, endHour)
+
+    const sameDates = `${beginDay} ${beginHour}` === `${endDay} ${endHour}`
 
     // Returns true if both beginDay and endDay are different while newDay is false.
     const differentDays = newDay === false && beginDay !== endDay
@@ -68,19 +80,10 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
     // Returns true if nbHalfHours exceeds max halfHours.
     const tooMuchHours = nbHalfHours > halfHours
 
-    if (beginDay === endDay && beginHour === value)
-        return 'Veuillez sélectionner une période d\'au moins 30mn'
-
-    const rules = [
-        differentDays,
-        daysNotFollowing,
-        tooMuchHours,
-    ]
-
-    if (rules.includes(true))
+    if ([sameDates, differentDays, daysNotFollowing, tooMuchHours].includes(true))
         return `Veuillez choisir une période de ${props.maxHours}h maximum`
 
-    return true
+    return false
 })
 </script>
 
@@ -92,11 +95,9 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
                     <span class="label-text">Début</span>
                 </label>
                 <div class="flex gap-x-2">
-                    <Field
+                    <select
                         v-model="fieldsProxy.begin.day"
-                        :name="`${section}-begin-generic-day-${index}`"
                         class="select select-bordered w-1/2 max-w-xs"
-                        as="select"
                     >
                         <option
                             v-for="(day, j) in days"
@@ -106,12 +107,11 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
                         >
                             {{ day }}
                         </option>
-                    </Field>
-                    <Field
+                    </select>
+
+                    <select
                         v-model="fieldsProxy.begin.hour"
-                        :name="`${section}-begin-generic-hour-${index}`"
                         class="select select-bordered w-1/2 max-w-xs"
-                        as="select"
                     >
                         <option
                             v-for="(hour, j) in hours"
@@ -121,7 +121,7 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
                         >
                             {{ hour }}
                         </option>
-                    </Field>
+                    </select>
                 </div>
             </div>
 
@@ -130,11 +130,9 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
                     <span class="label-text">Fin</span>
                 </label>
                 <div class="flex gap-x-2">
-                    <Field
+                    <select
                         v-model="fieldsProxy.end.day"
-                        :name="`${section}-end-generic-day-${index}`"
                         class="select select-bordered w-1/2 max-w-xs"
-                        as="select"
                     >
                         <option
                             v-for="(day, j) in days"
@@ -144,13 +142,11 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
                         >
                             {{ day }}
                         </option>
-                    </Field>
-                    <Field
+                    </select>
+
+                    <select
                         v-model="fieldsProxy.end.hour"
-                        :name="`${section}-end-generic-hour-${index}`"
                         class="select select-bordered w-1/2 max-w-xs"
-                        as="select"
-                        :rules="`available:@${section}-begin-generic-day-${index},@${section}-begin-generic-hour-${index},@${section}-end-generic-day-${index}`"
                     >
                         <option
                             v-for="(hour, j) in hours"
@@ -160,7 +156,7 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
                         >
                             {{ hour }}
                         </option>
-                    </Field>
+                    </select>
                 </div>
             </div>
 
@@ -174,9 +170,11 @@ defineRule('available', (value: string, [beginDay, beginHour, endDay]: [string, 
             </div>
         </div>
 
-        <ErrorMessage
+        <span
+            v-if="invalidRange"
             class="text-red-500"
-            :name="`${section}-end-generic-hour-${index}`"
-        />
+        >
+            {{ invalidRange }}
+        </span>
     </div>
 </template>
