@@ -2,9 +2,10 @@
 import { storeToRefs } from 'pinia'
 import { useUserStore } from '@/stores/users'
 import { useRoleplayStore } from '@/stores/roleplays'
-import RpDescriptionRoles from '@/components/rp/rpDescriptionRoles.vue'
-import RpChannels from '@/components/rp/rpChannels.vue'
-import RpUserList from '@/components/rp/rpUserList.vue'
+import RpDescriptionRoles from '@/components/rp/RpDescriptionRoles.vue'
+import RpChannels from '@/components/rp/RpChannels.vue'
+import RpUserList from '@/components/rp/RpUserList.vue'
+import RpRegistrationModal from '@/components/rp/RpRegistrationModal.vue'
 
 definePageMeta({
     validate: async (route) => {
@@ -24,6 +25,7 @@ const { user } = storeToRefs(userStore)
 
 const created = ref(false)
 const updated = ref(false)
+const showRPRegistration = ref(false)
 const currentTab = ref('description')
 
 if (Object.prototype.hasOwnProperty.call(query, 'created'))
@@ -71,14 +73,21 @@ onMounted(async () => {
                 Retour
             </button>
             <ClientOnly>
+                <!-- v-if="user.is_sarah" -->
                 <RouterLink
-                    v-if="user.is_sarah"
                     :to="`/admin/RP/${paramsId}/modifier`"
                     class="btn btn-secondary"
                 >
                     Modifier
                 </RouterLink>
             </ClientOnly>
+            <!-- v-if="user.is_sarah === false" -->
+            <button
+                class="btn btn-success"
+                @click="showRPRegistration = true"
+            >
+                Inscription
+            </button>
         </div>
 
         <div
@@ -123,6 +132,9 @@ onMounted(async () => {
         <RpChannels
             v-if="currentTab === 'channels'"
             :channels="roleplay.channels"
+        />
+        <RpRegistrationModal
+            :show="showRPRegistration"
         />
     </div>
 </template>

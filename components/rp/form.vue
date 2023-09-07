@@ -11,6 +11,7 @@ interface FormType {
     roles: {
         name: string
         max_users: number
+        description?: string
     }[]
 }
 

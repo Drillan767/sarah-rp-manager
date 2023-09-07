@@ -18,21 +18,21 @@
     "@vee-validate/nuxt": "^4.11.3",
     "@vee-validate/rules": "^4.11.3",
     "@vueuse/core": "^10.4.1",
-    "daisyui": "^3.6.4",
+    "daisyui": "^3.7.3",
     "pinia": "^2.1.4"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.41.0",
-    "@nuxt/devtools": "^0.8.2",
-    "@nuxtjs/supabase": "^1.0.2",
+    "@nuxt/devtools": "^0.8.3",
+    "@nuxtjs/supabase": "^1.1.0",
     "@nuxtjs/tailwindcss": "^6.8.0",
     "@pinia-plugin-persistedstate/nuxt": "^1.1.1",
     "@types/node": "^20.5.9",
     "dayjs-nuxt": "^1.1.2",
     "eslint": "^8.48.0",
-    "nuxt": "^3.7.0",
+    "nuxt": "^3.7.1",
     "sass": "^1.63.6",
-    "supabase": "^1.88.0",
+    "supabase": "^1.93.0",
     "typescript": "^5.2.2"
   }
 }

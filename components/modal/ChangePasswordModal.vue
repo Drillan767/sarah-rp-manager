@@ -49,7 +49,6 @@ onMounted(() => {
 
 <template>
     <dialog
-        id="my_modal_1"
         class="modal"
         :class="{ 'modal-open': show }"
     >

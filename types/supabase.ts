@@ -107,18 +107,21 @@ export interface Database {
             }
             characters_roles: {
                 Row: {
+                    active: boolean
                     character_id: number | null
                     created_at: string
                     id: number
                     role_id: number | null
                 }
                 Insert: {
+                    active?: boolean
                     character_id?: number | null
                     created_at?: string
                     id?: number
                     role_id?: number | null
                 }
                 Update: {
+                    active?: boolean
                     character_id?: number | null
                     created_at?: string
                     id?: number
@@ -258,6 +261,7 @@ export interface Database {
             roles: {
                 Row: {
                     created_at: string | null
+                    description: string | null
                     id: number
                     max_users: number
                     name: string
@@ -265,6 +269,7 @@ export interface Database {
                 }
                 Insert: {
                     created_at?: string | null
+                    description?: string | null
                     id?: number
                     max_users?: number
                     name: string
@@ -272,6 +277,7 @@ export interface Database {
                 }
                 Update: {
                     created_at?: string | null
+                    description?: string | null
                     id?: number
                     max_users?: number
                     name?: string
