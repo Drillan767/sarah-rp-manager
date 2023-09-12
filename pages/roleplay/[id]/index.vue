@@ -75,7 +75,7 @@ onMounted(async () => {
             <ClientOnly>
                 <!-- v-if="user.is_sarah" -->
                 <RouterLink
-                    :to="`/admin/RP/${paramsId}/modifier`"
+                    :to="`/roleplay/${paramsId}/modifier`"
                     class="btn btn-secondary"
                 >
                     Modifier

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeftIcon } from '@heroicons/vue/24/solid'
-import Form from '@/components/rp/form.vue'
+import Form from '@/components/rp/RpForm.vue'
 
 useHead({
     title: 'Nouveau RP',

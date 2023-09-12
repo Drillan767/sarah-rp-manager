@@ -71,3 +71,15 @@ export interface RoleplayDetail {
         max_users: number
     }[]
 }
+
+export interface RoleplayFormType {
+    title: string
+    description: string
+    illustration?: string
+    start_date: string | null
+    roles: {
+        name: string
+        max_users: number
+        description: string | null
+    }[]
+}

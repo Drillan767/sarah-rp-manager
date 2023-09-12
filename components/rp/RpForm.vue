@@ -2,29 +2,19 @@
 import { ErrorMessage, Field, Form, configure, defineRule } from 'vee-validate'
 import { image, max, min_value, required } from '@vee-validate/rules'
 import { localize } from '@vee-validate/i18n'
-
-interface FormType {
-    title: string
-    description: string
-    illustration?: string
-    start_date: string
-    roles: {
-        name: string
-        max_users: number
-        description?: string
-    }[]
-}
+import type { RoleplayFormType } from '~/types'
 
 const props = defineProps<{
     edit?: boolean | undefined
-    form: FormType
+    form: RoleplayFormType
     loading: boolean
 }>()
 const emit = defineEmits<{
-    (e: 'input', value: FormType): void
+    (e: 'input', value: RoleplayFormType): void
     (e: 'fileChange', value: File): void
     (e: 'submit'): void
 }>()
+
 defineRule('required', required)
 defineRule('min_value', min_value)
 defineRule('image', image)
@@ -173,7 +163,7 @@ watch(() => props.form, (value) => {
             <div
                 v-for="(role, i) in form.roles"
                 :key="i"
-                class="grid grid-cols-4 gap-4 mb-2"
+                class="grid grid-cols-4 grid-rows-3 gap-4 mb-2"
             >
                 <div class="col-span-2">
                     <Field
@@ -204,13 +194,22 @@ watch(() => props.form, (value) => {
                         class="text-red-500"
                     />
                 </div>
-                <div class="col-start-4 flex justify-end">
+                <div class="col-start-4">
                     <button
                         class="btn btn-error"
                         @click.prevent="removeRole(i)"
                     >
                         Supprimer
                     </button>
+                </div>
+                <div class="col-span-3 row-span-2 row-start-2">
+                    <textarea
+                        id="role_description"
+                        v-model="role.description"
+                        rows="2"
+                        class="textarea textarea-bordered w-full"
+                        placeholder="Description du rôle"
+                    />
                 </div>
             </div>
             <div class="mt-4">

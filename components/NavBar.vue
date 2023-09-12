@@ -27,6 +27,7 @@ onMounted(async () => {
         if (data) {
             userData.value = data
             currentUser.value.username = data.username
+            currentUser.value.isSarah = data.is_sarah
 
             if (data.image_url)
                 currentUser.value.image_url = data.image_url
