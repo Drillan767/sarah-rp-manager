@@ -13,26 +13,26 @@
   "dependencies": {
     "@heroicons/vue": "^2.0.18",
     "@pinia/nuxt": "^0.4.11",
-    "@supabase/supabase-js": "^2.33.2",
+    "@supabase/supabase-js": "^2.36.0",
     "@vee-validate/i18n": "^4.11.6",
     "@vee-validate/nuxt": "^4.11.6",
     "@vee-validate/rules": "^4.11.6",
     "@vueuse/core": "^10.4.1",
-    "daisyui": "^3.7.3",
+    "daisyui": "^3.7.7",
     "pinia": "^2.1.4"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.41.2",
-    "@nuxt/devtools": "^0.8.3",
-    "@nuxtjs/supabase": "^1.1.0",
+    "@antfu/eslint-config": "^1.0.0-beta.6",
+    "@nuxt/devtools": "^0.8.4",
+    "@nuxtjs/supabase": "^1.1.2",
     "@nuxtjs/tailwindcss": "^6.8.0",
-    "@pinia-plugin-persistedstate/nuxt": "^1.1.1",
-    "@types/node": "^20.6.0",
+    "@pinia-plugin-persistedstate/nuxt": "^1.1.2",
+    "@types/node": "^20.6.3",
     "dayjs-nuxt": "^1.1.2",
-    "eslint": "^8.49.0",
-    "nuxt": "^3.7.1",
-    "sass": "^1.63.6",
-    "supabase": "^1.93.0",
+    "eslint": "^8.50.0",
+    "nuxt": "^3.7.3",
+    "sass": "^1.68.0",
+    "supabase": "^1.99.5",
     "typescript": "^5.2.2"
   }
 }

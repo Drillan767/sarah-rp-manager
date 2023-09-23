@@ -34,10 +34,23 @@ async function submit() {
                         >
                             Sélection du personnage
                         </li>
-                        <li class="step">
+                        <li
+                            class="step"
+                            :class="{ 'step-primary': currentStep >= 2 }"
+                        >
                             Fin
                         </li>
                     </ul>
+                </div>
+
+                <div v-if="currentStep === 1">
+                    <p>Etape 1</p>
+                </div>
+                <div v-if="currentStep === 2">
+                    <p>Etape 2</p>
+                </div>
+                <div v-if="currentStep === 3">
+                    <p>Etape 3</p>
                 </div>
 
                 <div class="w-full mb-4">

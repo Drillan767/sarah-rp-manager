@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Database } from 'types/supabase'
+import type { Database } from '@/types/supabase'
 import { email, image, max, required } from '@vee-validate/rules'
 import { localize } from '@vee-validate/i18n'
 import { Field, Form, configure, defineRule } from 'vee-validate'
