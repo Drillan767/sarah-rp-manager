@@ -40,6 +40,7 @@ function addRole() {
     formProxy.value.roles.push({
         name: '',
         max_users: 1,
+        description: '',
     })
 }
 

@@ -1,18 +1,24 @@
 <script lang="ts" setup>
 import { TrashIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
+
+type Role = {
+    id?: number
+    name: string
+    max_users: number,
+    description: string,
+}
+
 defineProps<{ roles: any[] }>()
+
+const showRoleEditModal = ref(false)
+const showRoleDeleteModal = ref(false)
+
+const selectedRole = ref<Role>({} as Role)
 </script>
 
 <template>
     <div>
-        <!-- <ul>
-            <li
-                v-for="(role, i) in roles"
-                :key="i"
-            >
-                {{ role }}
-            </li>
-        </ul> -->
+        <h2 class="mb-4 text-xl font-bold text-gray-900 dark:text-white">Rôles</h2>
         <div
             v-for="(role, i) in roles"
             :key="i"

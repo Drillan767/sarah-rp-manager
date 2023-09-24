@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeftIcon } from '@heroicons/vue/24/solid'
-import Form from '@/components/rp/form.vue'
+import Form from '@/components/rp/RpForm.vue'
 
 useHead({
     title: 'Nouveau RP',
@@ -19,6 +19,7 @@ const form = ref({
         {
             name: '',
             max_users: 1,
+            description: '',
         },
     ],
 })
@@ -38,7 +39,7 @@ async function submit() {
     if (file.value)
         formData.append('illustration', file.value)
 
-    const { data } = await useFetch('/api/rp/store', {
+    const { data } = await useFetch<{ id: string }>('/api/rp/store', {
         method: 'POST',
         body: formData,
     })

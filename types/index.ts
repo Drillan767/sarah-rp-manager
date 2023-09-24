@@ -80,6 +80,6 @@ export interface RoleplayFormType {
     roles: {
         name: string
         max_users: number
-        description: string | null
+        description: string
     }[]
 }
