@@ -1,15 +1,13 @@
-<script setup>
-const route = useRoute()
+<script setup lang="ts">
+    const route = useRoute()
 
-const regex = /\/(oubli-mdp|connexion|inscription|nouveau-mdp)(\#.*)?/
-
-const whichLayout = computed(() => {
-    return regex.test(route.fullPath) ? 'auth' : 'default'
-})
+    const regex = /\/(forgot-password|login|register|new-password)(\#.*)?/
+    const whichLayout = computed(() => regex.test(route.fullPath) ? 'auth' : 'default')
 </script>
 
 <template>
     <NuxtLayout :name="whichLayout">
         <NuxtPage />
+        <Snackbar />
     </NuxtLayout>
 </template>

@@ -1,0 +1,149 @@
+{
+    "form": {
+        "edit": "Edit",
+        "save": "Save",
+        "add": "Add",
+        "cancel": "Cancel",
+        "close": "Close",
+        "delete":  "Delete",
+        "register": "Register",
+        "required": "The field is required",
+        "email": "The email must be valid",
+        "validDate": "The date must be valid",
+        "minLength": "The field must be at least {count} characters",
+        "maxLength": "The field must not exceed {count} characters",
+        "minValue": "The minimal required value is {value}",
+        "confirmed": "Passwords must match",
+        "tooBig": "The file size is too big",
+        "dateBefore": "Please pick a date before the {date}",
+        "dateAfter": "Please pick a date after the {date}",
+        "badFormat": "Please select an image",
+        "alreadyExists": "This {field} is already taken",
+        "updateConfirmed": "{thing} updated successfully",
+        "deleteConfirmed": "{thing} deleted successfully"
+    },
+    "common": {
+        "title": "Title",
+        "created_at": "Created at",
+        "updated_at": "Updated at",
+        "private": "Private",
+        "see": "See",
+        "by": "By",
+        "login": "Please authenticate yourself to continue",
+        "notfound": "The content you are looking isn't available or does not exist"
+    },
+    "fields": {
+        "name": "Name",
+        "email": "Email address",
+        "password": "Password",
+        "username": "Username",
+        "confirm_password": "Repeat the password"
+    },
+    "login": {
+        "action": "Login",
+        "noAccount": "No account?",
+        "error": "Invalid login credentials",
+        "success": "Authenticated successfully"
+    },
+    "forgotPwd": {
+        "title": "Password",
+        "action": "Forgot password",
+        "success": "A link to reset your password was sent to the indicated email address."
+    },
+    "register": {
+        "action": "Register",
+        "success": "Registration successful, please verify your email address with the link sent to you by email",
+        "accountExists": "Already have an account?"
+    },
+    "account": {
+        "self": "Account",
+        "logout": "Logout",
+        "dark": "Dark mode",
+        "light": "Light mode"
+    },
+    "pages": {
+        "home": "Home",
+        "profile": {
+            "title": "Profile",
+            "page": "Profile informations",
+            "password": "Edit password",
+            "availabilities": {
+                "self": "Availability",
+                "unself": "Unavailability",
+                "state": "Available",
+                "negative": "Unavailable",
+                "title": "Edit availabilities",
+                "general": "General availabilities",
+                "specific": "Specific availabilities",
+                "unavailabilities": "Regular unavailabilities",
+                "weekday_label": "Available during week days",
+                "weekday_hint": "From Monday to Friday from 22:00 to 00:00",
+                "weekend_label": "Available during week ends",
+                "weekend_hint": "From Saturday to sunday, all day long",
+                "add": "Add a ",
+                "edit": "Edit a ",
+                "sumpup_generic": "from {beginDay} at {beginHour} to {endDay} at {endHour}",
+                "sumup_specific": "from {begin} to {end}",
+                "hint_specific": "The value will be rounded to the closes half hour"
+            },
+            "success": {
+                "infos": "Account informations successfully updated",
+                "password": "Password successfully updated",
+                "availabilities": "Availabilities successfully updated"
+            },
+            "error": {
+                "isBefore": "The end date cannot be before the begin date",
+                "30mn": "Please pick a period of at least 30mn",
+                "isPast": "The selected date must be in the future",
+                "maxHour": "Please pick a period of {maxHours}h maximum",
+                "overlap": "At least two periods are overlapping",
+                "general": "Please ensure that a new added period isn't in conflict with your general availabilities"
+            }
+        },
+        "roleplays": {
+            "self": "roleplay|roleplays",
+            "navlink": "My roleplays",
+            "create": "New roleplay",
+            "list": {
+                "title": "Title",
+                "start_date": "Start date"
+            },
+            "form": {
+                "title": "Title",
+                "begin": "Begin date",
+                "role": "Role|Roles",
+                "infos": "Informations on the roleplay",
+                "public": "Is the roleplay public?",
+                "message": "the announcement",
+                "roles_add": "Add a role",
+                "roles_max_nb": "Maximum number",
+                "roles_name": "Role name"
+            },
+            "registration": {
+                "step1": "Select a role",
+                "step2": "Select a character",
+                "step3": "Wrapping up",
+                "reuse": "Reuse a character",
+                "no_character": "No character available",
+                "create": "Create a character",
+                "existing" : "Existing character",
+                "prev": "Previous",
+                "next": "Next",
+                "success": "Registration successful. You will be notified when it will be accepted"
+            },
+            "delete": {
+                "role": "Confirm the role's deletion?",
+                "role_message": "Deleting the \"{role}\" role cannot be undone, and each linked characters will also be deleted on their own.\n Confirm?"
+            }
+        }
+    },
+    "weekdays": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+    }
+}

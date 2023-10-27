@@ -1,0 +1,50 @@
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
+
+export interface SpecificDate {
+    isSpecific: true
+    begin: string
+    end: string
+}
+
+export interface GenericDate {
+    isSpecific: false
+    begin: {
+        day: string
+        hour: string
+    }
+    end: {
+        day: string
+        hour: string
+    }
+}
+
+export interface Availability {
+    weekdays: boolean
+    weekends: boolean
+    available: (SpecificDate | GenericDate)[]
+    unavailable: SpecificDate[]
+}
+
+export interface CreatedRole {
+    name: string,
+    max_users: number,
+    description: string,
+    roleplay_id: string,
+}
+
+export type Role = CreatedRole & {
+    id: number,
+}
+
+export interface Roleplay {
+    id: string,
+    title: string,
+    description: string,
+    message_board: string | null,
+    start_date: string | null,
+    illustration: string,
+    public: boolean,
+    user_id: number,
+    roles: Role[],
+    created_at: string,
+}

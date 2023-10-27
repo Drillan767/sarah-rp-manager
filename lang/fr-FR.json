@@ -1,0 +1,147 @@
+{
+    "form": {
+        "save": "Enregistrer",
+        "cancel": "Annuler",
+        "add": "Ajouter",
+        "edit": "Modifier",
+        "close": "Fermer",
+        "delete": "Supprimer",
+        "register": "Inscription",
+        "required": "Le champ est requis",
+        "email": "L'adresse email doit être valide",
+        "validDate": "La date doit être valide",
+        "minLength": "Le champ doit faire au moins {count} caractères",
+        "maxLength": "Le champ ne peut pas dépasser {count} caractères",
+        "minValue": "La valeur minimale requise est de {value}",
+        "confirmed": "Les mots de passe doivent être identiques",
+        "tooBig": "Le fichier sélectionné est trop volumineux",
+        "dateBefore": "Veuillez choisir une date avant le {date}",
+        "dateAfter": "Veuillez choisir une date après le {date}",
+        "badFormat": "Veuillez sélectionnner une image",
+        "alreadyExists": "Ce/cet {field} existe déjà",
+        "updateConfirmed": "{thing} mis à jour avec succès",
+        "deleteConfirmed": "{thing} supprimé avec succès"
+    },
+    "common": {
+        "title": "Titre",
+        "created_at": "Créé le",
+        "updated_at": "Mis à jour le",
+        "private": "Privé",
+        "see": "Voir",
+        "by": "Par",
+        "login": "Veuillez vous authentifier pour continuer",
+        "notfound": "La page que vous cherchez n'est pas disponible ou n'existe pas"
+    },
+    "fields": {
+        "name": "Nom",
+        "email": "Adresse email",
+        "password": "Mot de passe",
+        "username": "Identifiant",
+        "confirm_password": "Répéter le mot de passe"
+    },
+    "login": {
+        "action": "Connexion",
+        "noAccount": "Pas de compte ?",
+        "error": "Identifiant / Mot de passe incorrect",
+        "success": "Connexion réussie"
+    },
+    "forgotPwd": {
+        "title": "Mot de passe oublié",
+        "action": "Réinitialiser le mot de passe",
+        "success": "Un email vous permettant de réinitialiser votre mot de passe a été envoyé à l'adresse email indiquée."
+    },
+    "register": {
+        "action": "Inscription",
+        "success": "Inscription effectuée avec succès, veuillez activer votre compte grâce au lien envoyé par email.",
+        "accountExists": "Vous avez un compte ?"
+    },
+    "account": {
+        "self": "Mon compte",
+        "logout": "Déconnexion",
+        "dark": "Mode sombre",
+        "light": "Mode clair"
+    },
+    "pages": {
+        "home": "Accueil",
+        "profile": {
+            "title": "Profil",
+            "page": "Informations du profil",
+            "password": "Modifier le mot de passe",
+            "availabilities": {
+                "self": "Disponibilité",
+                "unself": "Indisponibilité",
+                "state": "Disponible",
+                "negative": "Indisponible",
+                "title": "Modifier les disponibilités",
+                "general": "Disponibilité générale",
+                "specific": "Disponibilité spécifique",
+                "unavailabilities": "Indisponibilités régulières",
+                "weekday_label": "Disponible en semaine",
+                "weekday_hint": "Du Lundi au Vendredi de 22h à minuit",
+                "weekend_label": "Disponible en week-end",
+                "weekend_hint": "Du samedi au dimanche, toute la journée",
+                "add": "Ajouter une ",
+                "edit": "Éditer une ",
+                "sumup_generic": "du {beginDay} à {beginHour} au {endDay} à {endHour}",
+                "sumup_specific": "du {begin} au {end}",
+                "hint_specific": "La valeur sera arrondie à la plus proche demi-heure"
+            },
+            "success": {
+                "infos": "Informations du compte mises à jour",
+                "password": "Mot de passe mit à jour",
+                "availabilities": "Disponibilités mises à jour"
+            },
+            "error": {
+                "isBefore": "La date de fin ne doit pas être avant la date de début",
+                "30mn": "Veuillez choisir une période d'au moins 30mn",
+                "isPast": "La date choisie doit être dans le futur",
+                "maxHour": "Veuillez choisir une période de {maxHours}h maximum",
+                "overlap": "Au moins deux périodes se chevauchent.",
+                "general": "Vérifiez qu'une nouvelle période ajoutée n'entre pas en conflit avec vos disponibilités générales."
+            }
+        },
+        "roleplays": {
+            "self": "roleplay|roleplays",
+            "navlink": "Mes roleplays",
+            "create": "Nouveau roleplay",
+            "start_date": "Date de début",
+            "nbRoles": "Rôles tous pourvus | {count} rôle disponible | {count} rôles disponibles",
+            "form": {
+                "title": "Titre",
+                "begin": "Date de début",
+                "role": "Rôle|Rôles",
+                "infos": "Informations sur le roleplay",
+                "public": "Le roleplay est-il publique ?",
+                "message": "l'annonce",
+                "roles_add": "Ajouter un rôle",
+                "roles_max_nb": "Nombre maximum",
+                "roles_name": "Nom du rôle"
+            },
+            "registration": {
+                "step1": "Sélectionner un rôle",
+                "step2": "Sélectionner un personnage",
+                "step3": "Finaliser l'inscription",
+                "reuse": "Réutiliser un personnage",
+                "no_character": "Aucun personnage disponible",
+                "create": "Créer un personnage",
+                "existing" : "Personnage existant",
+                "prev": "Précédent",
+                "next": "Suivant",
+                "success": "Inscription réussie. Vous recevrez une notification quand celle ci sera acceptée"
+            },
+            "delete": {
+                "role": "Confirmer la suppression du rôle ?",
+                "role_message": "La suppression du rôle {role} est irréversible, et chacun des personnages liés à celui-ci le seront également.\n Confirmer ?"
+            }
+        }
+    },
+    "weekdays": {
+        "monday": "Lundi",
+        "tuesday": "Mardi",
+        "wednesday": "Mercredi",
+        "thursday": "Jeudi",
+        "friday": "Vendredi",
+        "saturday": "Samedi",
+        "sunday": "Dimanche"
+    }
+}

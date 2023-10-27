@@ -1,6 +1,7 @@
 export function useCurrentUser() {
     return useState('user', () => ({
+        id: 0,
         username: '',
-        image_url: 'https://sarah-rp-manager.vercel.app/default-avatar.webp',
+        superadmin: false,
     }))
 }

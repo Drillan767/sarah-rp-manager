@@ -1,29 +1,48 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import process from 'node:process'
-
 export default defineNuxtConfig({
     modules: [
-        '@nuxtjs/supabase',
         'dayjs-nuxt',
-        '@nuxtjs/tailwindcss',
-        '@pinia/nuxt',
-        '@pinia-plugin-persistedstate/nuxt',
         '@vee-validate/nuxt',
+        '@nuxtjs/supabase',
+        '@nuxtjs/i18n',
     ],
 
-    css: [
-        '~/assets/scss/main.scss',
-    ],
+    devtools: { enabled: true },
 
-    postcss: {
-        plugins: {
-            tailwindcss: {},
-            autoprefixer: {},
-        },
+    i18n: {
+        lazy: true,
+        locales: [
+            {
+                code: 'fr',
+                file: 'fr-FR.json'
+            },
+            {
+                code: 'en',
+                file: 'en-US.json',
+            },
+        ],
+        langDir: 'lang',
+        defaultLocale: 'fr',
     },
 
-    pinia: {
-        autoImports: ['defineStore', 'acceptHMRUpdate'],
+    dayjs: {
+        locales: ['fr', 'en'],
+        defaultLocale: 'fr',
+        plugins: ['relativeTime', 'utc', 'weekOfYear'],
+    },
+
+    supabase: {
+        redirectOptions: {
+            login: '/login',
+            callback: '/callback',
+            exclude: [
+                '/',
+                 '/register',
+                '/forgot-password',
+                '/new-password',
+                '/roleplays/*'
+            ],
+        },
     },
 
     app: {
@@ -65,27 +84,13 @@ export default defineNuxtConfig({
         },
     },
 
-    supabase: {
-        redirectOptions: {
-            login: '/connexion',
-            callback: '/callback',
-            exclude: [
-                '/inscription',
-                '/oubli-mdp',
-                '/nouveau-mdp',
-            ],
-        },
-    },
+    css: [
+        'vuetify/lib/styles/main.sass',
+        '@mdi/font/css/materialdesignicons.min.css',
+        '~/assets/scss/main.scss',
+    ],
 
-    dayjs: {
-        locales: ['fr'],
-        defaultLocale: 'fr',
-        plugins: ['relativeTime', 'utc', 'weekOfYear'],
-    },
-
-    imports: {
-        dirs: ['stores'],
-    },
-
-    devtools: { enabled: true },
+    build: {
+        transpile: ['vuetify']
+    }
 })
