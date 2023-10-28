@@ -36,6 +36,18 @@ export type Role = CreatedRole & {
     id: number,
 }
 
+export interface Character {
+    id: number,
+    name: string,
+    role_id: number,
+    user_id: number,
+    illustration: string,
+    user: {
+        id: number,
+        name: string,
+    } | null
+}
+
 export interface Roleplay {
     id: string,
     title: string,
@@ -47,4 +59,12 @@ export interface Roleplay {
     user_id: number,
     roles: Role[],
     created_at: string,
+}
+
+export interface DataTableHeader {
+    title: string,
+    align?: 'start' | 'center' | 'end',
+    sortable?: boolean,
+    width?: string | number,
+    key?: string,
 }

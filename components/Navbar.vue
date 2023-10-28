@@ -1,4 +1,3 @@
-
 <script setup lang="ts">
 import type { Database } from '@/types/supabase'
 import { useTheme} from 'vuetify'
@@ -108,6 +107,13 @@ onMounted(async () => {
                 </VListItem>
             </VList>
         </VMenu>
+        <VBtn
+            v-else
+            to="/login"
+            color="primary"
+        >
+            {{ t('login.action')}}
+        </VBtn>
     </VAppBar>
 
 </template>

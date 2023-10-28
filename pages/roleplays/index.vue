@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Database } from '~/types/supabase'
-import type { Roleplay } from '~/types/models'
+import type { Roleplay, DataTableHeader } from '~/types/models'
 import { useCurrentUser } from '@/composables/currentUser'
 import useSnackBar from '~/composables/snackbar'
 
@@ -38,10 +38,6 @@ if (error || !data) {
 
 if (data) roleplays.value = data
 
-const showRP = async (_: any, item: { item: Roleplay }) => {
-    await router.push(`/roleplays/${item.item.id}`)
-}
-
 const links = [
     {
         title: t('pages.home'),
@@ -52,7 +48,7 @@ const links = [
     }
 ]
 
-const headers: any[] = [
+const headers: DataTableHeader[] = [
     { title: t('common.title'), align: 'start', key: 'title' },
     { title: 'Public', align: 'end', key: 'public' },
     { title: t('pages.roleplays.start_date'), align: 'end', key: 'start_date' },
@@ -94,7 +90,6 @@ const headers: any[] = [
                             v-model:expanded="expanded"
                             :show-expand="true"
                             item-value="name"
-                            @click:row="showRP"
                         >
                             <template #expanded-row="{ columns, item }">
                                 <tr>
@@ -115,6 +110,13 @@ const headers: any[] = [
                                 {{ dayjs(value).format('DD/MM/YYYY') }}
                             </template>
                             <template #item.actions="{ item }">
+                                <VBtn
+                                    variant="tonal"
+                                    icon="mdi-eye-arrow-right-outline"
+                                    color="blue"
+                                    class="mr-2"
+                                    :to="`/roleplays/${item.id}`"
+                                />
                                 <VBtn
                                     variant="tonal"
                                     color="orange"

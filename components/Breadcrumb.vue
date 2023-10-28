@@ -11,11 +11,13 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const items = props.links.map((link, i, row ) => ({
-  title: link.title,
-  to: link.to,
-  disabled: i + 1 === row.length
-}))
+const items = computed(() => {
+    return props.links.map((link, i, row ) => ({
+        title: link.title,
+        to: link.to,
+        disabled: i + 1 === row.length
+    }))
+})
 </script>
 
 <template>

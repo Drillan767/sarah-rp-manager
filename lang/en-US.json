@@ -131,6 +131,9 @@
                 "next": "Next",
                 "success": "Registration successful. You will be notified when it will be accepted"
             },
+            "characters": {
+                "self": "Character|Characters"
+            },
             "delete": {
                 "role": "Confirm the role's deletion?",
                 "role_message": "Deleting the \"{role}\" role cannot be undone, and each linked characters will also be deleted on their own.\n Confirm?"

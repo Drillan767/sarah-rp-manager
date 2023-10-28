@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Roleplay, Role } from '~/types/models'
 import type { Database } from '~/types/supabase'
-import useSnackBar from "~/composables/snackbar";
+import useSnackBar from '~/composables/snackbar'
 import { useCurrentUser } from '@/composables/currentUser'
 
 interface EditForm {
@@ -16,11 +16,11 @@ const supabase = useSupabaseClient<Database>()
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
-
 const { showSuccess } = useSnackBar()
 const currentUser = useCurrentUser()
 const { params } = route
 
+const tabs = ref(2)
 const loading = ref(false)
 const displayDeleteModale = ref(false)
 const roleDeleting = ref<Role>({} as Role)
@@ -33,13 +33,13 @@ const form = ref<EditForm>({
     public: true,
 })
 
-if (currentUser.value.id === 0) {
+/* if (currentUser.value.id === 0) {
     throw createError({
         statusCode: 404,
         statusMessage: t('common.notfound'),
         fatal: true,
     })
-}
+} */
 
 loading.value = true
 const { data, error } = await supabase
@@ -174,14 +174,26 @@ const links = [
                 md="6"
                 class="d-flex justify-end align-center"
             >
-                <VBtn
-                    prepend-icon="mdi-eye-arrow-right-outline"
-                    :to="`/roleplays/${roleplay.id}`"
-                    variant="outlined"
-                    color="blue"
-                >
-                    {{ t('common.see') }}
-                </VBtn>
+                <VTabs v-model="tabs">
+                    <VTab
+                        :to="`/roleplays/${roleplay.id}/characters`"
+                        :value="1"
+                    >
+                        Candidatures
+                    </VTab>
+                    <VTab
+                        :to="`/roleplays/${roleplay.id}/edit`"
+                        :value="2"
+                    >
+                        Editer
+                    </VTab>
+                    <VTab
+                        :to="`/roleplays/${roleplay.id}`"
+                        :value="3"
+                    >
+                        Voir
+                    </VTab>
+                </VTabs>
             </VCol>
         </VRow>
         <RPMessageBoardForm

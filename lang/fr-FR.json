@@ -129,6 +129,9 @@
                 "next": "Suivant",
                 "success": "Inscription réussie. Vous recevrez une notification quand celle ci sera acceptée"
             },
+            "characters": {
+                "self": "Personnage|Personnages"
+            },
             "delete": {
                 "role": "Confirmer la suppression du rôle ?",
                 "role_message": "La suppression du rôle {role} est irréversible, et chacun des personnages liés à celui-ci le seront également.\n Confirmer ?"
