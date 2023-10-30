@@ -197,7 +197,7 @@ const links = computed(() => ([
 const statusList = [
     {
         number: -1,
-        label: t('pages.roleplays.characters.waitingList'),
+        label: t('pages.roleplays.characters.waiting_list'),
         color: 'blue-gray',
     },
     {
