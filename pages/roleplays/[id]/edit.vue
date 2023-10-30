@@ -179,19 +179,19 @@ const links = [
                         :to="`/roleplays/${roleplay.id}/characters`"
                         :value="1"
                     >
-                        Candidatures
+                        {{ t('pages.roleplays.characters.self', 2) }}
                     </VTab>
                     <VTab
                         :to="`/roleplays/${roleplay.id}/edit`"
                         :value="2"
                     >
-                        Editer
+                        {{ t('form.edit') }}
                     </VTab>
                     <VTab
                         :to="`/roleplays/${roleplay.id}`"
                         :value="3"
                     >
-                        Voir
+                        {{ t('common.see') }}
                     </VTab>
                 </VTabs>
             </VCol>

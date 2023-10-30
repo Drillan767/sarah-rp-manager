@@ -1,9 +1,11 @@
 {
     "form": {
-        "edit": "Edit",
         "save": "Save",
-        "add": "Add",
         "cancel": "Cancel",
+        "add": "Add",
+        "accept": "Accept",
+        "refuse": "Refuse",
+        "edit": "Edit",
         "close": "Close",
         "delete":  "Delete",
         "register": "Register",
@@ -104,10 +106,8 @@
             "self": "roleplay|roleplays",
             "navlink": "My roleplays",
             "create": "New roleplay",
-            "list": {
-                "title": "Title",
-                "start_date": "Start date"
-            },
+            "start_date": "Start date",
+            "nbRoles": "No role left | {count} role available | {count} roles available",
             "form": {
                 "title": "Title",
                 "begin": "Begin date",
@@ -132,13 +132,27 @@
                 "success": "Registration successful. You will be notified when it will be accepted"
             },
             "characters": {
-                "self": "Character|Characters"
+                "self": "Character|Characters",
+                "denied": "Denied",
+                "pending": "Pending",
+                "accepted": "Accepted",
+                "moderator": "Moderator",
+                "blocked": "Blocked users",
+                "date": "Blocked at"
             },
             "delete": {
                 "role": "Confirm the role's deletion?",
                 "role_message": "Deleting the \"{role}\" role cannot be undone, and each linked characters will also be deleted on their own.\n Confirm?"
             }
         }
+    },
+    "block": {
+        "verb": "Block",
+        "users": "Blocked users",
+        "warning_rp": "Blocking the selected user will remove all of their characters for that roleplay, and add them to the list of blocked users, preventing them from re-registering.",
+        "action": "Block user",
+        "reason": "Specify the reason",
+        "cancel": "Unblock"
     },
     "weekdays": {
         "monday": "Monday",

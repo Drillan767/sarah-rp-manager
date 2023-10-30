@@ -13,21 +13,21 @@ export interface Database {
         Row: {
           created_at: string
           id: number
-          is_automatic: boolean
+          reason: string
           roleplay_id: string
           user_id: number
         }
         Insert: {
           created_at?: string
           id?: number
-          is_automatic?: boolean
+          reason: string
           roleplay_id: string
           user_id: number
         }
         Update: {
           created_at?: string
           id?: number
-          is_automatic?: boolean
+          reason?: string
           roleplay_id?: string
           user_id?: number
         }

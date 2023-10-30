@@ -41,11 +41,17 @@ export interface Character {
     name: string,
     role_id: number,
     user_id: number,
+    status: number,
     illustration: string,
+    description: string,
     user: {
         id: number,
-        name: string,
-    } | null
+        username: string,
+    }
+}
+
+export type RoleSettings = Role & {
+    characters: Character[]
 }
 
 export interface Roleplay {

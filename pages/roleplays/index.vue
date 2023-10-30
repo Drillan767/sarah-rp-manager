@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import type { Database } from '~/types/supabase'
-import type { Roleplay, DataTableHeader } from '~/types/models'
+import type { DataTableHeader } from '~/types/models'
 import { useCurrentUser } from '@/composables/currentUser'
 import useSnackBar from '~/composables/snackbar'
 
 const supabase = useSupabaseClient<Database>()
 const currentUser = useCurrentUser()
-const router = useRouter()
-const dayjs = useDayjs()
 const { t } = useI18n()
+const dayjs = useDayjs()
 
-const { showSuccess, showError } = useSnackBar()
+const { showError } = useSnackBar()
 
 const roleplays = ref<any[]>([])
 const expanded = ref([])

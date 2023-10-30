@@ -3,6 +3,8 @@
         "save": "Enregistrer",
         "cancel": "Annuler",
         "add": "Ajouter",
+        "accept": "Accepter",
+        "refuse": "Refuser",
         "edit": "Modifier",
         "close": "Fermer",
         "delete": "Supprimer",
@@ -130,13 +132,27 @@
                 "success": "Inscription réussie. Vous recevrez une notification quand celle ci sera acceptée"
             },
             "characters": {
-                "self": "Personnage|Personnages"
+                "self": "Personnage|Personnages",
+                "available": "Emplacement disponible",
+                "waiting_list": "Liste d'attente",
+                "pending": "En attente",
+                "accepted": "Accepté",
+                "moderator": "Modérateur",
+                "date": "Date de bloquage"
             },
             "delete": {
                 "role": "Confirmer la suppression du rôle ?",
                 "role_message": "La suppression du rôle {role} est irréversible, et chacun des personnages liés à celui-ci le seront également.\n Confirmer ?"
             }
         }
+    },
+    "block": {
+        "verb": "Bloquer",
+        "users": "Utilisateurs bloqués",
+        "warning_rp": "Bloquer l'utilisateur sélectionné entraînera la suppression de tous ses personnages pour ce roleplay, et l'ajoutera à la liste des utilisateurs bloqués, l'empêchant de se réinscrire.",
+        "action": "Bloquer l'utilisateur",
+        "reason": "Indiquer la raison",
+        "cancel": "Débloquer"
     },
     "weekdays": {
         "monday": "Lundi",
