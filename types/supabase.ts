@@ -242,6 +242,7 @@ export interface Database {
       }
       roleplays: {
         Row: {
+          cofounders: number[] | null
           created_at: string
           description: string
           id: string
@@ -253,6 +254,7 @@ export interface Database {
           user_id: number
         }
         Insert: {
+          cofounders?: number[] | null
           created_at?: string
           description: string
           id?: string
@@ -264,6 +266,7 @@ export interface Database {
           user_id: number
         }
         Update: {
+          cofounders?: number[] | null
           created_at?: string
           description?: string
           id?: string
@@ -355,7 +358,10 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_relationship: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never

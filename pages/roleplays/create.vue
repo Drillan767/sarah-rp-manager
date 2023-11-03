@@ -8,6 +8,7 @@ interface FormType {
     description: string,
     public: boolean,
     illustration: File | null,
+    cofounders: number[]
     roles: {
         roleplay_id: string,
         name: string,
@@ -31,13 +32,13 @@ const form = ref<FormType>({
     description: '',
     public: true,
     illustration: null,
+    cofounders: [],
     roles: [
         {
             name: '',
             max_users: 1,
             description: '',
             roleplay_id: '',
-            
         }
     ]
 })

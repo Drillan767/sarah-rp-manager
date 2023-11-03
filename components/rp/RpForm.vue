@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Database } from '~/types/supabase'
 import Wysiwyg from "~/components/rp/Wysiwyg.vue";
 import useValidation from "~/composables/useValidation";
 
@@ -10,6 +11,7 @@ interface Props {
         description: string,
         illustration: File | null,
         public: boolean,
+        cofounders: number[],
     },
     currentPreview?: string
     edit?: boolean,
@@ -17,6 +19,7 @@ interface Props {
 
 const { t } = useI18n()
 const dayjs = useDayjs()
+const supabase = useSupabaseClient<Database>()
 const { requiredRule, imageRule, notBeforeRule } = useValidation()
 
 const minDate = dayjs().format('YYYY-MM-DDT00:00')
@@ -31,13 +34,22 @@ const emit = defineEmits<{
 
 const preview = ref('')
 const showImage = ref(false)
+const usersList = ref<{ id: number, username: string }[]>([])
 
 const formProxy = computed({
     get: () => props.form,
     set: (value) => emit('input', value),
 })
 
-onMounted(() => {
+onMounted(async () => {
+    const { data } = await supabase
+        .from('users')
+        .select('id, username')
+
+    if (data) {
+        usersList.value = data
+    }
+
     if (props.edit) {
         if (props.currentPreview) preview.value = props.currentPreview
         formProxy.value.start_date = dayjs(formProxy.value.start_date).format('YYYY-MM-DD')
@@ -66,7 +78,7 @@ const handleImage = (e: Event) => {
         <template #text>
             <VContainer>
                 <VRow>
-                    <VCol cols="12" md="6">
+                    <VCol cols="12" md="4">
                         <VTextField
                             color="primary"
                             variant="outlined"
@@ -75,7 +87,20 @@ const handleImage = (e: Event) => {
                             :rules="[requiredRule]"
                         />
                     </VCol>
-                    <VCol cols="12" md="6">
+                    <VCol cols="12" md="4">
+                        <VSelect
+                            v-model="formProxy.cofounders"
+                            :items="usersList"
+                            :chips="true"
+                            variant="outlined"
+                            color="primary"
+                            label="Cofondateurs"
+                            :multiple="true"
+                            item-title="username"
+                            item-value="id"
+                        />
+                    </VCol>
+                    <VCol cols="12" md="4">
                         <VTextField
                             color="primary"
                             variant="outlined"
