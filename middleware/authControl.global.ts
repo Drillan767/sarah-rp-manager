@@ -30,7 +30,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
                     )
                 `)
                 .or(`user_id.eq.${currentUser!.id}, and(user_id.eq.${currentUser!.id},status.eq.2)`, { foreignTable: 'roles.characters' })
-                .single()
 
             rpFound = data ?? null
         }
@@ -40,7 +39,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
                 .from('roleplays')
                 .select('user_id')
                 .eq('user_id', currentUser!.id)
-                .single()
 
             rpFound = data ?? null
         }

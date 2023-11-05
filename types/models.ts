@@ -1,3 +1,4 @@
+
 export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
 
 export interface SpecificDate {
@@ -36,6 +37,14 @@ export type Role = CreatedRole & {
     id: number,
 }
 
+export interface Channel {
+    id: number,
+    name: string,
+    roleplay_id: string,
+    private: boolean,
+    allowed_roles: any,
+}
+
 export interface Character {
     id: number,
     name: string,
@@ -58,7 +67,7 @@ export interface Roleplay {
     id: string,
     title: string,
     description: string,
-    message_board: string | null,
+    message_board: string,
     start_date: string | null,
     illustration: string,
     public: boolean,

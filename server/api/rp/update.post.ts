@@ -14,7 +14,7 @@ export default defineEventHandler(async(event) => {
         const { data: files } = await supabase
             .storage
             .from('roleplays')
-            .list(`${payload.id}`)
+            .list(payload.id)
 
         // Remove current image.
         for (const file of files ?? []) {
