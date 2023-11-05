@@ -117,7 +117,9 @@
                 "message": "the announcement",
                 "roles_add": "Add a role",
                 "roles_max_nb": "Maximum number",
-                "roles_name": "Role name"
+                "roles_name": "Role name",
+                "channel_add": "Add a channel",
+                "channel_name": "Nom du canal"
             },
             "registration": {
                 "step1": "Select a role",
@@ -140,9 +142,14 @@
                 "blocked": "Blocked users",
                 "date": "Blocked at"
             },
+            "channel": {
+                "self": "Discussion channels"
+            },
             "delete": {
                 "role": "Confirm the role's deletion?",
-                "role_message": "Deleting the \"{role}\" role cannot be undone, and each linked characters will also be deleted on their own.\n Confirm?"
+                "role_message": "Deleting the \"{role}\" role cannot be undone, and each linked characters will also be deleted on their own.\n Confirm?",
+                "channel": "Confirme the canal's deletion?",
+                "channel_message": "Deleting the discussion channel cannot be undone, and will also delete every media and message sent through it. Confirm?"
             }
         }
     },

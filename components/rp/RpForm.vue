@@ -26,8 +26,14 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-    input: [value: Props['form']],
+    (e: 'input', value: Props['form']): void,
+    (e: 'save'): void,
 }>()
+
+/* const emit = defineEmits<{
+    input: [value: Props['form']],
+
+}>() */
 
 const preview = ref('')
 const showImage = ref(false)
@@ -135,6 +141,15 @@ const handleImage = (e: Event) => {
                     />
                 </VDialog>
             </VContainer>
+        </template>
+        <template #actions v-if="edit">
+            <VSpacer />
+            <VBtn
+                color="primary"
+                @click.prevent="emit('save')"
+            >
+                {{ t('form.save') }}
+            </VBtn>
         </template>
     </VCard>
 </template>

@@ -2,7 +2,6 @@
 import type { Roleplay, Role } from '~/types/models'
 import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
-import { useCurrentUser } from '@/composables/currentUser'
 
 interface EditForm {
     title: string,
@@ -12,19 +11,23 @@ interface EditForm {
     public: boolean,
 }
 
+type EditRoleplay = Omit<Roleplay, 'roles'>
+
 const supabase = useSupabaseClient<Database>()
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { showSuccess } = useSnackBar()
-const currentUser = useCurrentUser()
 const { params } = route
 
 const tabs = ref(2)
+const loadingRP = ref(false)
+const loadingRoles = ref(false)
 const loading = ref(false)
 const displayDeleteModale = ref(false)
+const roles = ref<Role[]>([])
 const roleDeleting = ref<Role>({} as Role)
-const roleplay = ref<Roleplay>({} as Roleplay)
+const roleplay = ref<EditRoleplay>({} as EditRoleplay)
 const form = ref<EditForm>({
     title: '',
     start_date: null,
@@ -33,64 +36,21 @@ const form = ref<EditForm>({
     public: true,
 })
 
-/* if (currentUser.value.id === 0) {
-    throw createError({
-        statusCode: 404,
-        statusMessage: t('common.notfound'),
-        fatal: true,
-    })
-} */
-
-loading.value = true
-const { data, error } = await supabase
-    .from('roleplays')
-    .select(`*, roles(*)`)
-    .eq('id', params.id)
-    .single()
-
-if (error || data === null || data.user_id !== currentUser.value.id) {
-    await router.push('/?notfound=1')
-}
-
-if (data) {
-    roleplay.value = data
-    form.value = Object.assign({}, {
-        title: data.title,
-        start_date: data.start_date,
-        description: data.description,
-        public: data.public,
-        illustration: null,
-    })
-}
-
-loading.value = false
-
 useHead({
-    title: `${t('form.edit')} ${roleplay.value.title}`,
+    title: () => `${t('form.edit')} ${roleplay.value?.title ?? ''}`,
+})
+
+onMounted(async() => {
+    await fetchRP()
+    await fetchRoles()
 })
 
 const submit = async() => {
     loading.value = true
 
-    const { title, public: isPublic, start_date, description, illustration } = form.value
-
-    const formData = new FormData()
-    formData.append('id', roleplay.value.id)
-    formData.append('title', title)
-    formData.append('public', isPublic ? '1' : '0')
-    if (start_date) formData.append('start_date', start_date)
-    formData.append('description', description)
-    if (illustration) formData.append('illustration', illustration)
-    formData.append('description', description)
-
-    await useFetch('/api/rp/update', {
-        method: 'POST',
-        body: formData,
-    })
-
     await useFetch('/api/roles/update', {
         method: 'POST',
-        body: roleplay.value.roles.map((r) => ({
+        body: roles.value.map((r) => ({
             ...r,
             roleplay_id: roleplay.value.id,
 
@@ -118,7 +78,7 @@ const deleteRoleplay = async() => {
 }
 
 const deleteRole = async() => {
-    loading.value = true
+    loadingRoles.value = true
     await useFetch('/api/roles/remove', {
         body: {
             id: roleDeleting.value.id,
@@ -127,20 +87,84 @@ const deleteRole = async() => {
     })
 
     displayDeleteModale.value = false
-    roleplay.value.roles = roleplay.value.roles.filter((r) => r.id !== roleDeleting.value.id)
-    loading.value = false
+    roles.value = roles.value.filter((r) => r.id !== roleDeleting.value.id)
+    loadingRoles.value = false
 
     showSuccess(t('form.deleteConfirmed', { thing: t('pages.roleplays.form.role', 1) }))
 }
 
-watch(form, (value) => {
-    console.log(value)
-    if (value.illustration) {
-        console.log('new image just dropped')
-    }
-})
+const fetchRP = async() => {
+    loadingRP.value = true
+    const { data } = await supabase
+        .from('roleplays')
+        .select('*')
+        .eq('id', params.id)
+        .single()
 
-const links = [
+    if (data) {
+        roleplay.value = data
+        form.value = Object.assign({}, {
+            title: data.title,
+            start_date: data.start_date,
+            description: data.description,
+            public: data.public,
+            illustration: null,
+        })
+    }
+
+    loadingRP.value = false
+}
+
+const fetchRoles = async() => {
+    loadingRoles.value = true
+    const { data } = await supabase
+        .from('roles')
+        .select('*')
+        .eq('roleplay_id', params.id)
+
+    if (data) roles.value = data
+
+    loadingRoles.value = false
+}
+
+const saveRP = async() => {
+    loadingRP.value = true
+
+    const { title, public: isPublic, start_date, description, illustration } = form.value
+
+    const formData = new FormData()
+    formData.append('id', roleplay.value.id)
+    formData.append('title', title)
+    formData.append('public', isPublic ? '1' : '0')
+    if (start_date) formData.append('start_date', start_date)
+    formData.append('description', description)
+    if (illustration) formData.append('illustration', illustration)
+    formData.append('description', description)
+
+    await useFetch('/api/rp/update', {
+        method: 'POST',
+        body: formData,
+    })
+
+    loadingRP.value = false
+}
+
+const updateRoles = async() => {
+    loadingRoles.value = true
+
+    await useFetch('/api/roles/update', {
+        method: 'POST',
+        body: roles.value.map((r) => ({
+            ...r,
+            roleplay_id: roleplay.value.id,
+
+        })),
+    })
+
+    loadingRoles.value = false
+}
+
+const links = computed(() => ([
     {
         title: t('pages.home'),
         to: '/'
@@ -152,7 +176,7 @@ const links = [
     {
         title: t('form.edit'),
     }
-]
+]))
 
 </script>
 
@@ -167,7 +191,11 @@ const links = [
         </VRow>
         <VRow>
             <VCol cols="12" md="6">
-                <h1 class="text-h3 mb-4">{{ `${t('form.edit')} "${roleplay.title}"` }}</h1>
+                <h1 class="text-h3 mb-4">
+                    <template v-if="roleplay.title">
+                        {{ `${t('form.edit')} "${roleplay.title}"` }}
+                    </template>
+                </h1>
             </VCol>
             <VCol
                 cols="12"
@@ -197,58 +225,66 @@ const links = [
             </VCol>
         </VRow>
         <RPMessageBoardForm
+            v-model:message="roleplay.message_board"
             :roleplay-id="roleplay.id"
-            :message="roleplay.message_board"
         />
-        <VForm @submit.prevent="submit">
-            <VRow>
-                <VCol>
-                    <RpForm
-                        :loading="loading"
-                        :current-preview="roleplay.illustration"
-                        :form="form"
-                        :edit="true"
-                    />
+        <VRow>
+            <VCol>
+                <RpForm
+                    :loading="loadingRP"
+                    :current-preview="roleplay.illustration"
+                    :form="form"
+                    :edit="true"
+                    @save="saveRP"
+                />
 
-                </VCol>
-            </VRow>
-            <VRow v-if="roleplay.roles">
-                <VCol>
-                    <RpRolesForm
-                        :loading="loading"
-                        :roles="roleplay.roles"
-                        @delete="handleRoleDeletion"
-                    />
-                </VCol>
-            </VRow>
-            <div class="d-flex justify-end my-4 gap-4">
-                <VBtn
-                    color="red"
-                    @click.prevent="deleteRoleplay"
-                >
-                    {{ t('form.delete') }}
-                </VBtn>
-                <VBtn
-                    color="primary"
-                    type="submit"
-                    :disabled="loading"
-                >
-                    {{ t('form.save') }}
-                </VBtn>
-            </div>
-        </VForm>
+            </VCol>
+        </VRow>
+        <VRow>
+            <VCol>
+                <RpRolesForm
+                    v-model:roles="roles"
+                    :loading="loadingRoles"
+                    :edit="true"
+                    @update="updateRoles"
+                    @delete="handleRoleDeletion"
+                />
+            </VCol>
+        </VRow>
+        <VRow>
+            <VCol>
+                <RPChannelsForm
+                    :roleplay-id="roleplay.id"
+                />
+            </VCol>
+        </VRow>
+        <div class="d-flex justify-end my-4 gap-4">
+            <VBtn
+                color="red"
+                @click.prevent="deleteRoleplay"
+            >
+                {{ t('form.delete') }}
+            </VBtn>
+            <VBtn
+                color="primary"
+                type="submit"
+                :disabled="loading"
+            >
+                {{ t('form.save') }}
+            </VBtn>
+        </div>
         <VDialog
             v-model="displayDeleteModale"
             width="800"
         >
             <VCard>
-                <VCardTitle>
+                <template #title>
                     {{ t('pages.roleplays.delete.role') }}
-                </VCardTitle>
-                <VCardText>
+                </template>
+                <template #text>
                     {{ t('pages.roleplays.delete.role_message') }}
-                </VCardText>
-                <VCardActions>
+                </template>
+                <template #actions>
                     <VSpacer />
                     <VBtn
                         @click="displayDeleteModale = false"
@@ -261,7 +297,7 @@ const links = [
                     >
                         {{ t('form.delete') }}
                     </VBtn>
-                </VCardActions>
+                </template>
             </VCard>
         </VDialog>
     </VContainer>

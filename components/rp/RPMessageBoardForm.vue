@@ -7,22 +7,31 @@ const { t } = useI18n()
 const { maxLengthRule } = useValidation()
 
 interface Props {
-    roleplayId: string,
-    message: string | null
+    roleplayId?: string,
+    message?: string
 }
 
-const supabase = useSupabaseClient<Database>()
-const props = defineProps<Props>()
 const { showSuccess } = useSnackBar()
+const supabase = useSupabaseClient<Database>()
+
+const props = defineProps<Props>()
+const emit = defineEmits<{
+    (e: 'update:message', value: Props['message']): void,
+}>()
+
+const messageProxy = computed({
+    get: () => props.message,
+    set: (value) => emit('update:message', value),
+})
+
 
 const loading = ref(false)
 const newMessage = ref('')
 
-onMounted(() => {
-    newMessage.value = props.message ?? ''
-})
 
 const submit = async() => {
+    if (!props.roleplayId) return
+
     loading.value = true
     await supabase
         .from('roleplays')
@@ -51,12 +60,12 @@ const submit = async() => {
                     <VForm>
                         <VTextField
                             label="Message"
-                            v-model="newMessage"
+                            v-model="messageProxy"
                             variant="outlined"
                             color="primary"
                             :clearable="true"
                             :counter-value="255"
-                            :rules="[maxLengthRule(newMessage, 255 )]"
+                            :rules="[maxLengthRule(messageProxy?.length ? messageProxy : '', 255 )]"
                         />
                     </VForm>
                 </template>

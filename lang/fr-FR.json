@@ -117,7 +117,9 @@
                 "message": "l'annonce",
                 "roles_add": "Ajouter un rôle",
                 "roles_max_nb": "Nombre maximum",
-                "roles_name": "Nom du rôle"
+                "roles_name": "Nom du rôle",
+                "channel_add": "Ajouter un canal",
+                "channel_name": "Nom du canal"
             },
             "registration": {
                 "step1": "Sélectionner un rôle",
@@ -140,9 +142,14 @@
                 "moderator": "Modérateur",
                 "date": "Date de bloquage"
             },
+            "channel": {
+                "self": "Canaux de discussion"
+            },
             "delete": {
                 "role": "Confirmer la suppression du rôle ?",
-                "role_message": "La suppression du rôle {role} est irréversible, et chacun des personnages liés à celui-ci le seront également.\n Confirmer ?"
+                "role_message": "La suppression du rôle {role} est irréversible, et chacun des personnages liés à celui-ci le seront également.\n Confirmer ?",
+                "channel": "Confirmer la suppression du canal de discussion ?",
+                "channel_message": "La suppression du canal est irréversible, et entrainera la suppression de tous les messages et médias qui ont pu êre envoyés dans celle-ci. Confirmer ?"
             }
         }
     },
