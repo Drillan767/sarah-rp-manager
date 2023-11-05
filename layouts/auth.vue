@@ -18,7 +18,7 @@
         </div>
         <div
             class="hidden d-lg-flex flex-1-1 h-screen overflow-hidden bg-cover"
-            style="background-image: url('https://images7.alphacoders.com/689/689877.jpg');"
+            style="background-image: url('/garden.jpg');"
         />
     </div>
 </template>
