@@ -3,6 +3,7 @@ import type  { CreatedRole, Role } from '~/types/models'
 import useValidation from '~/composables/useValidation'
 
 interface Props {
+    edit: boolean
     loading: boolean
     roles: (CreatedRole|Role)[]
 }
@@ -13,8 +14,9 @@ const { requiredRule, minValueRule } = useValidation()
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-    delete: [value: Role],
-    'update:roles': [value: (CreatedRole|Role)[]]
+    (e: 'delete', value: Role): void,
+    (e: 'update'): void,
+    (e: 'update:roles', value: (CreatedRole|Role)[]): void,
 }>()
 
 const rolesProxy = computed({
@@ -122,6 +124,15 @@ const removeRole = (i: number) => {
                     {{ t('pages.roleplays.form.roles_add') }}
                 </VBtn>
             </div>
+        </template>
+        <template #actions v-if="edit">
+            <VSpacer />
+            <VBtn
+                color="primary"
+                @click.prevent="emit('update')"
+            >
+                {{ t('form.save') }}
+            </VBtn>
         </template>
     </VCard>
 </template>

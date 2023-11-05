@@ -77,7 +77,7 @@ const submit = async() => {
 
     loading.value = false
 
-    await router.push(`/roleplays/${data.value}?created=1`)
+    await router.push(`/roleplays/${data.value}/edit?created=1`)
 }
 
 const links = [
@@ -116,6 +116,7 @@ const links = [
                     <RpForm
                         :loading="loading"
                         :form="form"
+                        :edit="false"
                     />
 
                 </VCol>
@@ -125,6 +126,7 @@ const links = [
                     <RpRolesForm
                       :loading="loading"
                       :roles="form.roles"
+                      :edit="false"
                     />
                 </VCol>
             </VRow>
