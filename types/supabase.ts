@@ -35,12 +35,14 @@ export interface Database {
           {
             foreignKeyName: "blacklists_roleplay_id_fkey"
             columns: ["roleplay_id"]
+            isOneToOne: false
             referencedRelation: "roleplays"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "blacklists_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -72,12 +74,14 @@ export interface Database {
           {
             foreignKeyName: "blocklists_origin_id_fkey"
             columns: ["origin_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "blocklists_target_id_fkey"
             columns: ["target_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -109,6 +113,7 @@ export interface Database {
           {
             foreignKeyName: "channels_roleplay_id_fkey"
             columns: ["roleplay_id"]
+            isOneToOne: false
             referencedRelation: "roleplays"
             referencedColumns: ["id"]
           }
@@ -137,12 +142,14 @@ export interface Database {
           {
             foreignKeyName: "channels_users_channel_id_fkey"
             columns: ["channel_id"]
+            isOneToOne: false
             referencedRelation: "channels"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "channels_users_users_id_fkey"
             columns: ["users_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -183,12 +190,14 @@ export interface Database {
           {
             foreignKeyName: "characters_role_id_fkey"
             columns: ["role_id"]
+            isOneToOne: false
             referencedRelation: "roles"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "characters_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -196,45 +205,47 @@ export interface Database {
       }
       messages: {
         Row: {
-          channel_id: number | null
+          channel_id: number
           created_at: string | null
           emojis: Json | null
           id: number
           image_url: string | null
           message: string
           read_by: Json | null
-          user_id: number | null
+          user_id: number
         }
         Insert: {
-          channel_id?: number | null
+          channel_id: number
           created_at?: string | null
           emojis?: Json | null
           id?: number
           image_url?: string | null
           message: string
           read_by?: Json | null
-          user_id?: number | null
+          user_id: number
         }
         Update: {
-          channel_id?: number | null
+          channel_id?: number
           created_at?: string | null
           emojis?: Json | null
           id?: number
           image_url?: string | null
           message?: string
           read_by?: Json | null
-          user_id?: number | null
+          user_id?: number
         }
         Relationships: [
           {
             foreignKeyName: "messages_channel_id_fkey"
             columns: ["channel_id"]
+            isOneToOne: false
             referencedRelation: "channels"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "messages_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -242,33 +253,36 @@ export interface Database {
       }
       roleplays: {
         Row: {
+          cofounders: number[] | null
           created_at: string
           description: string
           id: string
           illustration: string
-          message_board: string | null
+          message_board: string
           public: boolean
           start_date: string | null
           title: string
           user_id: number
         }
         Insert: {
+          cofounders?: number[] | null
           created_at?: string
           description: string
           id?: string
           illustration: string
-          message_board?: string | null
+          message_board?: string
           public?: boolean
           start_date?: string | null
           title: string
           user_id: number
         }
         Update: {
+          cofounders?: number[] | null
           created_at?: string
           description?: string
           id?: string
           illustration?: string
-          message_board?: string | null
+          message_board?: string
           public?: boolean
           start_date?: string | null
           title?: string
@@ -278,6 +292,7 @@ export interface Database {
           {
             foreignKeyName: "roleplays_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -312,6 +327,7 @@ export interface Database {
           {
             foreignKeyName: "roles_roleplay_id_fkey"
             columns: ["roleplay_id"]
+            isOneToOne: false
             referencedRelation: "roleplays"
             referencedColumns: ["id"]
           }
@@ -355,7 +371,10 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_relationship: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
