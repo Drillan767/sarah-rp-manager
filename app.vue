@@ -9,5 +9,6 @@
     <NuxtLayout :name="whichLayout">
         <NuxtPage />
         <Snackbar />
+        <Pegi18Warning />
     </NuxtLayout>
 </template>
