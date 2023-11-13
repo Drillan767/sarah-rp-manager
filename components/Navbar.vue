@@ -38,10 +38,14 @@ onMounted(async () => {
 
 <template>
     <VAppBar class="px-6">
-        <VAvatar :tile="true">
-            <VImg src="/sarah.jpg" />
-        </VAvatar>
-        <VToolbarTitle>Le Jardin de Sarah</VToolbarTitle>
+        <RouterLink to="/">
+            <VAvatar :tile="true">
+                <VImg src="/sarah.jpg" />
+            </VAvatar>
+        </RouterLink>
+        <VToolbarTitle>
+           Le Jardin de Sarah
+        </VToolbarTitle>
 
         <span class="d-none d-sm-inline mr-4">
             {{ currentUser.username }}
