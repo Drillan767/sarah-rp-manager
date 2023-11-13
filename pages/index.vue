@@ -16,24 +16,20 @@ const { t } = useI18n()
 const rpList = ref<Roleplay[]>([])
 const blacklistedRPs = ref<string[]>([])
 
-onMounted(() => {
-    if (currentUser.value.id) fetch()
-})
+onMounted(() => fetch())
 
 watch(currentUser, async (value) => {
-    if (value.id) await fetch()
-})
-
-const availableRPs = computed(() => rpList.value.filter((r) => !blacklistedRPs.value.includes(r.id)))
-
-const fetch = async() => {
     const { data: bl } = await supabase
         .from('blacklists')
         .select('roleplay_id')
         .eq('user_id', currentUser.value.id)
 
     blacklistedRPs.value = bl?.map((bl) => bl.roleplay_id) ?? []
+})
 
+const availableRPs = computed(() => rpList.value.filter((r) => !blacklistedRPs.value.includes(r.id)))
+
+const fetch = async() => {
     const { data: rp } = await supabase
         .from('roleplays')
         .select(`
