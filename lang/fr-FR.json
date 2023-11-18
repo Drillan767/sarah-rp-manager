@@ -64,7 +64,6 @@
         "light": "Mode clair"
     },
     "pages": {
-        "home": "Accueil",
         "profile": {
             "title": "Profil",
             "page": "Informations du profil",
