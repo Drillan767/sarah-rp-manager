@@ -25,9 +25,20 @@ onMounted(() => {
             v-for="(message, i) in messages"
             :key="i"
         >
-            <VRow>
-                <VCol class="d-flex" :class="{'justify-end': i % 2 === 0}">
-                    <Transition :appear="true" :name="i % 2 === 0 ? 'slideleft' : 'slideright'">
+            <VRow
+                justify="center"
+            >
+                <VCol
+                    cols="12"
+                    md="6"
+                    class="d-flex py-0"
+                    :class="{'justify-end': i % 2 === 0}"
+
+                >
+                    <Transition
+                        :appear="true"
+                        :name="i % 2 === 0 ? 'slideright' : 'slideleft'"
+                    >
                     <VCard
                         :rounded="true"
                         class="mb-2"
