@@ -1,73 +1,101 @@
 <script setup lang="ts">
-import type { Database } from '~/types/supabase'
-import { useCurrentUser } from '~/composables/currentUser';
-
-interface Roleplay {
-    id: string,
-    illustration: string,
-    title: string,
-    start_date: string | null,
-}
-
-const currentUser = useCurrentUser()
-const supabase = useSupabaseClient<Database>()
-const { t } = useI18n()
-
-const rpList = ref<Roleplay[]>([])
-const blacklistedRPs = ref<string[]>([])
-
-onMounted(() => fetch())
-
-watch(currentUser, async (value) => {
-    const { data: bl } = await supabase
-        .from('blacklists')
-        .select('roleplay_id')
-        .eq('user_id', currentUser.value.id)
-
-    blacklistedRPs.value = bl?.map((bl) => bl.roleplay_id) ?? []
+const { t } = useI18n({
+    useScope: 'local',
 })
 
-const availableRPs = computed(() => rpList.value.filter((r) => !blacklistedRPs.value.includes(r.id)))
-
-const fetch = async() => {
-    const { data: rp } = await supabase
-        .from('roleplays')
-        .select(`
-            id,
-            title,
-            illustration,
-            start_date
-        `)
-        .eq('public', true)
-
-    rpList.value = rp ?? []
-}
-
+const messages = ref<string[]>([])
 
 useHead({
-    title: t('pages.home')
+    title: t('title'),
 })
+
+onMounted(() => {
+    for (let i = 0; i <= 30; i++) {
+        setTimeout(() => {
+            messages.value.push(`Message n°${i +1 }`)
+        }, i * 2000)
+    }
+})
+
 </script>
 
 <template>
-<VContainer>
-    <VRow>
-        <VCol
-            v-for="(rp, i) in availableRPs"
+    <VContainer>
+        <template
+            v-for="(message, i) in messages"
             :key="i"
-            cols="3"
         >
-            <VCard :to="`/roleplays/${rp.id}`">
-                <VImg
-                    :src="rp.illustration"
-                    height="250"
-                    cover
-                />
-                <VCardTitle>
-                    {{ rp.title }}
-                </VCardTitle>
-            </VCard>
-        </VCol>
-    </VRow>
-</VContainer>
+            <VRow>
+                <VCol class="d-flex" :class="{'justify-end': i % 2 === 0}">
+                    <Transition :appear="true" :name="i % 2 === 0 ? 'slideleft' : 'slideright'">
+                    <VCard
+                        :rounded="true"
+                        class="mb-2"
+                        width="300"
+                        :color="i % 2 === 0 ? 'blue' : undefined"
+                    >
+                        <template #subtitle>
+                            {{ i % 2 === 0 ? 'Moi' : 'Sarah' }}
+                        </template>
+                        <template #text>
+                            {{ message }}, Bespoke celiac edison bulb, godard woke kogi
+                        </template>
+                    </VCard>
+                </Transition>
+                </VCol>
+            </VRow>
+        </template>
+    </VContainer>
 </template>
+
+
+<style scoped lang="scss">
+.slideleft-enter, .slideright-enter { 
+  opacity: 0;
+}
+
+.slideleft-enter-active, .slideright-enter-active {
+    transition: opacity .5s;
+}
+
+.slideleft-enter-active {
+  animation: slide-left .3s ease-in forwards;
+}
+
+.slideright-enter-active {
+  animation: slide-right .3s ease-in forwards;
+}
+
+@keyframes slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+</style>
+
+<i18n lang="json">
+{
+    "fr": {
+        "title": "Accueil"
+    },
+    "en": {
+        "title": "Home"
+    }
+}
+</i18n>
