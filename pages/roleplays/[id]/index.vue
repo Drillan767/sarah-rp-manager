@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Roleplay } from '~/types/models'
 import type { Database } from '~/types/supabase'
-import { useCurrentUser } from '@/composables/currentUser'
+import { useCurrentUser } from '~/composables/currentUser'
 import RpRegisterForm from "~/components/rp/RpRegisterForm.vue";
 
 interface RPDetail extends Omit<Roleplay, 'roles'> {

@@ -1,5 +1,5 @@
 import type { Availability, GenericDate, SpecificDate } from '~/types/models'
-import { days } from '@/assets/json/availability-time.json'
+import { days } from '~/assets/json/availability-time.json'
 import {Dayjs} from "dayjs";
 
 export default function useAvailabilities() {
