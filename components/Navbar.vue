@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Database } from '@/types/supabase'
+import type { Database } from '~/types/supabase'
 import { useTheme} from 'vuetify'
-import { useCurrentUser } from '@/composables/currentUser'
+import { useCurrentUser } from '~/composables/currentUser'
 
 const { t } = useI18n()
 const theme = useTheme()

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Database } from '@/types/supabase'
+import type { Database } from '~/types/supabase'
 import { useField, useForm } from 'vee-validate'
 import * as yup from 'yup';
 

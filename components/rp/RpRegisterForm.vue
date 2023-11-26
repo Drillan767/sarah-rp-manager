@@ -2,8 +2,8 @@
 import type { Database } from '~/types/supabase'
 import type { Roleplay } from '~/types/models'
 import useSnackBar from '~/composables/snackbar'
-import { useCurrentUser } from '@/composables/currentUser'
-import useValidation from '@/composables/useValidation'
+import { useCurrentUser } from '~/composables/currentUser'
+import useValidation from '~/composables/useValidation'
 
 interface RoleDetail {
     id: number,

@@ -1,26 +1,81 @@
 <script setup lang="ts">
+import { useCurrentUser } from '~/composables/currentUser'
+import messageList from '~/assets/json/landing-messages.json'
+import Message from '~/components/channels/Message.vue'
+
+interface Message {
+    id: number,
+    message: string
+    created_at: string,
+    url?: string,
+    media?: string,
+    sender: string,
+    from_sender: boolean,
+    reactions: {
+        smiley: string,
+        users: string[],
+    }[]
+}
+
 const { t } = useI18n({
     useScope: 'local',
 })
 
-const messages = ref<string[]>([])
+const currentUser = useCurrentUser()
+const dayjs = useDayjs()
+
+const username = ref('')
+
+const messages = ref<Message[]>([])
+const user = useSupabaseUser()
+
+username.value = user.value ? currentUser.value.username : t('me')
 
 useHead({
     title: t('title'),
 })
 
 onMounted(() => {
-    for (let i = 0; i <= 30; i++) {
+    messageList.forEach((message, i) => {
         setTimeout(() => {
-            messages.value.push(`Message n°${i +1 }`)
+            messages.value.push({
+                id: message.id,
+                message: message.message,
+                created_at: dayjs().toISOString(),
+                reactions: [],
+                from_sender: message.from_sender,
+                sender: message.from_sender ? username.value : 'Sarah',
+            })
         }, i * 2000)
-    }
+
+        if (message.emoji) {
+            setTimeout(() => {
+                messages.value[i].reactions.push({
+                    smiley: message.emoji,
+                    users: [message.from_sender ? 'Sarah' : username.value],
+                })
+            }, (i * 2000) + 500)
+
+        }
+    })
 })
+
+const addReaction = () => {
+    messages.value[2].reactions.push({
+        smiley: '😂',
+        users: ['Random boug']
+    })
+}
 
 </script>
 
 <template>
     <VContainer>
+        <VRow>
+            <VBtn @click="addReaction">
+                Ajouter une réaction
+            </VBtn>
+        </VRow>
         <template
             v-for="(message, i) in messages"
             :key="i"
@@ -28,32 +83,11 @@ onMounted(() => {
             <VRow
                 justify="center"
             >
-                <VCol
-                    cols="12"
-                    md="6"
-                    class="d-flex py-0"
-                    :class="{'justify-end': i % 2 === 0}"
-
-                >
-                    <Transition
-                        :appear="true"
-                        :name="i % 2 === 0 ? 'slideright' : 'slideleft'"
-                    >
-                    <VCard
-                        :rounded="true"
-                        class="mb-2"
-                        width="300"
-                        :color="i % 2 === 0 ? 'blue' : undefined"
-                    >
-                        <template #subtitle>
-                            {{ i % 2 === 0 ? 'Moi' : 'Sarah' }}
-                        </template>
-                        <template #text>
-                            {{ message }}, Bespoke celiac edison bulb, godard woke kogi
-                        </template>
-                    </VCard>
-                </Transition>
-                </VCol>
+                <Message
+                    :message="message"
+                    :enable-interactions="false"
+                    :from-sender="message.from_sender"
+                />
             </VRow>
         </template>
     </VContainer>
@@ -103,10 +137,14 @@ onMounted(() => {
 <i18n lang="json">
 {
     "fr": {
-        "title": "Accueil"
+        "me": "Moi",
+        "title": "Accueil",
+        "add_emoji": "Ajouter une réaction"
     },
     "en": {
-        "title": "Home"
+        "me": "Me",
+        "title": "Home",
+        "add_emoji": "Add a reaction"
     }
 }
 </i18n>
