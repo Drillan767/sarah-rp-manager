@@ -53,12 +53,13 @@ const emojiSelect = (emoji: EmojiExt) => {
             <VCard
                 :rounded="true"
                 class="mb-2"
-                width="300"
+                max-width="300"
+                :to="message.url ?? undefined"
                 :color="fromSender ? 'blue' : undefined"
             >
                 <template #subtitle>
                     <div
-                        class="d-flex justify-space-between"
+                        class="d-flex justify-space-between gap-x-2"
                         :class="{ 'flex-row-reverse': fromSender }"
                     >
                         <span>
