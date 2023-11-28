@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { SpecificDate } from '~/types/models'
 import { useDebounceFn } from '@vueuse/core'
-import {af} from "vuetify/locale";
 
 interface Props {
     maxHours: number,

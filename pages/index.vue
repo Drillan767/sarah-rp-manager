@@ -40,8 +40,9 @@ onMounted(() => {
         setTimeout(() => {
             messages.value.push({
                 id: message.id,
-                message: message.message,
+                message: t(message.message),
                 created_at: dayjs().toISOString(),
+                url: message.url ?? undefined,
                 reactions: [],
                 from_sender: message.from_sender,
                 sender: message.from_sender ? username.value : 'Sarah',
@@ -71,25 +72,31 @@ const addReaction = () => {
 
 <template>
     <VContainer>
-        <VRow>
-            <VBtn @click="addReaction">
-                Ajouter une réaction
-            </VBtn>
+        <VRow justify="center">
+            <VAvatar
+                class="my-4"
+                image="/sarah.jpg"
+                :size="130"
+            />
         </VRow>
-        <template
+        <VRow>
+            <VCol>
+                <h1 class="text-center">
+                    {{ t('say') }} Sarah...
+                </h1>
+            </VCol>
+        </VRow>
+        <VRow
+            justify="center"
             v-for="(message, i) in messages"
             :key="i"
         >
-            <VRow
-                justify="center"
-            >
-                <Message
-                    :message="message"
-                    :enable-interactions="false"
-                    :from-sender="message.from_sender"
-                />
-            </VRow>
-        </template>
+            <Message
+                :message="message"
+                :enable-interactions="false"
+                :from-sender="message.from_sender"
+            />
+        </VRow>
     </VContainer>
 </template>
 
@@ -139,12 +146,36 @@ const addReaction = () => {
     "fr": {
         "me": "Moi",
         "title": "Accueil",
-        "add_emoji": "Ajouter une réaction"
+        "say": "Dis",
+        "sarah": {
+            "message1": "Accède à tes roleplays",
+            "message2": "Regarde tous tes personnages disponibles",
+            "message3": "Modifie tes disponibilités"
+        },
+        "sender": {
+            "message1": "On fait quoi ce soir ?",
+            "message2": "Merci !",
+            "message3": "Ah et je joue qui ?",
+            "message4": "Trop bien !",
+            "message5": "Les gens savent que je suis là ?"
+        }
     },
     "en": {
         "me": "Me",
         "title": "Home",
-        "add_emoji": "Add a reaction"
+        "say": "Say",
+        "sarah": {
+            "message1": "Access your roleplays",
+            "message2": "Check all your current characters",
+            "message3": "Change your availability"
+        },
+        "sender": {
+            "message1": "What are we doing tonight?",
+            "message2": "Thanks!",
+            "message3": "Oh and who do I play as?",
+            "message4": "Cool!",
+            "message5": "The others know I am here, right?"
+        }
     }
 }
 </i18n>
