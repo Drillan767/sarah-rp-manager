@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { mergeProps } from 'vue'
-import type { EmojiExt } from 'vue3-emoji-picker'
-import EmojiPicker from 'vue3-emoji-picker'
-import 'vue3-emoji-picker/css'
 
 interface Props {
     message: {
@@ -33,7 +30,7 @@ const creationDate = computed(() => {
     return initialDate.format(format)
 })
 
-const emojiSelect = (emoji: EmojiExt) => {
+const emojiSelect = (emoji) => {
     console.log(emoji)
 }
 
@@ -89,11 +86,11 @@ const emojiSelect = (emoji: EmojiExt) => {
                                 </template>
                             </VTooltip>
                         </template>
-                        <EmojiPicker
+                        <!-- <EmojiPicker
                             :native="true"
                             theme="auto"
                             @select="emojiSelect"
-                        />
+                        />-->
                     </VMenu>
                     <VTooltip
                         location="bottom"
