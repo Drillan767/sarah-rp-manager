@@ -12,7 +12,7 @@
     "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.1.1",
+    "@antfu/eslint-config": "^2.1.2",
     "@nuxt/devtools": "1.0.4",
     "@nuxtjs/i18n": "^8.0.0-rc.5",
     "@nuxtjs/supabase": "^1.1.4",
@@ -28,15 +28,17 @@
   "dependencies": {
     "@mdi/font": "^7.3.67",
     "@supabase/supabase-js": "^2.39.0",
-    "@tiptap/extension-placeholder": "^2.1.12",
-    "@tiptap/pm": "^2.1.12",
-    "@tiptap/starter-kit": "^2.1.12",
-    "@tiptap/vue-3": "^2.1.12",
-    "@vee-validate/nuxt": "^4.12.1",
-    "@vee-validate/yup": "^4.12.1",
+    "@tiptap/extension-placeholder": "^2.1.13",
+    "@tiptap/pm": "^2.1.13",
+    "@tiptap/starter-kit": "^2.1.13",
+    "@tiptap/vue-3": "^2.1.13",
+    "@vee-validate/i18n": "^4.12.2",
+    "@vee-validate/nuxt": "^4.12.2",
+    "@vee-validate/rules": "^4.12.2",
     "@vueuse/core": "^10.6.1",
+    "@vueuse/router": "^10.7.0",
+    "vite-plugin-vuetify": "^1.0.2",
     "vue3-emoji-picker": "^1.1.8",
-    "vuetify": "^3.4.4",
-    "yup": "^1.3.2"
+    "vuetify": "^3.4.4"
   }
 }

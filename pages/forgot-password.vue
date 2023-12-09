@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useField, useForm } from 'vee-validate'
-import * as yup from 'yup';
+import { useForm } from 'vee-validate'
+import { vuetifyConfig } from '~/composables/vuetifyConfig';
 
 const { t } = useI18n()
 
@@ -8,16 +8,13 @@ useHead({
     title: t('forgotPwd.title'),
 })
 
-const validationSchema = yup.object().shape({
-    email: yup.
-        string()
-        .email(t('form.email'))
-        .required(t('form.required')),
+const { defineField, handleSubmit } = useForm({
+    validationSchema: {
+        email: 'email|required',
+    }
 })
 
-const { handleSubmit } = useForm({ validationSchema })
-
-const email = useField('email', validationSchema)
+const [email, emailProps] = defineField('email', vuetifyConfig)
 
 const client = useSupabaseClient()
 
@@ -27,7 +24,7 @@ const loading = ref(false)
 const submit = handleSubmit(async(values) => {
     loading.value = true
     await client.auth.resetPasswordForEmail(values.email, {
-        redirectTo: 'https://rp-manager.vercel.app/create-password',
+        redirectTo: 'https://sarah-rp.fr/new-password',
     })
 
     success.value = true
@@ -52,11 +49,11 @@ const submit = handleSubmit(async(values) => {
         />
 
         <VTextField
+            v-bind="emailProps"
+            v-model="email"
             :label="t('fields.email')"
             variant="underlined"
             color="primary"
-            v-model="email.value.value"
-            :error-messages="email.errorMessage.value"
             class="mb-4"
         />
 
@@ -71,7 +68,7 @@ const submit = handleSubmit(async(values) => {
                     rounded="lg"
                     block
                 >
-                    {{ t('login.action') }}
+                    {{ t('forgotPwd.action') }}
                 </VBtn>
             </div>
         </div>

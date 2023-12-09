@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Database } from '~/types/supabase'
-import { useField, useForm } from 'vee-validate'
-import * as yup from 'yup';
+import { useForm, useIsFormValid } from 'vee-validate'
+import { vuetifyConfig } from '~/composables/vuetifyConfig'
 
 const { t } = useI18n()
 const supabase = useSupabaseClient<Database>()
@@ -11,31 +11,21 @@ useHead({
     title: t('register.action'),
 })
 
-const validationSchema = yup.object().shape({
-    email: yup.
-        string()
-        .email(t('form.email'))
-        .required(t('form.required')),
-    username: yup
-        .string()
-        .min(6, t('form.minLength', 6))
-        .required(t('form.required')),
-    password: yup
-        .string()
-        .min(6, t('form.minLength', 6))
-        .required(t('form.required')),
-    passwordConfirmation: yup
-        .string()
-        .oneOf([yup.ref('password')], t('form.confirmed'))
-        .required(t('form.required')),
+const { defineField, handleSubmit, resetForm } = useForm({
+    validationSchema: {
+        email: 'email|required',
+        username: 'min:6|required',
+        password: 'min:6|required',
+        passwordConfirmation: 'required|confirmed:@password',
+    }
 })
 
-const { handleSubmit } = useForm({ validationSchema })
+const [email, emailProps] = defineField('email', vuetifyConfig)
+const [username, usernameProps] = defineField('username', vuetifyConfig)
+const [pwd, pwdProps] = defineField('password', vuetifyConfig)
+const [pwdConfirm, pwdConfirmProps] = defineField('passwordConfirmation', vuetifyConfig)
 
-const email = useField('email', validationSchema)
-const username = useField('username', validationSchema)
-const password = useField('password', validationSchema)
-const passwordConfirmation = useField('passwordConfirmation', validationSchema)
+const formValid = useIsFormValid()
 
 const valid = ref(false)
 const loading = ref(false)
@@ -83,6 +73,7 @@ const submit = handleSubmit(async(values) => {
             throw insertError
 
         success.value = true
+        resetForm()
     }
     catch (e: any) {
         error.value = e.message
@@ -115,40 +106,40 @@ const submit = handleSubmit(async(values) => {
         />
 
         <VTextField
+            v-bind="emailProps"
+            v-model="email"
             :label="t('fields.email')"
             variant="underlined"
             color="primary"
-            v-model="email.value.value"
-            :error-messages="email.errorMessage.value"
             class="mb-4"
         />
 
         <VTextField
+            v-bind="usernameProps"
+            v-model="username"
             :label="t('fields.username')"
             variant="underlined"
             color="primary"
-            v-model="username.value.value"
-            :error-messages="username.errorMessage.value"
             class="mb-4"
         />
 
         <VTextField
+            v-bind="pwdProps"
+            v-model="pwd"
             :label="t('fields.password')"
             variant="underlined"
             color="primary"
             type="password"
-            v-model="password.value.value"
-            :error-messages="password.errorMessage.value"
             class="mb-4"
         />
 
         <VTextField
+            v-bind="pwdConfirmProps"
+            v-model="pwdConfirm"
             :label="t('fields.confirm_password')"
             variant="underlined"
             color="primary"
             type="password"
-            v-model="passwordConfirmation.value.value"
-            :error-messages="passwordConfirmation.errorMessage.value"
             class="mb-4"
         />
 
@@ -156,7 +147,7 @@ const submit = handleSubmit(async(values) => {
             <div class="d-flex justify-center w-full">
                 <VBtn
                     :loading="loading"
-                    :disabled="!valid || loading"
+                    :disabled="!formValid || loading"
                     elevation="0"
                     type="submit"
                     color="primary"
@@ -169,12 +160,12 @@ const submit = handleSubmit(async(values) => {
             </div>
         </div>
 
-        <div class="">
+        <div class="text-center mt-4">
             <p>
                 {{ t('register.accountExists') }}
                 <NuxtLink
                     to="/login"
-                    class=""
+                    class="text-indigo font-weight-bold text-decoration-none"
                 >
 
                     {{ t('login.action') }}

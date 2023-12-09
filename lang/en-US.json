@@ -57,6 +57,10 @@
         "success": "Registration successful, please verify your email address with the link sent to you by email",
         "accountExists": "Already have an account?"
     },
+    "newPwd": {
+        "title": "New password",
+        "success": "Password changed successfully"
+    },
     "account": {
         "self": "Account",
         "logout": "Logout",
