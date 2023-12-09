@@ -1,7 +1,14 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+
 export default defineNuxtConfig({
     modules: [
         'dayjs-nuxt',
+        (_options, nuxt) => {
+            nuxt.hooks.hook('vite:extendConfig', (config) => {
+                // @ts-expect-error
+                config.plugins.push(vuetify({ autoImport: true }))
+            })
+        },
         '@vee-validate/nuxt',
         '@nuxtjs/supabase',
         '@nuxtjs/i18n',
@@ -92,5 +99,13 @@ export default defineNuxtConfig({
 
     build: {
         transpile: ['vuetify']
-    }
+    },
+
+    vite: {
+        vue: {
+            template: {
+                transformAssetUrls,
+            },
+        },
+    },
 })

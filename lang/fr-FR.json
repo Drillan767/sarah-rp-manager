@@ -57,6 +57,10 @@
         "success": "Inscription effectuée avec succès, veuillez activer votre compte grâce au lien envoyé par email.",
         "accountExists": "Vous avez un compte ?"
     },
+    "newPwd": {
+        "title": "Nouveau mot de passe",
+        "success": "Mot de passe enregistré avec succès"
+    },
     "account": {
         "self": "Mon compte",
         "logout": "Déconnexion",
@@ -64,6 +68,7 @@
         "light": "Mode clair"
     },
     "pages": {
+        "home": "Accueil",
         "profile": {
             "title": "Profil",
             "page": "Informations du profil",

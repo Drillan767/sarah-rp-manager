@@ -1,30 +1,31 @@
 <script setup lang="ts">
 import type { Database} from "~/types/supabase"
-import { useField, useForm } from 'vee-validate'
-import * as yup from 'yup';
+import { useForm, useIsFormValid } from 'vee-validate'
+import { vuetifyConfig } from '~/composables/vuetifyConfig'
 import useSnackBar from '~/composables/snackbar'
+
+interface UserData {
+    email: string,
+    username: string,
+    description: string | null,
+}
 
 const { t } = useI18n()
 const supabase = useSupabaseClient<Database>()
 const session = useSupabaseUser()
 const { showSuccess } = useSnackBar()
 
-const validationSchema = yup.object().shape({
-    username: yup
-        .string()
-        .min(4, t('form.minLength', 4))
-        .required(t('form.required')),
-    description: yup
-        .string()
-        .nullable()
+const { defineField, setValues, handleSubmit } = useForm<UserData>({
+    validationSchema: {
+        username: 'min:4|required',
+    }
 })
 
-const { handleSubmit } = useForm({ validationSchema })
+const formValid = useIsFormValid()
 
-// Email never changes
-const email = ref('')
-const username = useField('username', validationSchema)
-const description = useField('description', validationSchema)
+const [email, emailProps] = defineField('email', vuetifyConfig)
+const [username, usernameProps] = defineField('username', vuetifyConfig)
+const [description, descriptionProps] = defineField('description', vuetifyConfig)
 
 const loading = ref(false)
 
@@ -37,9 +38,7 @@ onMounted(async() => {
         .single()
 
     if (data) {
-        email.value = data.email
-        username.value.value = data.username
-        description.value.value = data.description ?? ''
+        setValues(data)
     }
     loading.value = false
 })
@@ -76,10 +75,9 @@ const submit = handleSubmit(async (values) => {
                         md="6"
                     >
                         <VTextField
-                            :label="t('fields.email')"
-                            color="primary"
-                            variant="outlined"
+                            v-bind="emailProps"
                             v-model="email"
+                            :label="t('fields.email')"
                             :disabled="true"
                         />
                     </VCol>
@@ -88,22 +86,19 @@ const submit = handleSubmit(async (values) => {
                         md="6"
                     >
                         <VTextField
+                            v-bind="usernameProps"
+                            v-model="username"
                             :label="t('fields.username')"
-                            color="primary"
-                            variant="outlined"
-                            v-model="username.value.value"
-                            :error-messages="username.errorMessage.value"
                         />
                     </VCol>
                 </VRow>
                 <VRow>
                     <VCol>
                         <VTextarea
+                            v-bind="descriptionProps"
+                            v-model="description"
                             label="Description"
-                            variant="outlined"
-                            v-model="description.value.value"
                             :auto-grow="true"
-                            color="primary"
                         />
                     </VCol>
                 </VRow>
@@ -112,6 +107,7 @@ const submit = handleSubmit(async (values) => {
                 <VBtn
                     color="primary"
                     type="submit"
+                    :disabled="!formValid"
                 >
                     {{ t('form.save') }}
                 </VBtn>

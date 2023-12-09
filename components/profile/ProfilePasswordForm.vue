@@ -1,26 +1,20 @@
 <script setup lang="ts">
-import { useField, useForm } from 'vee-validate'
-import * as yup from 'yup';
+import { useForm } from 'vee-validate'
 import useSnackBar from '~/composables/snackbar'
 
 const { t } = useI18n()
 const supabase = useSupabaseClient()
 const { showSuccess } = useSnackBar()
 
-const validationSchema = yup.object().shape({
-    password: yup
-        .string()
-        .min(6, t('form.minLength', 6))
-        .required(t('form.required')),
-    passwordConfirmation: yup
-        .string()
-        .oneOf([yup.ref('password')], t('form.confirmed'))
-        .required(t('form.required')),
+const { defineField, handleSubmit, handleReset } = useForm({
+    validationSchema: {
+        password: 'required|min:6',
+        repeatPassword: 'required|confirmed:@password',
+    }
 })
 
-const { handleSubmit, handleReset } = useForm({ validationSchema })
-const password = useField('password', validationSchema)
-const passwordConfirmation = useField('passwordConfirmation', validationSchema)
+const [pwd, pwdProps] = defineField('password', vuetifyConfig)
+const [confirmPwd, confirmPwdProps] = defineField('repeatPassword', vuetifyConfig)
 
 const loading = ref(false)
 
@@ -30,7 +24,6 @@ const submit = handleSubmit(async (values) => {
         .updateUser({ password: values.password })
 
     handleReset()
-
     showSuccess(t('pages.profile.success.password'))
 })
 
@@ -54,12 +47,10 @@ const submit = handleSubmit(async (values) => {
                         md="6"
                     >
                         <VTextField
+                            v-bind="pwdProps"
+                            v-modem="pwd"
                             :label="t('fields.password')"
                             type="password"
-                            color="primary"
-                            variant="outlined"
-                            v-model="passwordConfirmation.value.value"
-                            :error-messages="passwordConfirmation.errorMessage.value"
                         />
                     </VCol>
                     <VCol
@@ -67,12 +58,10 @@ const submit = handleSubmit(async (values) => {
                         md="6"
                     >
                         <VTextField
+                            v-bind="confirmPwdProps"
+                            v-model="confirmPwd"
                             :label="t('fields.confirm_password')"
                             type="password"
-                            color="primary"
-                            variant="outlined"
-                            v-model="password.value.value"
-                            :error-messages="password.errorMessage.value"
                         />
                     </VCol>
                 </VRow>

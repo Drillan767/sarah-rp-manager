@@ -1,43 +1,39 @@
 <script setup lang="ts">
-import { useField, useForm } from 'vee-validate'
-import * as yup from 'yup';
+import { useForm, useIsFormValid } from 'vee-validate'
+import { vuetifyConfig } from '@/composables/vuetifyConfig'
 
 const { t } = useI18n()
 const client = useSupabaseClient()
 const router = useRouter()
 
+const { defineField, handleSubmit, values: loginValues } = useForm({
+    validationSchema: {
+        email: 'email|required',
+        password: 'required'
+    },
+    initialValues: {
+        email: '',
+        password: '',
+    }
+})
+
+const [email, emailProps] = defineField('email', vuetifyConfig)
+const [password, passwordProps] = defineField('password', vuetifyConfig)
+const formValid = useIsFormValid()
+
 useHead({
     title: t('login.action'),
 })
 
-const validationSchema = yup.object().shape({
-    email: yup.
-        string()
-        .email(t('form.email'))
-        .required(t('form.required')),
-    password: yup
-        .string()
-        .min(6, t('form.minLength', 6))
-        .required(t('form.required')),
-})
-
-const { handleSubmit } = useForm({ validationSchema })
-
-const email = useField('email', validationSchema)
-const password = useField('password', validationSchema)
-
+const globalError = ref('')
 const loading = ref(false)
-const error = ref('')
 
 const signin = handleSubmit(async(values) => {
-    error.value = '';
+    globalError.value = ''
     loading.value = true
 
     try {
-        const { error } = await client.auth.signInWithPassword({
-            email: values.email,
-            password: values.password,
-        })
+        const { error } = await client.auth.signInWithPassword(loginValues)
 
         if (error)
             throw error
@@ -45,7 +41,7 @@ const signin = handleSubmit(async(values) => {
         await router.push('/')
     }
     catch (e: any) {
-        error.value = e.message
+        globalError.value = e.message
         loading.value = false
     }
 })
@@ -59,27 +55,26 @@ const signin = handleSubmit(async(values) => {
         </h1>
 
         <VAlert
-            v-if="error !== ''"
+            v-if="globalError !== ''"
             type="error"
-            :text="error"
+            :text="globalError"
             class="mb-4"
         />
 
         <VTextField
-            :label="t('fields.email')"
+            v-bind="emailProps"
+            v-model="email"
             variant="underlined"
-            color="primary"
-            v-model="email.value.value"
-            :error-messages="email.errorMessage.value"
+            :label="t('fields.email')"
             class="mb-4"
         />
+
         <VTextField
+            v-bind="passwordProps"
+            v-model="password"
             :label="t('fields.password')"
             variant="underlined"
-            color="primary"
             type="password"
-            v-model="password.value.value"
-            :error-messages="password.errorMessage.value"
             class="mb-4"
         />
 
@@ -87,6 +82,7 @@ const signin = handleSubmit(async(values) => {
             <div class="d-flex justify-center w-full lg:w-1/2">
                 <VBtn
                     :loading="loading"
+                    :disabled="!formValid"
                     elevation="0"
                     type="submit"
                     color="primary"

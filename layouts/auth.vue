@@ -1,31 +1,41 @@
 <template>
     <div class="d-lg-flex">
-        <div class="white-block">
-            <div class="branding">
-                <img
-                    class="rounded-full h-24 w-24"
-                    src="/sarah.jpg"
-                    alt="Sarah"
-                >
+        <div class="white-block w-md-50">
+            <div class="pa-12 d-flex justify-center justify-md-start">
+                <div class="d-flex flex-column flex-md-row align-center">
+                    <VAvatar
+                        size="96"
+                        image="/sarah.jpg"
+                        alt="Sarah"
+                    />
 
-                <span>
-                    Le Jardin de Sarah
-                </span>
+                    <span class="brand ml-md-2">
+                        Le Jardin de Sarah
+                    </span>
+                </div>
             </div>
-            <div class="px-12 sm:px-24 md:px-48 lg:px-12 xl:px-24 xl:max-w-2xl">
+            <div class="px-10 mt-4">
                 <slot />
             </div>
         </div>
         <div
-            class="hidden d-lg-flex flex-1-1 h-screen overflow-hidden bg-cover"
+            class="d-none d-lg-flex flex-1-1 h-screen overflow-hidden bg-cover"
             style="background-image: url('/garden.jpg');"
         />
     </div>
 </template>
 
 <style scoped lang="scss">
+
+.brand {
+    color: #3730a3;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: .025em;
+    line-height: 2rem;
+    margin-left: .5rem;
+}
 .white-block {
-    width: 50%;
     height: 100vh;
     background-color: white;
 
@@ -34,7 +44,7 @@
     }
 
     .branding {
-        display: flex;
+        /* display: flex;
         align-items: center;
         justify-content: center;
         padding-bottom: 3rem;
@@ -44,7 +54,7 @@
             justify-content: start;
             padding-left: 3rem;
             padding-right: 3rem;
-        }
+        } */
 
         img {
             border-radius: 50%;
