@@ -42,34 +42,5 @@
     @media (min-width: 1280px) {
         width: 640px;
     }
-
-    .branding {
-        /* display: flex;
-        align-items: center;
-        justify-content: center;
-        padding-bottom: 3rem;
-        padding-top: 3rem;
-
-        @media (min-width: 1024px) {
-            justify-content: start;
-            padding-left: 3rem;
-            padding-right: 3rem;
-        } */
-
-        img {
-            border-radius: 50%;
-            width: 6rem;
-            height: 6rem;
-        }
-
-        span {
-            color: rgb(55 48 163);
-            letter-spacing: .025em;
-            font-weight: 600;
-            font-size: 1.5rem;
-            line-height: 2rem;
-            margin-left: 0.5rem;
-        }
-    }
 }
 </style>
