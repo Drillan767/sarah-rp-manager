@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useRouteParams } from '@vueuse/router'
 import type { Character, DataTableHeader } from '~/types/models'
 import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
@@ -40,12 +41,11 @@ interface BlockedUser {
 }
 
 const supabase = useSupabaseClient<Database>()
-const route = useRoute()
 const { t } = useI18n()
 const dayjs = useDayjs()
 const { showSuccess } = useSnackBar()
-const { params } = route
 const { requiredRule } = useValidation()
+const rpId = useRouteParams('id', null, { transform: Number })
 
 const statusList = [
     {
@@ -104,6 +104,7 @@ async function fetch() {
                     id,
                     illustration,
                     description,
+                    user_id
                     status,
                     name,
                     user:users(
@@ -113,7 +114,7 @@ async function fetch() {
                 )
             )
         `)
-        .eq('id', params.id)
+        .eq('id', rpId.value)
         .single()
 
     if (rpData)
@@ -122,7 +123,7 @@ async function fetch() {
     const { data: blockedList } = await supabase
         .from('blacklists')
         .select(`*, user:users(id, username)`)
-        .eq('roleplay_id', params.id)
+        .eq('roleplay_id', rpId.value)
 
     if (blockedList)
         blockedUsers.value = blockedList
@@ -367,13 +368,9 @@ const blockedListHeaders: DataTableHeader[] = [
                 <VRow>
                     <VCard
                         prepend-icon="mdi-account-cancel"
+                        :title="t('block.users')"
                         class="my-4 w-100"
                     >
-                        <template #title>
-                            <h2 class="text-h3">
-                                {{ t('block.users') }}
-                            </h2>
-                        </template>
                         <template #text>
                             <VDataTable
                                 v-model:expanded="expanded"
