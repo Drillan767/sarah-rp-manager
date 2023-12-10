@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { useForm } from 'vee-validate'
 import type { Database } from '~/types/supabase'
-import useValidation from '~/composables/useValidation'
+import { vuetifyConfig } from '~/composables/vuetifyConfig'
 import useSnackBar from '~/composables/snackbar'
 
 const props = defineProps<Props>()
@@ -8,7 +9,6 @@ const emit = defineEmits<{
     (e: 'update:message', value: Props['message']): void
 }>()
 const { t } = useI18n()
-const { maxLengthRule } = useValidation()
 
 interface Props {
     roleplayId?: string
@@ -18,15 +18,20 @@ interface Props {
 const { showSuccess } = useSnackBar()
 const supabase = useSupabaseClient<Database>()
 
-const messageProxy = computed({
-    get: () => props.message,
-    set: value => emit('update:message', value),
+const loading = ref(false)
+
+const { defineField, handleSubmit, controlledValues, setValues } = useForm({
+    validationSchema: {
+        message: 'max:255',
+    },
+    initialValues: {
+        message: props.message,
+    },
 })
 
-const loading = ref(false)
-const newMessage = ref('')
+const [message, messageProps] = defineField('message', vuetifyConfig)
 
-async function submit() {
+const submit = handleSubmit(async ({ message }) => {
     if (!props.roleplayId)
         return
 
@@ -34,13 +39,16 @@ async function submit() {
     await supabase
         .from('roleplays')
         .update({
-            message_board: newMessage.value,
+            message_board: message,
         })
         .eq('id', props.roleplayId)
 
     loading.value = false
     showSuccess(t('form.updateConfirmed', { thing: 'message' }))
-}
+})
+
+watch(controlledValues, value => emit('update:message', value.message))
+watch(() => props.message, value => setValues({ message: value }))
 </script>
 
 <template>
@@ -56,13 +64,11 @@ async function submit() {
                 <template #text>
                     <VForm>
                         <VTextField
-                            v-model="messageProxy"
+                            v-bind="messageProps"
+                            v-model="message"
                             label="Message"
-                            variant="outlined"
-                            color="primary"
                             :clearable="true"
-                            :counter-value="255"
-                            :rules="[maxLengthRule(messageProxy?.length ? messageProxy : '', 255)]"
+                            :counter="255"
                         />
                     </VForm>
                 </template>
@@ -80,7 +86,3 @@ async function submit() {
         </VCol>
     </VRow>
 </template>
-
-<style scoped lang="scss">
-
-</style>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useRouteParams } from '@vueuse/router'
+import { useForm, useIsFormValid } from 'vee-validate'
 import type { Character, DataTableHeader } from '~/types/models'
+import { vuetifyConfig } from '~/composables/vuetifyConfig'
 import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
-import useValidation from '~/composables/useValidation'
 
 interface RoleplayData {
     id: string
@@ -29,6 +30,13 @@ interface RoleplayData {
     }[]
 }
 
+interface IBlockForm {
+    user_id: number
+    username: string
+    reason: string
+    roleplay_id: string
+}
+
 interface BlockedUser {
     id: number
     user: {
@@ -43,7 +51,6 @@ const supabase = useSupabaseClient<Database>()
 const { t } = useI18n()
 const dayjs = useDayjs()
 const { showSuccess } = useSnackBar()
-const { requiredRule } = useValidation()
 const rpId = useRouteParams('id', null, { transform: String })
 
 const statusList = [
@@ -78,12 +85,18 @@ const selectedCharacter = ref<Character>({} as Character)
 const blockedUsers = ref<BlockedUser[]>([])
 const expanded = ref([])
 
-const blockForm = ref({
-    user_id: 0,
-    username: '',
-    reason: '',
-    roleplay_id: '',
+const { defineField, setValues, handleSubmit, resetForm, controlledValues: blockForm } = useForm<IBlockForm>({
+    validationSchema: {
+        reason: 'required',
+    },
 })
+
+const [reason, reasonProps] = defineField('reason', vuetifyConfig)
+
+// We don't need to define a v-model nor a props.
+defineField('username')
+
+const formValid = useIsFormValid()
 
 async function fetch() {
     loading.value = true
@@ -138,9 +151,12 @@ function openDetails(character: Character) {
 }
 
 function showBlockDialog(user: { username: string, id: number }) {
-    blockForm.value.username = user.username
-    blockForm.value.user_id = user.id
-    blockForm.value.roleplay_id = roleplay.value.id
+    setValues({
+        username: user.username,
+        user_id: user.id,
+        roleplay_id: roleplay.value.id,
+    })
+
     displayBlockDialog.value = true
 }
 
@@ -155,27 +171,22 @@ watch(rpId, (value) => {
 
 onMounted(() => fetch())
 
-async function blockUser() {
+const blockUser = handleSubmit(async (values) => {
     loading.value = true
     await useFetch('/api/rp/block', {
         method: 'POST',
-        body: blockForm.value,
+        body: values,
     })
 
-    blockForm.value = {
-        user_id: 0,
-        username: '',
-        reason: '',
-        roleplay_id: '',
-    }
+    resetForm()
 
     loading.value = false
 
-    showSuccess('L\'utilisateur a été bloqué et tous ses personnages ont été supprimés pour ce roleplay')
+    showSuccess(t('pages.roleplays.characters.blocked'))
     displayBlockDialog.value = false
 
     await fetch()
-}
+})
 
 async function handleDecision(decision: number) {
     loading.value = true
@@ -188,7 +199,7 @@ async function handleDecision(decision: number) {
             },
         })
 
-        showSuccess('Personnage refusé avec succès')
+        showSuccess(t('pages.roleplays.characters.refused'))
     }
     else {
         await useFetch('/api/rp/accept', {
@@ -199,7 +210,7 @@ async function handleDecision(decision: number) {
             },
         })
 
-        showSuccess('Statut du personnage mit à jour')
+        showSuccess(t('form.updateConfirmed', { thing: t('pages.roleplays.characters.status') }))
     }
 
     openCharacterDetails.value = false
@@ -478,11 +489,9 @@ const blockedListHeaders: DataTableHeader[] = [
                             :text="t('block.warning_rp')"
                         />
                         <VTextarea
-                            v-model="blockForm.reason"
-                            variant="outlined"
-                            color="primary"
+                            v-bind="reasonProps"
+                            v-model="reason"
                             :label="t('block.reason')"
-                            :rules="[requiredRule]"
                         />
                     </VCardText>
                     <VCardActions>
@@ -493,6 +502,7 @@ const blockedListHeaders: DataTableHeader[] = [
                             {{ t('form.cancel') }}
                         </VBtn>
                         <VBtn
+                            :disabled="!formValid"
                             color="red"
                             prepend-icon="mdi-cancel"
                             type="submit"
