@@ -139,12 +139,15 @@
             },
             "characters": {
                 "self": "Character|Characters",
-                "denied": "Denied",
+                "available": "Slot available",
+                "waiting_list": "Waiting list",
                 "pending": "Pending",
                 "accepted": "Accepted",
                 "moderator": "Moderator",
-                "blocked": "Blocked users",
-                "date": "Blocked at"
+                "date": "Blocked at",
+                "refused": "Character refused successfully",
+                "status": "Character status",
+                "blocked": "The user was blocked and all his characters were deleted for this roleplay"
             },
             "channel": {
                 "self": "Discussion channels"

@@ -144,7 +144,10 @@
                 "pending": "En attente",
                 "accepted": "Accepté",
                 "moderator": "Modérateur",
-                "date": "Date de bloquage"
+                "date": "Date de bloquage",
+                "refused": "Personnage refusé avec succès",
+                "status": "Statut du personnage",
+                "blocked": "L'utilisateur a été bloqué et tous ses personnages ont été supprimés pour ce roleplay"
             },
             "channel": {
                 "self": "Canaux de discussion"
