@@ -15,7 +15,6 @@ type EditRoleplay = Omit<Roleplay, 'roles'>
 
 const supabase = useSupabaseClient<Database>()
 const route = useRoute()
-const router = useRouter()
 const { t } = useI18n()
 const { showSuccess } = useSnackBar()
 const { params } = route
