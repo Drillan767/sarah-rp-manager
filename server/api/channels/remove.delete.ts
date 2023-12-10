@@ -1,4 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server';
+import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/supabase'
 
 export default defineEventHandler(async (event) => {
@@ -27,5 +27,4 @@ export default defineEventHandler(async (event) => {
         .eq('id', body.id)
 
     return body
-
 })

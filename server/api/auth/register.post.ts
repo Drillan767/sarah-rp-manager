@@ -1,7 +1,7 @@
-import type { Database } from '~/types/supabase';
-import { serverSupabaseClient } from '#supabase/server';
+import type { Database } from '~/types/supabase'
+import { serverSupabaseClient } from '#supabase/server'
 
-export default defineEventHandler(async(event) => {
+export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
     const supabase = await serverSupabaseClient<Database>(event)
@@ -40,9 +40,7 @@ export default defineEventHandler(async(event) => {
 
     return insertedUser
 
-
-    /*const { data: emailCount } = await supabase.from('users').select('id').eq('email', registerForm.value.email)
-
+    /* const { data: emailCount } = await supabase.from('users').select('id').eq('email', registerForm.value.email)
 
         const { data: registeredUser } = await supabase
             .auth
@@ -79,6 +77,5 @@ export default defineEventHandler(async(event) => {
                 showSuccess(t('login.success'))
                 emit('login')
             }
-        }*/
-
+        } */
 })

@@ -4,8 +4,8 @@ import { serverSupabaseUser } from '#supabase/server'
 
 const supabaseUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/avatars`
 
-export default defineEventHandler(async(event) => {
-    const { payload, supabase, body} = await multipartFormHandler(event)
+export default defineEventHandler(async (event) => {
+    const { payload, supabase, body } = await multipartFormHandler(event)
     let illustration = ''
 
     const currentUser = await serverSupabaseUser(event)
@@ -23,10 +23,12 @@ export default defineEventHandler(async(event) => {
                 contentType: `${mediaData.type};charset=UTF-8`,
             })
 
-        if (uploadError) throw createError({ statusCode: 400, message: uploadError.message })
+        if (uploadError)
+            throw createError({ statusCode: 400, message: uploadError.message })
 
         illustration = `${supabaseUrl}/${currentUser?.id}/avatars/${mediaData.filename}`
-    } else {
+    }
+    else {
         const media = body.find(field => field.name === 'illustration')!
         illustration = media.data.toString()
     }
@@ -36,9 +38,9 @@ export default defineEventHandler(async(event) => {
         .insert({
             name,
             description,
-            user_id: parseInt(user_id),
-            role_id: parseInt(role_id),
-            status: parseInt(status),
+            user_id: Number.parseInt(user_id),
+            role_id: Number.parseInt(role_id),
+            status: Number.parseInt(status),
             illustration,
         })
 

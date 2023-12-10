@@ -1,13 +1,13 @@
-import { serverSupabaseClient } from '#supabase/server';
+import { serverSupabaseClient } from '#supabase/server'
 import type { Database } from '~/types/supabase'
 
 interface CreatedChannel {
-    name: string,
-    roleplay_id: string,
+    name: string
+    roleplay_id: string
 }
 
 interface Channel extends CreatedChannel {
-    id: number,
+    id: number
 }
 
 export default defineEventHandler(async (event) => {
@@ -15,27 +15,24 @@ export default defineEventHandler(async (event) => {
 
     const supabase = await serverSupabaseClient<Database>(event)
 
-    const channelsCreateList: CreatedChannel[] = [];
-    const channelsUpdateList: Channel[] = [];
+    const channelsCreateList: CreatedChannel[] = []
+    const channelsUpdateList: Channel[] = []
 
     body.forEach((channel: CreatedChannel | Channel) => {
-        if ('id' in channel) {
+        if ('id' in channel)
             channelsUpdateList.push(channel)
-        } else {
+        else
             channelsCreateList.push(channel)
-        }
     })
 
     // Creating new channels.
-    const { data, error } = await supabase
+    await supabase
         .from('channels')
         .insert(channelsCreateList)
 
-    console.log(data, error)
-
     // Updating existing ones.
     for (const r of channelsUpdateList) {
-        const {id, ...fields } = r
+        const { id, ...fields } = r
         await supabase
             .from('roles')
             .update(fields)

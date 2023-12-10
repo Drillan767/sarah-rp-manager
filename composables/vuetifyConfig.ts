@@ -1,5 +1,7 @@
-export const vuetifyConfig = (state: any) => ({
-    props: {
-      'error-messages': state.errors,
-    },
-  });
+export function vuetifyConfig(state: any) {
+    return {
+        props: {
+            'error-messages': state.errors,
+        },
+    }
+}

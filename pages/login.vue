@@ -9,12 +9,12 @@ const router = useRouter()
 const { defineField, handleSubmit, values: loginValues } = useForm({
     validationSchema: {
         email: 'email|required',
-        password: 'required'
+        password: 'required',
     },
     initialValues: {
         email: '',
         password: '',
-    }
+    },
 })
 
 const [email, emailProps] = defineField('email', vuetifyConfig)
@@ -28,7 +28,7 @@ useHead({
 const globalError = ref('')
 const loading = ref(false)
 
-const signin = handleSubmit(async(values) => {
+const signin = handleSubmit(async () => {
     globalError.value = ''
     loading.value = true
 
@@ -45,7 +45,6 @@ const signin = handleSubmit(async(values) => {
         loading.value = false
     }
 })
-
 </script>
 
 <template>

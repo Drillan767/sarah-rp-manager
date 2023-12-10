@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import type { Database } from '~/types/supabase'
 import { useForm, useIsFormValid } from 'vee-validate'
+import type { Database } from '~/types/supabase'
 import { vuetifyConfig } from '~/composables/vuetifyConfig'
 
 const { t } = useI18n()
 const supabase = useSupabaseClient<Database>()
-const router = useRouter()
 
 useHead({
     title: t('register.action'),
@@ -17,7 +16,7 @@ const { defineField, handleSubmit, resetForm } = useForm({
         username: 'min:6|required',
         password: 'min:6|required',
         passwordConfirmation: 'required|confirmed:@password',
-    }
+    },
 })
 
 const [email, emailProps] = defineField('email', vuetifyConfig)
@@ -32,7 +31,7 @@ const loading = ref(false)
 const success = ref(false)
 const error = ref('')
 
-const submit = handleSubmit(async(values) => {
+const submit = handleSubmit(async (values) => {
     error.value = ''
     success.value = false
     loading.value = true
@@ -82,11 +81,10 @@ const submit = handleSubmit(async(values) => {
         loading.value = false
     }
 })
-
 </script>
 
 <template>
-    <VForm @submit.prevent="submit" v-model="valid">
+    <VForm v-model="valid" @submit.prevent="submit">
         <h2 class="text-center mb-6 text-4xl text-indigo-900 font-display font-semibold text-lg-left xl:text-5xl xl:text-bold">
             {{ t('register.action') }}
         </h2>
@@ -167,7 +165,6 @@ const submit = handleSubmit(async(values) => {
                     to="/login"
                     class="text-indigo font-weight-bold text-decoration-none"
                 >
-
                     {{ t('login.action') }}
                 </NuxtLink>
             </p>

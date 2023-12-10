@@ -1,28 +1,26 @@
 <script setup lang="ts">
-import type { Database } from '~/types/supabase'
-import { useCurrentUser } from "~/composables/currentUser";
+import { useCurrentUser } from '~/composables/currentUser'
 
 interface FormType {
-    title: string,
-    start_date: string,
-    description: string,
-    public: boolean,
-    illustration: File | null,
+    title: string
+    start_date: string
+    description: string
+    public: boolean
+    illustration: File | null
     roles: {
-        roleplay_id: string,
-        name: string,
-        max_users: number,
-        description: string,
+        roleplay_id: string
+        name: string
+        max_users: number
+        description: string
     }[]
 }
 
 const { t } = useI18n()
 const currentUser = useCurrentUser()
-const supabase = useSupabaseClient<Database>()
 const router = useRouter()
 
 useHead({
-    title: t('pages.roleplays.create')
+    title: t('pages.roleplays.create'),
 })
 
 const form = ref<FormType>({
@@ -37,17 +35,18 @@ const form = ref<FormType>({
             max_users: 1,
             description: '',
             roleplay_id: '',
-            
-        }
-    ]
+
+        },
+    ],
 })
 
 const loading = ref(false)
 
-const submit = async() => {
+async function submit() {
     const { title, public: isPublic, start_date, description, illustration, roles } = form.value
 
-    if (!illustration) return
+    if (!illustration)
+        return
 
     loading.value = true
 
@@ -61,7 +60,7 @@ const submit = async() => {
     formData.append('user_id', currentUser.value.id.toString())
 
     // Stores RP and illustration.
-    const { data, error } = await useFetch('/api/rp/create', {
+    const { data } = await useFetch('/api/rp/create', {
         method: 'POST',
         body: formData,
     })
@@ -69,10 +68,10 @@ const submit = async() => {
     // Store related roles.
     await useFetch('/api/roles/create', {
         method: 'POST',
-        body: roles.map((r) => ({
+        body: roles.map(r => ({
             ...r,
             roleplay_id: data.value,
-        }))
+        })),
     })
 
     loading.value = false
@@ -83,17 +82,16 @@ const submit = async() => {
 const links = [
     {
         title: t('pages.home'),
-        to: '/'
+        to: '/',
     },
     {
         title: t('pages.roleplays.navlink'),
-        to: '/roleplays'
+        to: '/roleplays',
     },
     {
-        title: t('pages.roleplays.create')
-    }
+        title: t('pages.roleplays.create'),
+    },
 ]
-
 </script>
 
 <template>
@@ -108,7 +106,9 @@ const links = [
             </VRow>
             <VRow>
                 <VCol>
-                    <h1 class="text-h3 mb-4">{{ t('pages.roleplays.create') }}</h1>
+                    <h1 class="text-h3 mb-4">
+                        {{ t('pages.roleplays.create') }}
+                    </h1>
                 </VCol>
             </VRow>
             <VRow>
@@ -118,15 +118,14 @@ const links = [
                         :form="form"
                         :edit="false"
                     />
-
                 </VCol>
             </VRow>
             <VRow>
                 <VCol>
                     <RpRolesForm
-                      :loading="loading"
-                      :roles="form.roles"
-                      :edit="false"
+                        :loading="loading"
+                        :roles="form.roles"
+                        :edit="false"
                     />
                 </VCol>
             </VRow>

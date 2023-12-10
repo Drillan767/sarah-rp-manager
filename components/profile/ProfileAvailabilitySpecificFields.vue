@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { SpecificDate } from '~/types/models'
 import { useDebounceFn } from '@vueuse/core'
+import type { SpecificDate } from '~/types/models'
 
 interface Props {
-    maxHours: number,
-    availabilityType: 'available' | 'unavailable',
+    maxHours: number
+    availabilityType: 'available' | 'unavailable'
     availability: SpecificDate
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-    (e: 'update:availability', value: SpecificDate): void,
-    (e: 'hasError', value: boolean): void,
+    (e: 'update:availability', value: SpecificDate): void
+    (e: 'hasError', value: boolean): void
 }>()
 
 const { t } = useI18n()
@@ -21,7 +21,7 @@ const minDate = dayjs().format('YYYY-MM-DDT00:00')
 
 const currentAvailability = computed({
     get: () => props.availability,
-    set: (value) => emit('update:availability', value)
+    set: value => emit('update:availability', value),
 })
 
 const invalidRange = computed(() => {
@@ -29,10 +29,14 @@ const invalidRange = computed(() => {
     const before = dayjs(begin)
     const after = dayjs(end)
 
-    if (after.isBefore(before)) return [t('pages.profile.error.isBefore')]
-    if (after.diff(before, 'm') < 30) return [t('pages.profile.error.30mn')]
-    if (dayjs().isAfter(before) || dayjs().isAfter(after)) return [t('pages.profile.error.isPast')]
-    if (props.availabilityType === 'available' && after.diff(before, 'h') > props.maxHours) return [t('pages.profile.error.maxHour', { maxHours: props.maxHours})]
+    if (after.isBefore(before))
+        return [t('pages.profile.error.isBefore')]
+    if (after.diff(before, 'm') < 30)
+        return [t('pages.profile.error.30mn')]
+    if (dayjs().isAfter(before) || dayjs().isAfter(after))
+        return [t('pages.profile.error.isPast')]
+    if (props.availabilityType === 'available' && after.diff(before, 'h') > props.maxHours)
+        return [t('pages.profile.error.maxHour', { maxHours: props.maxHours })]
 
     return null
 })
@@ -53,12 +57,13 @@ const debounceRound = useDebounceFn((e: Event, type: 'begin' | 'end') => {
 function toRound(e: Event, type: 'begin' | 'end') {
     debounceRound(e, type)
 }
-
 </script>
 
 <template>
     <div>
-        <p class="text-subtitle-1">Début</p>
+        <p class="text-subtitle-1">
+            Début
+        </p>
         <VTextField
             v-model="currentAvailability.begin"
             type="datetime-local"
@@ -71,7 +76,9 @@ function toRound(e: Event, type: 'begin' | 'end') {
 
         <VDivider class="border-opacity-100 mb-4" />
 
-        <p class="text-subtitle-1">Fin</p>
+        <p class="text-subtitle-1">
+            Fin
+        </p>
         <VTextField
             v-model="currentAvailability.end"
             :min="minDate"
@@ -83,4 +90,3 @@ function toRound(e: Event, type: 'begin' | 'end') {
         />
     </div>
 </template>
-

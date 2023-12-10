@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { Roleplay, Role } from '~/types/models'
+import type { Role, Roleplay } from '~/types/models'
 import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
 
 interface EditForm {
-    title: string,
-    start_date: string | null,
-    illustration: File | null,
-    description: string,
-    public: boolean,
+    title: string
+    start_date: string | null
+    illustration: File | null
+    description: string
+    public: boolean
 }
 
 type EditRoleplay = Omit<Roleplay, 'roles'>
@@ -40,35 +40,17 @@ useHead({
     title: () => `${t('form.edit')} ${roleplay.value?.title ?? ''}`,
 })
 
-onMounted(async() => {
+onMounted(async () => {
     await fetchRP()
     await fetchRoles()
 })
 
-const submit = async() => {
-    loading.value = true
-
-    await useFetch('/api/roles/update', {
-        method: 'POST',
-        body: roles.value.map((r) => ({
-            ...r,
-            roleplay_id: roleplay.value.id,
-
-        })),
-    })
-
-    loading.value = false
-
-    showSuccess(t('form.updateConfirmed', { thing: t('pages.roleplays.self') }))
-    await router.push(`/roleplays/${roleplay.value.id}?updated=1`)
-}
-
-const handleRoleDeletion = (role: Role) => {
+function handleRoleDeletion(role: Role) {
     roleDeleting.value = role
     displayDeleteModale.value = true
 }
 
-const deleteRoleplay = async() => {
+async function deleteRoleplay() {
     await useFetch('/api/rp/remove', {
         method: 'DELETE',
         body: {
@@ -77,7 +59,7 @@ const deleteRoleplay = async() => {
     })
 }
 
-const deleteRole = async() => {
+async function deleteRole() {
     loadingRoles.value = true
     await useFetch('/api/roles/remove', {
         body: {
@@ -87,13 +69,13 @@ const deleteRole = async() => {
     })
 
     displayDeleteModale.value = false
-    roles.value = roles.value.filter((r) => r.id !== roleDeleting.value.id)
+    roles.value = roles.value.filter(r => r.id !== roleDeleting.value.id)
     loadingRoles.value = false
 
     showSuccess(t('form.deleteConfirmed', { thing: t('pages.roleplays.form.role', 1) }))
 }
 
-const fetchRP = async() => {
+async function fetchRP() {
     loadingRP.value = true
     const { data } = await supabase
         .from('roleplays')
@@ -115,19 +97,20 @@ const fetchRP = async() => {
     loadingRP.value = false
 }
 
-const fetchRoles = async() => {
+async function fetchRoles() {
     loadingRoles.value = true
     const { data } = await supabase
         .from('roles')
         .select('*')
         .eq('roleplay_id', params.id)
 
-    if (data) roles.value = data
+    if (data)
+        roles.value = data
 
     loadingRoles.value = false
 }
 
-const saveRP = async() => {
+async function saveRP() {
     loadingRP.value = true
 
     const { title, public: isPublic, start_date, description, illustration } = form.value
@@ -136,9 +119,11 @@ const saveRP = async() => {
     formData.append('id', roleplay.value.id)
     formData.append('title', title)
     formData.append('public', isPublic ? '1' : '0')
-    if (start_date) formData.append('start_date', start_date)
+    if (start_date)
+        formData.append('start_date', start_date)
     formData.append('description', description)
-    if (illustration) formData.append('illustration', illustration)
+    if (illustration)
+        formData.append('illustration', illustration)
     formData.append('description', description)
 
     await useFetch('/api/rp/update', {
@@ -149,12 +134,12 @@ const saveRP = async() => {
     loadingRP.value = false
 }
 
-const updateRoles = async() => {
+async function updateRoles() {
     loadingRoles.value = true
 
     await useFetch('/api/roles/update', {
         method: 'POST',
-        body: roles.value.map((r) => ({
+        body: roles.value.map(r => ({
             ...r,
             roleplay_id: roleplay.value.id,
 
@@ -167,17 +152,16 @@ const updateRoles = async() => {
 const links = computed(() => ([
     {
         title: t('pages.home'),
-        to: '/'
+        to: '/',
     },
     {
         title: roleplay.value.title,
-        to: `/roleplays/${roleplay.value.id}`
+        to: `/roleplays/${roleplay.value.id}`,
     },
     {
         title: t('form.edit'),
-    }
+    },
 ]))
-
 </script>
 
 <template>
@@ -237,7 +221,6 @@ const links = computed(() => ([
                     :edit="true"
                     @save="saveRP"
                 />
-
             </VCol>
         </VRow>
         <VRow>
@@ -292,8 +275,8 @@ const links = computed(() => ([
                         {{ t('form.cancel') }}
                     </VBtn>
                     <VBtn
-                        @click="deleteRole"
                         color="red"
+                        @click="deleteRole"
                     >
                         {{ t('form.delete') }}
                     </VBtn>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { useTheme } from 'vuetify'
 import type { Database } from '~/types/supabase'
-import { useTheme} from 'vuetify'
 import { useCurrentUser } from '~/composables/currentUser'
 
 const { t } = useI18n()
@@ -11,12 +11,12 @@ const router = useRouter()
 const user = useSupabaseUser()
 const currentUser = useCurrentUser()
 
-const logout = async() => {
+async function logout() {
     await supabase.auth.signOut()
     await router.push('/connexion')
 }
 
-const switchTheme = () => {
+function switchTheme() {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
 }
 
@@ -28,12 +28,10 @@ onMounted(async () => {
             .eq('session_id', user.value.id)
             .single()
 
-        if (data) {
+        if (data)
             currentUser.value = data
-        }
     }
 })
-
 </script>
 
 <template>
@@ -44,19 +42,19 @@ onMounted(async () => {
             </VAvatar>
         </RouterLink>
         <VToolbarTitle>
-           Le Jardin de Sarah
+            Le Jardin de Sarah
         </VToolbarTitle>
 
         <span class="d-none d-sm-inline mr-4">
             {{ currentUser.username }}
         </span>
         <VMenu v-if="currentUser.id !== 0" anchor="bottom end">
-            <template v-slot:activator="{ props }">
+            <template #activator="{ props }">
                 <VBtn
                     icon
                     v-bind="props"
                 >
-                    <VAvatar >
+                    <VAvatar>
                         <VImg
                             src="/default-avatar.webp"
                         />
@@ -116,8 +114,7 @@ onMounted(async () => {
             to="/login"
             color="primary"
         >
-            {{ t('login.action')}}
+            {{ t('login.action') }}
         </VBtn>
     </VAppBar>
-
 </template>

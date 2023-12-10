@@ -1,3 +1,4 @@
+import process from 'node:process'
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
 
 export default defineNuxtConfig({
@@ -5,8 +6,8 @@ export default defineNuxtConfig({
         'dayjs-nuxt',
         (_options, nuxt) => {
             nuxt.hooks.hook('vite:extendConfig', (config) => {
-                // @ts-expect-error
-                config.plugins.push(vuetify({ autoImport: true }))
+                if (config.plugins)
+                    config.plugins.push(vuetify({ autoImport: true }))
             })
         },
         '@vee-validate/nuxt',
@@ -21,7 +22,7 @@ export default defineNuxtConfig({
         locales: [
             {
                 code: 'fr',
-                file: 'fr-FR.json'
+                file: 'fr-FR.json',
             },
             {
                 code: 'en',
@@ -44,10 +45,10 @@ export default defineNuxtConfig({
             callback: '/callback',
             exclude: [
                 '/',
-                 '/register',
+                '/register',
                 '/forgot-password',
                 '/new-password',
-                '/roleplays/*'
+                '/roleplays/*',
             ],
         },
     },
@@ -98,7 +99,7 @@ export default defineNuxtConfig({
     ],
 
     build: {
-        transpile: ['vuetify']
+        transpile: ['vuetify'],
     },
 
     vite: {

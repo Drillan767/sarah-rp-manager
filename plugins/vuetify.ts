@@ -1,4 +1,4 @@
-import { createVuetify } from "vuetify/lib/framework.mjs"
+import { createVuetify } from 'vuetify/lib/framework.mjs'
 
 export default defineNuxtPlugin((nuxtApp) => {
     const vuetify = createVuetify({
@@ -11,8 +11,8 @@ export default defineNuxtPlugin((nuxtApp) => {
             VTextarea: {
                 variant: 'outlined',
                 color: 'primary',
-            }
-        }
+            },
+        },
     })
 
     nuxtApp.vueApp.use(vuetify)

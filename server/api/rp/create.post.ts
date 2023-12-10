@@ -3,7 +3,7 @@ import multipartFormHandler from '~/server/api/multipartFormHandler'
 
 const supabase_url = `${process.env.SUPABASE_URL}/storage/v1/object/public/roleplays`
 
-export default defineEventHandler(async(event) => {
+export default defineEventHandler(async (event) => {
     const { payload, supabase, body } = await multipartFormHandler(event)
     // Storing initial values into Supabase.
     const { data, error } = await supabase
@@ -14,11 +14,12 @@ export default defineEventHandler(async(event) => {
             illustration: '',
             public: payload.public === '1',
             start_date: payload.start_date,
-            user_id: parseInt(payload.user_id),
+            user_id: Number.parseInt(payload.user_id),
         })
         .select('id')
 
-    if (error) throw createError({ statusCode: 400, message: error.message })
+    if (error)
+        throw createError({ statusCode: 400, message: error.message })
 
     const [{ id: rpId }] = data
 
@@ -35,17 +36,19 @@ export default defineEventHandler(async(event) => {
             contentType: `${mediaData.type};charset=UTF-8`,
         })
 
-    if (uploadError) throw createError({ statusCode: 400, message: uploadError.message })
+    if (uploadError)
+        throw createError({ statusCode: 400, message: uploadError.message })
 
     // Updating rp with illustration path.
     const { error: updateError } = await supabase
         .from('roleplays')
         .update({
-            illustration: `${supabase_url}/${rpPath}`
+            illustration: `${supabase_url}/${rpPath}`,
         })
         .eq('id', rpId)
 
-    if (updateError) throw createError({ statusCode: 400, message: updateError.message })
+    if (updateError)
+        throw createError({ statusCode: 400, message: updateError.message })
 
     return rpId
 })

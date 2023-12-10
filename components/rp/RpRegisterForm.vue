@@ -6,45 +6,45 @@ import { useCurrentUser } from '~/composables/currentUser'
 import useValidation from '~/composables/useValidation'
 
 interface RoleDetail {
-    id: number,
-    name: string,
-    description: string,
-    max_users: number,
+    id: number
+    name: string
+    description: string
+    max_users: number
     characters: any[]
 }
 
 interface RPDetail extends Omit<Roleplay, 'roles'> {
-    roles: RoleDetail[],
+    roles: RoleDetail[]
     user: {
-        id: number,
-        username: string,
+        id: number
+        username: string
     } | null
 }
 
 interface UserCharacter {
-    id: number,
-    name: string,
-    description: string,
-    illustration: string,
-    role_id: number,
-    user_id: number,
+    id: number
+    name: string
+    description: string
+    illustration: string
+    role_id: number
+    user_id: number
 }
 
 interface CharacterFormType {
-    name: string,
-    description: string,
-    role_id: number,
-    illustration: File | null,
-    status: number,
+    name: string
+    description: string
+    role_id: number
+    illustration: File | null
+    status: number
 }
 
 const props = defineProps<{
-    roleplay: RPDetail,
-    show: boolean,
+    roleplay: RPDetail
+    show: boolean
 }>()
 
 const emit = defineEmits<{
-    (e: 'close'): void,
+    (e: 'close'): void
 }>()
 
 const { t } = useI18n()
@@ -78,7 +78,8 @@ const characterForm = ref<CharacterFormType>({
 })
 
 const cantProceed = computed(() => {
-    if (currentStep.value === 1) return [undefined, 0].includes(characterForm.value.role_id)
+    if (currentStep.value === 1)
+        return [undefined, 0].includes(characterForm.value.role_id)
     if (currentStep.value === 2) {
         return creationDecision.value === 'create'
             ? characterForm.value.name === '' || characterForm.value.description === '' || characterForm.value.illustration === null
@@ -89,22 +90,22 @@ const cantProceed = computed(() => {
 })
 
 onMounted(() => {
-    if (currentUser.value.id === 0) {
+    if (currentUser.value.id === 0)
         showAuthModale.value = true
-    }
 })
 
-const roleUnavailble = (role: RoleDetail) => {
-    if (role.max_users - role.characters[0] === 0) return true
+function roleUnavailble(role: RoleDetail) {
+    if (role.max_users - role.characters[0] === 0)
+        return true
 
-    const characterRolesId = userCharacters.value.map((uc) => uc.role_id)
-    const rpRolesId = props.roleplay.roles.map((r) => r.id)
-    const commonIds = characterRolesId.filter((x) => rpRolesId.includes(x))
+    const characterRolesId = userCharacters.value.map(uc => uc.role_id)
+    const rpRolesId = props.roleplay.roles.map(r => r.id)
+    const commonIds = characterRolesId.filter(x => rpRolesId.includes(x))
 
     return commonIds.includes(role.id)
 }
 
-const handleImage = (e: Event) => {
+function handleImage(e: Event) {
     const files = (e.target as HTMLInputElement).files
 
     if (files) {
@@ -113,7 +114,7 @@ const handleImage = (e: Event) => {
     }
 }
 
-const submit = async() => {
+async function submit() {
     loading.value = true
     const formData = new FormData()
     formData.append('action', creationDecision.value)
@@ -123,11 +124,11 @@ const submit = async() => {
     formData.append('role_id', characterForm.value.role_id.toString())
     formData.append('status', '0')
 
-    if (creationDecision.value === 'create' && characterForm.value.illustration)  {
+    if (creationDecision.value === 'create' && characterForm.value.illustration)
         formData.append('illustration', characterForm.value.illustration)
-    } else {
+
+    else
         formData.append('illustration', preview.value)
-    }
 
     await useFetch('/api/rp/register', {
         method: 'POST',
@@ -140,7 +141,7 @@ const submit = async() => {
     showSuccess(t('pages.roleplays.registration.success'))
 }
 
-const close = () => {
+function close() {
     emit('close')
     currentStep.value = 1
     preview.value = ''
@@ -154,7 +155,7 @@ const close = () => {
     }
 }
 
-const fetchCharactersList = async() => {
+async function fetchCharactersList() {
     const { data } = await supabase
         .from('characters')
         .select('*')
@@ -166,16 +167,14 @@ const fetchCharactersList = async() => {
     }
 }
 
-const handleLogin = () => {
-    showAuthModale.value = false
-}
-
 watch(() => props.show, async (value) => {
-    if (value) await fetchCharactersList()
+    if (value)
+        await fetchCharactersList()
 })
 
 watch(currentUser, async (value) => {
-    if (value.id !== 0) await fetchCharactersList()
+    if (value.id !== 0)
+        await fetchCharactersList()
 })
 
 watch(selectedCharacter, (value) => {
@@ -185,7 +184,6 @@ watch(selectedCharacter, (value) => {
         characterForm.value.description = value.description
     }
 })
-
 </script>
 
 <template>
@@ -248,11 +246,11 @@ watch(selectedCharacter, (value) => {
                     v-model="formValid"
                 >
                     <VTextField
+                        v-model="characterForm.name"
                         :label="t('fields.name')"
                         color="primary"
                         variant="outlined"
                         :rules="[requiredRule]"
-                        v-model="characterForm.name"
                     />
 
                     <div class="d-flex">
@@ -277,9 +275,9 @@ watch(selectedCharacter, (value) => {
                         />
                     </div>
                     <VTextarea
+                        v-model="characterForm.description"
                         label="Description"
                         variant="outlined"
-                        v-model="characterForm.description"
                         :auto-grow="true"
                         rows="2"
                         color="primary"
@@ -287,9 +285,9 @@ watch(selectedCharacter, (value) => {
                 </VForm>
                 <div v-if="creationDecision === 'reuse'">
                     <VSelect
+                        v-model="selectedCharacter"
                         variant="outlined"
                         label="Personnage existant"
-                        v-model="selectedCharacter"
                         :items="userCharacters"
                         :return-object="true"
                         item-title="name"
@@ -297,9 +295,9 @@ watch(selectedCharacter, (value) => {
                         :no-data-text="t('pages.roleplays.registration.no_character')"
                         :rules="[requiredRule]"
                     >
-                        <template #item="{ props, item }">
+                        <template #item="{ props: select, item }">
                             <VListItem
-                                v-bind="props"
+                                v-bind="select"
                                 :prepend-avatar="item.raw.illustration"
                             />
                         </template>
@@ -326,7 +324,7 @@ watch(selectedCharacter, (value) => {
                     </VCardText>
                 </VCard>
             </template>
-<!--            <VStepperHeader>
+            <!--            <VStepperHeader>
                 <VStepperItem
                     :complete="currentStep > 1"
                     :title="t('pages.roleplays.registration.step1')"
@@ -346,7 +344,7 @@ watch(selectedCharacter, (value) => {
                     subtitle="On verra bien"
                     value="2"
                 />
-            </VStepperHeader>-->
+            </VStepperHeader> -->
 
             <template #actions>
                 <div class="v-stepper-actions">

@@ -1,44 +1,44 @@
 {
-  "name": "nuxt-app",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
-  },
-  "devDependencies": {
-    "@antfu/eslint-config": "^2.4.3",
-    "@nuxt/devtools": "1.0.5",
-    "@nuxtjs/i18n": "^8.0.0-rc.8",
-    "@nuxtjs/supabase": "^1.1.4",
-    "dayjs-nuxt": "^2.1.9",
-    "eslint": "^8.55.0",
-    "nuxt": "^3.8.2",
-    "sass": "^1.69.5",
-    "supabase": "^1.115.5",
-    "typescript": "^5.3.3",
-    "vue": "^3.3.11",
-    "vue-router": "^4.2.5"
-  },
-  "dependencies": {
-    "@mdi/font": "^7.3.67",
-    "@supabase/supabase-js": "^2.39.0",
-    "@tiptap/extension-placeholder": "^2.1.13",
-    "@tiptap/pm": "^2.1.13",
-    "@tiptap/starter-kit": "^2.1.13",
-    "@tiptap/vue-3": "^2.1.13",
-    "@vee-validate/i18n": "^4.12.2",
-    "@vee-validate/nuxt": "^4.12.2",
-    "@vee-validate/rules": "^4.12.2",
-    "@vueuse/core": "^10.7.0",
-    "@vueuse/router": "^10.7.0",
-    "vite-plugin-vuetify": "^1.0.2",
-    "vue3-emoji-picker": "^1.1.8",
-    "vuetify": "^3.4.6"
-  }
+    "name": "nuxt-app",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "build": "nuxt build",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix"
+    },
+    "dependencies": {
+        "@mdi/font": "^7.3.67",
+        "@supabase/supabase-js": "^2.39.0",
+        "@tiptap/extension-placeholder": "^2.1.13",
+        "@tiptap/pm": "^2.1.13",
+        "@tiptap/starter-kit": "^2.1.13",
+        "@tiptap/vue-3": "^2.1.13",
+        "@vee-validate/i18n": "^4.12.2",
+        "@vee-validate/nuxt": "^4.12.2",
+        "@vee-validate/rules": "^4.12.2",
+        "@vueuse/core": "^10.7.0",
+        "@vueuse/router": "^10.7.0",
+        "vite-plugin-vuetify": "^1.0.2",
+        "vue3-emoji-picker": "^1.1.8",
+        "vuetify": "^3.4.6"
+    },
+    "devDependencies": {
+        "@antfu/eslint-config": "^2.4.3",
+        "@nuxt/devtools": "1.0.5",
+        "@nuxtjs/i18n": "^8.0.0-rc.8",
+        "@nuxtjs/supabase": "^1.1.4",
+        "dayjs-nuxt": "^2.1.9",
+        "eslint": "^8.55.0",
+        "nuxt": "^3.8.2",
+        "sass": "^1.69.5",
+        "supabase": "^1.115.5",
+        "typescript": "^5.3.3",
+        "vue": "^3.3.11",
+        "vue-router": "^4.2.5"
+    }
 }

@@ -2,22 +2,21 @@
 import type { Database } from '~/types/supabase'
 import useValidation from '~/composables/useValidation'
 import { useCurrentUser } from '~/composables/currentUser'
-import useSnackBar from "~/composables/snackbar";
+import useSnackBar from '~/composables/snackbar'
 
 const props = defineProps<{ show: boolean }>()
 
+const emit = defineEmits<{
+    (e: 'login'): void
+    (e: 'register'): void
+    (e: 'update:show', value: boolean): void
+}>()
 const { t } = useI18n()
 const router = useRouter()
 const supabase = useSupabaseClient<Database>()
 const currentUser = useCurrentUser()
 const { showError, showSuccess } = useSnackBar()
 const { requiredRule, emailRule, confirmedRule, minLengthRule } = useValidation()
-
-const emit = defineEmits<{
-    (e: 'login'): void,
-    (e: 'register'): void,
-    (e: 'update:show', value: boolean): void;
-}>()
 
 const emailError = ref<string | null>(null)
 const usernameError = ref<string | null>(null)
@@ -40,14 +39,14 @@ const registerForm = ref({
 
 const showProxy = computed({
     get: () => props.show,
-    set: (value) =>  emit('update:show', value)
+    set: value => emit('update:show', value),
 })
 
-const submit = async(action: 'login' | 'register') => {
+async function submit(action: 'login' | 'register') {
     loading.value = true
     if (action === 'login') {
         try {
-            const { data: authData  } = await supabase
+            const { data: authData } = await supabase
                 .auth
                 .signInWithPassword({
                     email: loginForm.value.email,
@@ -68,11 +67,12 @@ const submit = async(action: 'login' | 'register') => {
                     showProxy.value = false
                 }
             }
-        } catch (e: any) {
-            console.log(e)
+        }
+        catch (e: any) {
             showError(t('login.error'))
         }
-    } else {
+    }
+    else {
         usernameError.value = null
         emailError.value = null
 
@@ -81,13 +81,12 @@ const submit = async(action: 'login' | 'register') => {
             body: registerForm.value,
         })
 
-       if (data.value && data.value.length) {
-           const [user] = data.value
-           currentUser.value = data.value[0]
+        if (data.value && data.value.length) {
+            currentUser.value = data.value[0]
 
-           showSuccess(t('register.success'))
-           showProxy.value = false
-       }
+            showSuccess(t('register.success'))
+            showProxy.value = false
+        }
     }
 
     loading.value = false
@@ -97,9 +96,8 @@ watch(() => registerForm.value.email, async (value) => {
     if (emailRule(value) === true) {
         const { data } = await supabase.from('users').select('id').eq('email', value)
 
-        if (data && data.length) {
+        if (data && data.length)
             emailError.value = t('form.alreadyExists', { field: t('fields.email') })
-        }
     }
 })
 
@@ -107,18 +105,16 @@ watch(() => registerForm.value.username, async (value) => {
     if (minLengthRule(value, 6) === true) {
         const { data } = await supabase.from('users').select('id').eq('username', value)
 
-        if (data && data.length) {
+        if (data && data.length)
             usernameError.value = t('form.alreadyExists', { field: t('fields.username') })
-        }
     }
 })
 
-const clearField = () => {
+function clearField() {
     registerValid.value = true
     emailError.value = null
     usernameError.value = null
 }
-
 </script>
 
 <template>
@@ -126,7 +122,6 @@ const clearField = () => {
         v-model="showProxy"
         :persistent="true"
         width="700"
-
     >
         <VCard
             prepend-icon="mdi-account-question"
@@ -249,5 +244,4 @@ const clearField = () => {
             </template>
         </VCard>
     </VDialog>
-
 </template>

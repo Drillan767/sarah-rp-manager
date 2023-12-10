@@ -1,30 +1,30 @@
 <script setup lang="ts">
 import type { GenericDate } from '~/types/models'
 import useAvailabilities from '~/composables/availabilities'
-import { days, hours } from '~/assets/json/availability-time.json'
+import { days } from '~/assets/json/availability-time.json'
 
 interface Props {
-    maxHours: number,
-    availability: GenericDate,
+    maxHours: number
+    availability: GenericDate
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-    (e: 'update:availability', value: GenericDate): void,
-    (e: 'hasError', value: boolean): void,
+    (e: 'update:availability', value: GenericDate): void
+    (e: 'hasError', value: boolean): void
 }>()
 
 const { t } = useI18n()
 const { halfHoursBetween } = useAvailabilities()
 
-const daysList = days.map((d) => ({
+const daysList = days.map(d => ({
     title: t(`weekdays.${d}`),
     value: d,
 }))
 
 const currentAvailability = computed({
     get: () => props.availability,
-    set: (value) => emit('update:availability', value)
+    set: value => emit('update:availability', value),
 })
 
 const invalidRange = computed(() => {
@@ -37,7 +37,8 @@ const invalidRange = computed(() => {
 
     const { newDay, halfHours: nbHalfHours } = halfHoursBetween(beginHour, endHour)
 
-    if (`${beginDay} ${beginHour}` === `${endDay} ${endHour}`) return t('pages.profile.error.30mn')
+    if (`${beginDay} ${beginHour}` === `${endDay} ${endHour}`)
+        return t('pages.profile.error.30mn')
 
     // Returns true if both beginDay and endDay are different while newDay is false.
     const differentDays = !newDay && beginDay !== endDay
@@ -50,11 +51,10 @@ const invalidRange = computed(() => {
     )
 
     // Returns true if nbHalfHours exceeds max halfHours.
-    const tooMuchHours = nbHalfHours > nbHalfHours
+    const tooMuchHours = nbHalfHours > props.maxHours
 
-    if ([differentDays, daysNotFollowing, tooMuchHours].includes(true)) {
+    if ([differentDays, daysNotFollowing, tooMuchHours].includes(true))
         return t('pages.profile.error.maxHour', { maxHours: props.maxHours })
-    }
 
     return null
 })
@@ -62,19 +62,20 @@ const invalidRange = computed(() => {
 watch(invalidRange, (value) => {
     emit('hasError', value !== null)
 })
-
 </script>
 
 <template>
     <div>
         <VAlert
-          v-if="invalidRange"
-          density="compact"
-          type="warning"
-          :text="invalidRange"
-          class="mb-4"
+            v-if="invalidRange"
+            density="compact"
+            type="warning"
+            :text="invalidRange"
+            class="mb-4"
         />
-        <p class="text-subtitle-1">Début</p>
+        <p class="text-subtitle-1">
+            Début
+        </p>
         <VSelect
             v-model="currentAvailability.begin.day"
             label="Jour"
@@ -90,7 +91,9 @@ watch(invalidRange, (value) => {
 
         <VDivider class="border-opacity-100 mb-4" />
 
-        <p class="text-subtitle-1">Fin</p>
+        <p class="text-subtitle-1">
+            Fin
+        </p>
 
         <VSelect
             v-model="currentAvailability.end.day"
@@ -106,4 +109,3 @@ watch(invalidRange, (value) => {
         />
     </div>
 </template>
-

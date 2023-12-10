@@ -3,7 +3,6 @@ import useSnackBar from '~/composables/snackbar'
 
 const { snackbar } = useSnackBar()
 const { t } = useI18n()
-
 </script>
 
 <template>

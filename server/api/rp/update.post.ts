@@ -1,10 +1,9 @@
-import type { Database } from '~/types/supabase';
-import { serverSupabaseClient } from '#supabase/server';
-import multipartFormHandler from "~/server/api/multipartFormHandler";
+import process from 'node:process'
+import multipartFormHandler from '~/server/api/multipartFormHandler'
 
 const supabaseUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/roleplays`
 
-export default defineEventHandler(async(event) => {
+export default defineEventHandler(async (event) => {
     const { payload, supabase, body } = await multipartFormHandler(event)
 
     const mediaData = body.find(field => field.name === 'illustration')
@@ -39,7 +38,7 @@ export default defineEventHandler(async(event) => {
     const { id, ...fields } = payload
 
     // Update with new data.
-    const { error: updateError } = await supabase
+    await supabase
         .from('roleplays')
         .update(fields)
         .eq('id', id)

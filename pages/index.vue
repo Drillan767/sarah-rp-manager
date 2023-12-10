@@ -3,17 +3,17 @@ import { useCurrentUser } from '~/composables/currentUser'
 import messageList from '~/assets/json/landing-messages.json'
 import Message from '~/components/channels/Message.vue'
 
-interface Message {
-    id: number,
+interface IMessage {
+    id: number
     message: string
-    created_at: string,
-    url?: string,
-    media?: string,
-    sender: string,
-    from_sender: boolean,
+    created_at: string
+    url?: string
+    media?: string
+    sender: string
+    from_sender: boolean
     reactions: {
-        smiley: string,
-        users: string[],
+        smiley: string
+        users: string[]
     }[]
 }
 
@@ -26,7 +26,7 @@ const dayjs = useDayjs()
 
 const username = ref('')
 
-const messages = ref<Message[]>([])
+const messages = ref<IMessage[]>([])
 const user = useSupabaseUser()
 
 username.value = user.value ? currentUser.value.username : t('me')
@@ -56,18 +56,9 @@ onMounted(() => {
                     users: [message.from_sender ? 'Sarah' : username.value],
                 })
             }, (i * 2000) + 500)
-
         }
     })
 })
-
-const addReaction = () => {
-    messages.value[2].reactions.push({
-        smiley: '😂',
-        users: ['Random boug']
-    })
-}
-
 </script>
 
 <template>
@@ -87,9 +78,9 @@ const addReaction = () => {
             </VCol>
         </VRow>
         <VRow
-            justify="center"
             v-for="(message, i) in messages"
             :key="i"
+            justify="center"
         >
             <Message
                 :message="message"
@@ -100,9 +91,8 @@ const addReaction = () => {
     </VContainer>
 </template>
 
-
 <style scoped lang="scss">
-.slideleft-enter, .slideright-enter { 
+.slideleft-enter, .slideright-enter {
   opacity: 0;
 }
 

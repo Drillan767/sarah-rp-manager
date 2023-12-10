@@ -1,9 +1,9 @@
 interface Snackbar {
-    display: boolean,
-    color: 'success' | 'warning' | 'error' | 'default',
-    message: string,
-    closeable: true,
-    timeout: number,
+    display: boolean
+    color: 'success' | 'warning' | 'error' | 'default'
+    message: string
+    closeable: true
+    timeout: number
 }
 
 const snackbar = ref<Snackbar>({
@@ -14,13 +14,13 @@ const snackbar = ref<Snackbar>({
     display: false,
 })
 
-const showSuccess = (message: string) => {
+function showSuccess(message: string) {
     snackbar.value.message = message
     snackbar.value.color = 'success'
     snackbar.value.display = true
 }
 
-const showError = (message: string) => {
+function showError(message: string) {
     snackbar.value.message = message
     snackbar.value.color = 'error'
     snackbar.value.display = true
