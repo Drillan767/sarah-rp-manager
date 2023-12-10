@@ -47,7 +47,6 @@ export interface Channel {
 export interface Character {
     id: number
     name: string
-    role_id: number
     user_id: number
     status: number
     illustration: string
@@ -55,7 +54,7 @@ export interface Character {
     user: {
         id: number
         username: string
-    }
+    } | null
 }
 
 export type RoleSettings = Role & {

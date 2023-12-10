@@ -17,7 +17,6 @@ interface RoleplayData {
         characters: {
             id: number
             name: string
-            role_id: number
             user_id: number
             status: number
             illustration: string
@@ -25,7 +24,7 @@ interface RoleplayData {
             user: {
                 id: number
                 username: string
-            }
+            } | null
         }[]
     }[]
 }
@@ -45,7 +44,7 @@ const { t } = useI18n()
 const dayjs = useDayjs()
 const { showSuccess } = useSnackBar()
 const { requiredRule } = useValidation()
-const rpId = useRouteParams('id', null, { transform: Number })
+const rpId = useRouteParams('id', null, { transform: String })
 
 const statusList = [
     {
@@ -104,7 +103,7 @@ async function fetch() {
                     id,
                     illustration,
                     description,
-                    user_id
+                    user_id,
                     status,
                     name,
                     user:users(
@@ -147,6 +146,11 @@ function showBlockDialog(user: { username: string, id: number }) {
 
 useHead({
     title: t('pages.roleplays.characters.self', 2),
+})
+
+watch(rpId, (value) => {
+    if (value)
+        fetch()
 })
 
 onMounted(() => fetch())
@@ -265,7 +269,7 @@ const blockedListHeaders: DataTableHeader[] = [
                             {{ t('pages.roleplays.characters.self', 2) }}
                         </VTab>
                         <VTab
-                            :to="`/roleplays/${roleplay.id}/edit`"
+                            :to="`/roleplays/${rpId}/edit`"
                             :value="2"
                         >
                             {{ t('form.edit') }}
@@ -309,6 +313,7 @@ const blockedListHeaders: DataTableHeader[] = [
                                     >
                                         <template #append>
                                             <VBtn
+                                                v-if="character.user"
                                                 variant="text"
                                                 color="red"
                                                 icon="mdi-cancel"
@@ -411,8 +416,11 @@ const blockedListHeaders: DataTableHeader[] = [
                     <VCardTitle class="text-white d-flex justify-space-between ">
                         <p>
                             <span>{{ selectedCharacter.name }}</span>
-                            <span class="text-subtitle-1 ml-2">
-                                ({{ selectedCharacter.user.username }})
+                            <span
+                                v-if="selectedCharacter.user"
+                                class="text-subtitle-1 ml-2"
+                            >
+                                ({{ selectedCharacter.user?.username }})
                             </span>
                         </p>
                         <VChip
