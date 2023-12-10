@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { Availability, SpecificDate, GenericDate } from '~/types/models'
-import type { Database} from '~/types/supabase'
+import type { Availability, GenericDate, SpecificDate } from '~/types/models'
+import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
-import useAvailabilities from "~/composables/availabilities";
+import useAvailabilities from '~/composables/availabilities'
 
 interface AvailableDate {
-    type: 'available',
+    type: 'available'
     content: SpecificDate | GenericDate
 }
 
 interface UnavailableDate {
-    type: 'unavailable',
-    content: SpecificDate,
+    type: 'unavailable'
+    content: SpecificDate
 }
 
 type Payload = AvailableDate | UnavailableDate
@@ -23,11 +23,6 @@ const session = useSupabaseUser()
 const { calculateOverlap } = useAvailabilities()
 const { showSuccess } = useSnackBar()
 
-const periodOverlapping = computed(() => {
-    const grid = calculateOverlap(availabilities.value)
-    return grid.includes(2)
-})
-
 const availabilities = ref<Availability>({
     weekdays: false,
     weekends: false,
@@ -38,12 +33,17 @@ const availabilities = ref<Availability>({
 const loading = ref(false)
 const itemGroup = ref<number[]>([])
 const displayAvailabilityModale = ref(false)
-const currentAvailability = ref<SpecificDate|GenericDate>()
+const currentAvailability = ref<SpecificDate | GenericDate>()
 const currentIndex = ref<number>()
-const availabilityType = ref<'available'|'unavailable'>('available')
-const modalType = ref<'create'|'update'>('create')
+const availabilityType = ref<'available' | 'unavailable'>('available')
+const modalType = ref<'create' | 'update'>('create')
 
-onMounted(async() => {
+const periodOverlapping = computed(() => {
+    const grid = calculateOverlap(availabilities.value)
+    return grid.includes(2)
+})
+
+onMounted(async () => {
     loading.value = true
     const { data } = await supabase
         .from('users')
@@ -53,8 +53,10 @@ onMounted(async() => {
 
     if (data) {
         availabilities.value = data.availability as unknown as Availability
-        if (availabilities.value.weekdays) itemGroup.value.push(0)
-        if (availabilities.value.weekends) itemGroup.value.push(1)
+        if (availabilities.value.weekdays)
+            itemGroup.value.push(0)
+        if (availabilities.value.weekends)
+            itemGroup.value.push(1)
     }
 
     loading.value = false
@@ -65,13 +67,13 @@ watch(itemGroup, (value) => {
     availabilities.value.weekends = 1 in value
 })
 
-const addDate = (type: 'available' | 'unavailable') => {
+function addDate(type: 'available' | 'unavailable') {
     availabilityType.value = type
     modalType.value = 'create'
     displayAvailabilityModale.value = true
 }
 
-const editDate = (date: GenericDate | SpecificDate, type: 'available' | 'unavailable', index: number) => {
+function editDate(date: GenericDate | SpecificDate, type: 'available' | 'unavailable', index: number) {
     currentAvailability.value = date
     availabilityType.value = type
     currentIndex.value = index
@@ -80,26 +82,28 @@ const editDate = (date: GenericDate | SpecificDate, type: 'available' | 'unavail
     displayAvailabilityModale.value = true
 }
 
-const removeDate = (type: 'available' | 'unavailable', i: number) => {
+function removeDate(type: 'available' | 'unavailable', i: number) {
     availabilities.value[type].splice(i, 1)
 }
 
-const addAvailabilty = (value: Payload) => {
+function addAvailabilty(value: Payload) {
     const { type, content } = value
-    if (type === 'available') availabilities.value.available.push(content)
-    if (type === 'unavailable') availabilities.value[type].push(content)
+    if (type === 'available')
+        availabilities.value.available.push(content)
+    if (type === 'unavailable')
+        availabilities.value[type].push(content)
 }
 
-const updateAvailability = (value: { date: Payload, i: number }) => {
+function updateAvailability(value: { date: Payload, i: number }) {
     const { date: { type, content }, i } = value
 
     availabilities.value[type][i] = content
 }
 
-const submit = async () => {
+async function submit() {
     loading.value = true
 
-    const { error } = await supabase
+    await supabase
         .from('users')
         .update({ availability: availabilities.value })
         .eq('session_id', session.value!.id)
@@ -109,27 +113,27 @@ const submit = async () => {
     showSuccess(t('pages.profile.success.availabilities'))
 }
 
-const closeModal = () => {
+function closeModal() {
     currentIndex.value = undefined
     currentAvailability.value = undefined
     displayAvailabilityModale.value = false
 }
 
-const generateSummary = (type: 'available' | 'unavailable', availability: GenericDate | SpecificDate) => {
+function generateSummary(type: 'available' | 'unavailable', availability: GenericDate | SpecificDate) {
     const typeKey = type === 'available' ? 'pages.profile.availabilities.state' : 'pages.profile.availabilities.negative'
     if (availability.isSpecific) {
         const begin = dayjs(availability.begin).format('DD/MM/YYYY HH:mm')
         const end = dayjs(availability.end).format('DD/MM/YYYY HH:mm')
-        return t(typeKey) + ' ' + t('pages.profile.availabilities.sumup_specific', { begin, end })
-    } else {
+        return `${t(typeKey)} ${t('pages.profile.availabilities.sumup_specific', { begin, end })}`
+    }
+    else {
         const beginDay = t(`weekdays.${availability.begin.day}`)
         const endDay = t(`weekdays.${availability.end.day}`)
         const { begin: { hour: beginHour }, end: { hour: endHour } } = availability
 
-        return t(typeKey) +  ` ${t('pages.profile.availabilities.sumup_generic', { beginDay, beginHour, endDay, endHour })}`
+        return `${t(typeKey)} ${t('pages.profile.availabilities.sumup_generic', { beginDay, beginHour, endDay, endHour })}`
     }
 }
-
 </script>
 
 <template>
@@ -150,15 +154,17 @@ const generateSummary = (type: 'available' | 'unavailable', availability: Generi
                 >
                     <template #text>
                         <p>{{ t('pages.profile.error.overlap') }}</p>
-                        <p v-if="availabilities.weekdays">{{ t('pages.profile.error.general') }}</p>
+                        <p v-if="availabilities.weekdays">
+                            {{ t('pages.profile.error.general') }}
+                        </p>
                     </template>
                 </VAlert>
                 <VRow>
                     <VCol>
                         <VItemGroup
+                            v-model="itemGroup"
                             selected-class="bg-blue"
                             :multiple="true"
-                            v-model="itemGroup"
                         >
                             <VContainer>
                                 <VRow>
@@ -182,7 +188,7 @@ const generateSummary = (type: 'available' | 'unavailable', availability: Generi
                                                     <span class="v-card-subtitle">
                                                         {{ t('pages.profile.availabilities.weekday_hint') }}
                                                     </span>
-                                                 </div>
+                                                </div>
                                             </VCard>
                                         </VItem>
                                     </VCol>
@@ -223,9 +229,9 @@ const generateSummary = (type: 'available' | 'unavailable', availability: Generi
                 <VRow>
                     <VCol>
                         <VCard
-                            class="mb-4"
                             v-for="(a, i) in availabilities.available"
                             :key="i"
+                            class="mb-4"
                             variant="tonal"
                             color="blue"
                         >
@@ -282,9 +288,9 @@ const generateSummary = (type: 'available' | 'unavailable', availability: Generi
                 <VRow>
                     <VCol>
                         <VCard
-                            class="mb-4"
                             v-for="(u, i) in availabilities.unavailable"
                             :key="i"
+                            class="mb-4"
                             variant="tonal"
                             color="red"
                         >
@@ -331,8 +337,6 @@ const generateSummary = (type: 'available' | 'unavailable', availability: Generi
                         {{ t('pages.profile.availabilities.add') }} {{ t('pages.profile.availabilities.unself') }}
                     </VBtn>
                 </div>
-
-
             </VContainer>
             <VCardActions class="d-flex justify-end">
                 <VBtn
@@ -346,10 +350,10 @@ const generateSummary = (type: 'available' | 'unavailable', availability: Generi
         </VForm>
         <ProfileAvailabilityModale
             :show="displayAvailabilityModale"
-            :modalType="modalType"
-            :availabilityType="availabilityType"
-            :currentAvailability="currentAvailability"
-            :currentIndex="currentIndex"
+            :modal-type="modalType"
+            :availability-type="availabilityType"
+            :current-availability="currentAvailability"
+            :current-index="currentIndex"
             @close="closeModal"
             @save="addAvailabilty"
             @update="updateAvailability"

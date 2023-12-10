@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
-import { vuetifyConfig } from '~/composables/vuetifyConfig';
+import { vuetifyConfig } from '~/composables/vuetifyConfig'
 
 const { t } = useI18n()
 
@@ -11,17 +11,17 @@ useHead({
 const { defineField, handleSubmit } = useForm({
     validationSchema: {
         email: 'email|required',
-    }
+    },
 })
 
 const [email, emailProps] = defineField('email', vuetifyConfig)
 
 const client = useSupabaseClient()
 
-const success= ref(false)
+const success = ref(false)
 const loading = ref(false)
 
-const submit = handleSubmit(async(values) => {
+const submit = handleSubmit(async (values) => {
     loading.value = true
     await client.auth.resetPasswordForEmail(values.email, {
         redirectTo: 'https://sarah-rp.fr/new-password',
@@ -30,12 +30,10 @@ const submit = handleSubmit(async(values) => {
     success.value = true
     loading.value = false
 })
-
 </script>
 
 <template>
     <VForm @submit.prevent="submit">
-
         <h2
             class="text-center text-4xl mb-6 text-indigo-900 font-display font-semibold text-lg-left xl:text-5xl xl:text-bold"
         >
@@ -66,7 +64,7 @@ const submit = handleSubmit(async(values) => {
                     color="primary"
                     size="large"
                     rounded="lg"
-                    block
+                    :block="true"
                 >
                     {{ t('forgotPwd.action') }}
                 </VBtn>

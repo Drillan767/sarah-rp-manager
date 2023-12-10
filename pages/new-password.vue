@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useForm, useIsFormValid } from 'vee-validate'
-import { useRouteQuery  } from '@vueuse/router'
-import { vuetifyConfig } from '~/composables/vuetifyConfig';
+import { useRouteQuery } from '@vueuse/router'
+import { vuetifyConfig } from '~/composables/vuetifyConfig'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -9,7 +9,8 @@ const supabase = useSupabaseClient()
 
 const code = useRouteQuery('code')
 
-if (!code.value) router.push('/login')
+if (!code.value)
+    router.push('/login')
 
 useHead({
     title: t('newPwd.title'),
@@ -19,7 +20,7 @@ const { defineField, handleSubmit } = useForm({
     validationSchema: {
         password: 'required|min:6',
         repeatPassword: 'required|confirmed:@password',
-    }
+    },
 })
 
 const [pwd, pwdProps] = defineField('password', vuetifyConfig)
@@ -28,14 +29,13 @@ const loading = ref(false)
 
 const formValid = useIsFormValid()
 
-const submit = handleSubmit(async(values) => {
+const submit = handleSubmit(async (values) => {
     loading.value = true
     await supabase.auth.updateUser({
         password: values.password,
     })
     loading.value = false
 })
-
 </script>
 
 <template>
@@ -78,6 +78,5 @@ const submit = handleSubmit(async(values) => {
                 </VBtn>
             </div>
         </div>
-
     </VForm>
 </template>

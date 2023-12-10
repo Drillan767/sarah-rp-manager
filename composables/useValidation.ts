@@ -7,22 +7,25 @@ export default function useValidation() {
     const requiredRule = (value: any) => !!value || t('form.required')
     const emailRule = (value: string) => /.+@.+\..+/.test(value) || t('form.email')
     const confirmedRule = (value: string, ref: string) => value === ref || t('form.confirmed')
-    const minLengthRule = (value: string, min: number) => value && value.length >= min || t('form.minLength', { count: min})
+    const minLengthRule = (value: string, min: number) => (value && value.length >= min) || t('form.minLength', { count: min })
     const maxLengthRule = (value: string, max: number) => {
-        if (value) {
-            return value.length <= max || t('form.maxLength', { count: max})
-        }
+        if (value)
+            return value.length <= max || t('form.maxLength', { count: max })
+
         return true
     }
     // const minValueRule = (value: number, min: number) => value <= min || t('form.minValue', { value: min })
-    const minValueRule = (min: number, value: any) => parseInt(value) >= min || t('form.minValue', { value: min })
+    const minValueRule = (min: number, value: any) => Number.parseInt(value) >= min || t('form.minValue', { value: min })
     const imageRule = (editing: boolean, value: File | null) => {
         if (!editing && value === null) {
             return t('form.required')
-        } else {
+        }
+        else {
             if (value) {
-                if (!value.type.includes('image')) return t('form.badFormat')
-                if (value.size > 2000000) return t('form.tooBig')
+                if (!value.type.includes('image'))
+                    return t('form.badFormat')
+                if (value.size > 2000000)
+                    return t('form.tooBig')
             }
         }
 
@@ -33,7 +36,8 @@ export default function useValidation() {
         const beforeDate = dayjs(before)
         const testDate = dayjs(value)
 
-        if (beforeDate.isAfter(testDate)) return t('form.dateAfter', { date: beforeDate.format('DD/MM/YYYY') })
+        if (beforeDate.isAfter(testDate))
+            return t('form.dateAfter', { date: beforeDate.format('DD/MM/YYYY') })
 
         return true
     }
@@ -42,7 +46,8 @@ export default function useValidation() {
         const afterDate = dayjs(after)
         const testDate = dayjs(value)
 
-        if (afterDate.isAfter(testDate)) return t('form.dateAfter', { date: afterDate.format('DD/MM/YYYY') })
+        if (afterDate.isAfter(testDate))
+            return t('form.dateAfter', { date: afterDate.format('DD/MM/YYYY') })
 
         return true
     }

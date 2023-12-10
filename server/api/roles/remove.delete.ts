@@ -1,7 +1,7 @@
-import type { Database } from '~/types/supabase';
-import { serverSupabaseClient } from '#supabase/server';
+import type { Database } from '~/types/supabase'
+import { serverSupabaseClient } from '#supabase/server'
 
-export default defineEventHandler(async(event) => {
+export default defineEventHandler(async (event) => {
     const body = await readBody(event)
 
     const supabase = await serverSupabaseClient<Database>(event)
@@ -14,7 +14,7 @@ export default defineEventHandler(async(event) => {
     if (error) {
         throw createError({
             statusCode: 400,
-            statusMessage: error.message
+            statusMessage: error.message,
         })
     }
 

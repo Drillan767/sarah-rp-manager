@@ -1,5 +1,5 @@
-import type { Database } from '~/types/supabase';
-import { serverSupabaseClient } from '#supabase/server';
+import type { Database } from '~/types/supabase'
+import { serverSupabaseClient } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
     const body = await readBody(event)
@@ -12,13 +12,13 @@ export default defineEventHandler(async (event) => {
         .eq('user_id', body.user_id)
         .eq('roles.roleplay_id', body.roleplay_id)
 
-    if (!data) return
+    if (!data)
+        return
 
     await supabase
         .from('characters')
         .delete()
-        .in('id', data.map((d) => d.id))
-
+        .in('id', data.map(d => d.id))
 
     await supabase
         .from('blacklists')

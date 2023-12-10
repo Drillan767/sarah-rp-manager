@@ -1,30 +1,28 @@
 <script setup lang="ts">
-import type  { CreatedRole, Role } from '~/types/models'
+import type { CreatedRole, Role } from '~/types/models'
 import useValidation from '~/composables/useValidation'
 
 interface Props {
     edit: boolean
     loading: boolean
-    roles: (CreatedRole|Role)[]
+    roles: (CreatedRole | Role)[]
 }
 
+const props = defineProps<Props>()
+const emit = defineEmits<{
+    (e: 'delete', value: Role): void
+    (e: 'update'): void
+    (e: 'update:roles', value: (CreatedRole | Role)[]): void
+}>()
 const { t } = useI18n()
 const { requiredRule, minValueRule } = useValidation()
 
-const props = defineProps<Props>()
-
-const emit = defineEmits<{
-    (e: 'delete', value: Role): void,
-    (e: 'update'): void,
-    (e: 'update:roles', value: (CreatedRole|Role)[]): void,
-}>()
-
 const rolesProxy = computed({
     get: () => props.roles,
-    set: (value) => emit('update:roles', value)
+    set: value => emit('update:roles', value),
 })
 
-const addRole = () => {
+function addRole() {
     rolesProxy.value.push({
         name: '',
         max_users: 1,
@@ -33,15 +31,15 @@ const addRole = () => {
     })
 }
 
-const removeRole = (i: number) => {
+function removeRole(i: number) {
     if ('id' in rolesProxy.value[i]) {
         const payload = rolesProxy.value[i] as Role
         emit('delete', payload)
-    } else {
+    }
+    else {
         rolesProxy.value.splice(i, 1)
     }
 }
-
 </script>
 
 <template>
@@ -67,21 +65,21 @@ const removeRole = (i: number) => {
                             >
                                 <VCol cols="6">
                                     <VTextField
+                                        v-model="role.name"
                                         :label="t('pages.roleplays.form.roles_name')"
                                         variant="outlined"
                                         color="primary"
                                         :rules="[requiredRule]"
-                                        v-model="role.name"
                                     />
                                 </VCol>
                                 <VCol cols="3">
                                     <VTextField
+                                        v-model="role.max_users"
                                         :label="t('pages.roleplays.form.roles_max_nb')"
                                         variant="outlined"
                                         type="number"
                                         color="primary"
                                         :rules="[minValueRule(1, role.max_users)]"
-                                        v-model="role.max_users"
                                     />
                                 </VCol>
                                 <VCol
@@ -97,9 +95,9 @@ const removeRole = (i: number) => {
                                 </VCol>
                                 <VCol cols="12">
                                     <VTextarea
+                                        v-model="role.description"
                                         label="Description"
                                         variant="outlined"
-                                        v-model="role.description"
                                         rows="2"
                                         :rules="[requiredRule]"
                                         :auto-grow="true"
@@ -110,7 +108,6 @@ const removeRole = (i: number) => {
                         </VContainer>
                     </VCol>
                 </VRow>
-
             </VContainer>
             <div class="d-flex justify-center">
                 <VBtn
@@ -125,7 +122,7 @@ const removeRole = (i: number) => {
                 </VBtn>
             </div>
         </template>
-        <template #actions v-if="edit">
+        <template v-if="edit" #actions>
             <VSpacer />
             <VBtn
                 color="primary"

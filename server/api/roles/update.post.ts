@@ -2,7 +2,7 @@ import type { Database } from '~/types/supabase'
 import type { CreatedRole, Role } from '~/types/models'
 import { serverSupabaseClient } from '#supabase/server'
 
-export default defineEventHandler(async(event) => {
+export default defineEventHandler(async (event) => {
     const body = await readBody<(CreatedRole | Role)[]>(event)
 
     const supabase = await serverSupabaseClient<Database>(event)
@@ -11,11 +11,10 @@ export default defineEventHandler(async(event) => {
     const rolesCreateList: CreatedRole[] = []
 
     body.forEach((role) => {
-        if ('id' in role) {
+        if ('id' in role)
             rolesUpdateList.push(role)
-        } else {
+        else
             rolesCreateList.push(role)
-        }
     })
 
     // Creating new roles.
@@ -25,7 +24,7 @@ export default defineEventHandler(async(event) => {
 
     // Updating existing ones.
     for (const r of rolesUpdateList) {
-        const {id, ...fields } = r
+        const { id, ...fields } = r
         await supabase
             .from('roles')
             .update(fields)

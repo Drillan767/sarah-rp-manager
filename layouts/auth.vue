@@ -26,7 +26,6 @@
 </template>
 
 <style scoped lang="scss">
-
 .brand {
     color: #3730a3;
     font-size: 1.5rem;

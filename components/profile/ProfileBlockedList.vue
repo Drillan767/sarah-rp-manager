@@ -3,7 +3,7 @@
 </script>
 
 <template>
-
+    <p>Blocked.</p>
 </template>
 
 <style scoped>

@@ -3,19 +3,19 @@ import { mergeProps } from 'vue'
 
 interface Props {
     message: {
-        id: number,
+        id: number
         message: string
-        created_at: string,
-        url?: string,
-        media?: string,
-        sender: string,
+        created_at: string
+        url?: string
+        media?: string
+        sender: string
         reactions: {
-            smiley: string,
-            users: string[],
+            smiley: string
+            users: string[]
         }[]
     }
-    fromSender?: boolean,
-    enableInteractions?: boolean,
+    fromSender?: boolean
+    enableInteractions?: boolean
 }
 
 const props = defineProps<Props>()
@@ -29,11 +29,6 @@ const creationDate = computed(() => {
 
     return initialDate.format(format)
 })
-
-const emojiSelect = (emoji) => {
-    console.log(emoji)
-}
-
 </script>
 
 <template>
@@ -41,7 +36,7 @@ const emojiSelect = (emoji) => {
         cols="12"
         md="6"
         class="d-flex py-0"
-        :class="{'justify-end': fromSender }"
+        :class="{ 'justify-end': fromSender }"
     >
         <Transition
             :appear="true"
@@ -90,15 +85,15 @@ const emojiSelect = (emoji) => {
                             :native="true"
                             theme="auto"
                             @select="emojiSelect"
-                        />-->
+                        /> -->
                     </VMenu>
                     <VTooltip
-                        location="bottom"
                         v-for="(reaction, i) in message.reactions"
                         :key="i"
+                        location="bottom"
                         :text="reaction.users[0]"
                     >
-                        <template #activator="{ props: tooltip}">
+                        <template #activator="{ props: tooltip }">
                             <VChip
                                 v-bind="tooltip"
                             >

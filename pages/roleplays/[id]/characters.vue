@@ -2,41 +2,41 @@
 import type { Character, DataTableHeader } from '~/types/models'
 import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
-import useValidation from '~/composables/useValidation' 
+import useValidation from '~/composables/useValidation'
 
 interface RoleplayData {
-    id: string,
-    title: string,
+    id: string
+    title: string
     roles: {
-        id: number,
-        name: string,
-        max_users: number,
-        description: string,
-        roleplay_id: string,
+        id: number
+        name: string
+        max_users: number
+        description: string
+        roleplay_id: string
         characters: {
-            id: number,
-            name: string,
-            role_id: number,
-            user_id: number,
-            status: number,
-            illustration: string,
-            description: string,
+            id: number
+            name: string
+            role_id: number
+            user_id: number
+            status: number
+            illustration: string
+            description: string
             user: {
-                id: number,
-                username: string,
+                id: number
+                username: string
             }
         }[]
     }[]
 }
 
 interface BlockedUser {
-    id: number,
+    id: number
     user: {
-        id: number,
-        username: string,
-    } | null,
-    created_at: string,
-    reason: string,
+        id: number
+        username: string
+    } | null
+    created_at: string
+    reason: string
 }
 
 const supabase = useSupabaseClient<Database>()
@@ -46,6 +46,29 @@ const dayjs = useDayjs()
 const { showSuccess } = useSnackBar()
 const { params } = route
 const { requiredRule } = useValidation()
+
+const statusList = [
+    {
+        number: -1,
+        label: t('pages.roleplays.characters.waiting_list'),
+        color: 'blue-gray',
+    },
+    {
+        number: 0,
+        label: t('pages.roleplays.characters.pending'),
+        color: 'orange',
+    },
+    {
+        number: 1,
+        label: t('pages.roleplays.characters.accepted'),
+        color: 'green',
+    },
+    {
+        number: 2,
+        label: t('pages.roleplays.characters.moderator'),
+        color: 'yellow',
+    },
+]
 
 const displayBlockDialog = ref(false)
 const loading = ref(false)
@@ -63,7 +86,7 @@ const blockForm = ref({
     roleplay_id: '',
 })
 
-const fetch = async() => {
+async function fetch() {
     loading.value = true
 
     const { data: rpData } = await supabase
@@ -93,30 +116,28 @@ const fetch = async() => {
         .eq('id', params.id)
         .single()
 
-    if (rpData) {
+    if (rpData)
         roleplay.value = rpData
-    }
 
     const { data: blockedList } = await supabase
         .from('blacklists')
         .select(`*, user:users(id, username)`)
         .eq('roleplay_id', params.id)
 
-    if (blockedList) {
+    if (blockedList)
         blockedUsers.value = blockedList
-    }
 
     loading.value = false
 }
 
-const getStatus = (status: number) => statusList.find((s) => s.number === status)
+const getStatus = (status: number) => statusList.find(s => s.number === status)
 
-const openDetails = (character: Character) => {
+function openDetails(character: Character) {
     openCharacterDetails.value = true
     selectedCharacter.value = character
 }
 
-const showBlockDialog = (user: { username: string, id: number}) => {
+function showBlockDialog(user: { username: string, id: number }) {
     blockForm.value.username = user.username
     blockForm.value.user_id = user.id
     blockForm.value.roleplay_id = roleplay.value.id
@@ -129,11 +150,11 @@ useHead({
 
 onMounted(() => fetch())
 
-const blockUser = async() => {
+async function blockUser() {
     loading.value = true
     await useFetch('/api/rp/block', {
         method: 'POST',
-        body: blockForm.value
+        body: blockForm.value,
     })
 
     blockForm.value = {
@@ -145,13 +166,13 @@ const blockUser = async() => {
 
     loading.value = false
 
-    showSuccess("L'utilisateur a été bloqué et tous ses personnages ont été supprimés pour ce roleplay")
+    showSuccess('L\'utilisateur a été bloqué et tous ses personnages ont été supprimés pour ce roleplay')
     displayBlockDialog.value = false
 
     await fetch()
 }
 
-const handleDecision = async (decision: number) => {
+async function handleDecision(decision: number) {
     loading.value = true
 
     if (decision === -2) {
@@ -159,17 +180,18 @@ const handleDecision = async (decision: number) => {
             body: {
                 id: selectedCharacter.value.id,
                 method: 'DELETE',
-            }
+            },
         })
 
         showSuccess('Personnage refusé avec succès')
-    } else {
+    }
+    else {
         await useFetch('/api/rp/accept', {
             method: 'POST',
             body: {
                 id: selectedCharacter.value.id,
                 decision,
-            }
+            },
         })
 
         showSuccess('Statut du personnage mit à jour')
@@ -183,39 +205,16 @@ const handleDecision = async (decision: number) => {
 const links = computed(() => ([
     {
         title: t('pages.home'),
-        to: '/'
+        to: '/',
     },
     {
         title: roleplay.value.title,
-        to: `/roleplays/${roleplay.value.id}`
+        to: `/roleplays/${roleplay.value.id}`,
     },
     {
         title: t('pages.roleplays.characters.self', 2),
-    }
+    },
 ]))
-
-const statusList = [
-    {
-        number: -1,
-        label: t('pages.roleplays.characters.waiting_list'),
-        color: 'blue-gray',
-    },
-    {
-        number: 0,
-        label: t('pages.roleplays.characters.pending'),
-        color: 'orange',
-    },
-    {
-        number: 1,
-        label: t('pages.roleplays.characters.accepted'),
-        color: 'green',
-    },
-    {
-        number: 2,
-        label: t('pages.roleplays.characters.moderator'),
-        color: 'yellow'
-    }
-]
 
 const blockedListHeaders: DataTableHeader[] = [
     {
@@ -248,7 +247,9 @@ const blockedListHeaders: DataTableHeader[] = [
             </VRow>
             <VRow>
                 <VCol cols="12" md="6">
-                    <h1 class="text-h3 mb-4">{{ t('pages.roleplays.characters.self', 2) }}</h1>
+                    <h1 class="text-h3 mb-4">
+                        {{ t('pages.roleplays.characters.self', 2) }}
+                    </h1>
                 </VCol>
                 <VCol
                     cols="12"
@@ -289,9 +290,9 @@ const blockedListHeaders: DataTableHeader[] = [
                 <VCol cols="12">
                     <VRow>
                         <VCol
-                            cols="2"
                             v-for="(character, j) in role.characters"
                             :key="j"
+                            cols="2"
                         >
                             <VCard>
                                 <VImg
@@ -313,7 +314,6 @@ const blockedListHeaders: DataTableHeader[] = [
                                                 @click="showBlockDialog(character.user)"
                                             />
                                         </template>
-
                                     </VToolbar>
                                     <VCardTitle class="text-white">
                                         {{ character.name }}
@@ -323,7 +323,6 @@ const blockedListHeaders: DataTableHeader[] = [
                                     <VChip
                                         :color="getStatus(character.status)!.color"
                                         :text="getStatus(character.status)!.label"
-
                                     />
                                     <VSpacer />
                                     <VBtn
@@ -334,13 +333,13 @@ const blockedListHeaders: DataTableHeader[] = [
                             </VCard>
                         </VCol>
                         <VCol
-                            cols="2"
                             v-for="j in (role.max_users - role.characters.length)"
                             :key="j"
+                            cols="2"
                         >
-                        <VCard
-                            variant="tonal"
-                        >
+                            <VCard
+                                variant="tonal"
+                            >
                                 <VImg
                                     src="/default-avatar.webp"
                                     class="align-end"
@@ -436,12 +435,12 @@ const blockedListHeaders: DataTableHeader[] = [
                         @click="handleDecision(-2)"
                     >
                         {{ t('form.refuse') }}
-                   </VBtn>
-                   <VSpacer />
-                   <VBtn
-                        @click="handleDecision(-1)"
+                    </VBtn>
+                    <VSpacer />
+                    <VBtn
                         color="blue"
-                   >
+                        @click="handleDecision(-1)"
+                    >
                         {{ t('pages.roleplays.characters.waiting_list') }}
                     </VBtn>
                     <VBtn
@@ -474,9 +473,9 @@ const blockedListHeaders: DataTableHeader[] = [
                             :text="t('block.warning_rp')"
                         />
                         <VTextarea
+                            v-model="blockForm.reason"
                             variant="outlined"
                             color="primary"
-                            v-model="blockForm.reason"
                             :label="t('block.reason')"
                             :rules="[requiredRule]"
                         />
@@ -501,4 +500,3 @@ const blockedListHeaders: DataTableHeader[] = [
         </VDialog>
     </div>
 </template>
-

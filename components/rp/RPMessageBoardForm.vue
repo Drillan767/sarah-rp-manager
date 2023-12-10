@@ -3,47 +3,44 @@ import type { Database } from '~/types/supabase'
 import useValidation from '~/composables/useValidation'
 import useSnackBar from '~/composables/snackbar'
 
+const props = defineProps<Props>()
+const emit = defineEmits<{
+    (e: 'update:message', value: Props['message']): void
+}>()
 const { t } = useI18n()
 const { maxLengthRule } = useValidation()
 
 interface Props {
-    roleplayId?: string,
+    roleplayId?: string
     message?: string
 }
 
 const { showSuccess } = useSnackBar()
 const supabase = useSupabaseClient<Database>()
 
-const props = defineProps<Props>()
-const emit = defineEmits<{
-    (e: 'update:message', value: Props['message']): void,
-}>()
-
 const messageProxy = computed({
     get: () => props.message,
-    set: (value) => emit('update:message', value),
+    set: value => emit('update:message', value),
 })
-
 
 const loading = ref(false)
 const newMessage = ref('')
 
-
-const submit = async() => {
-    if (!props.roleplayId) return
+async function submit() {
+    if (!props.roleplayId)
+        return
 
     loading.value = true
     await supabase
         .from('roleplays')
         .update({
-            message_board: newMessage.value
+            message_board: newMessage.value,
         })
         .eq('id', props.roleplayId)
 
     loading.value = false
     showSuccess(t('form.updateConfirmed', { thing: 'message' }))
 }
-
 </script>
 
 <template>
@@ -59,13 +56,13 @@ const submit = async() => {
                 <template #text>
                     <VForm>
                         <VTextField
-                            label="Message"
                             v-model="messageProxy"
+                            label="Message"
                             variant="outlined"
                             color="primary"
                             :clearable="true"
                             :counter-value="255"
-                            :rules="[maxLengthRule(messageProxy?.length ? messageProxy : '', 255 )]"
+                            :rules="[maxLengthRule(messageProxy?.length ? messageProxy : '', 255)]"
                         />
                     </VForm>
                 </template>

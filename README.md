@@ -1,8 +1,8 @@
 # Sarah RP Manager
 
-## Introduction 
+## Introduction
 
-This projects aim for Sarah to be able to host RP sessions with the best experience possible. 
+This projects aim for Sarah to be able to host RP sessions with the best experience possible.
 
 ## Stack
 
@@ -34,4 +34,3 @@ Also, every informations will be available: the RP's title and descriptions, but
 
 - [ ] Sarah makes the call to see who's here or not
 - [ ] The delay for the call is over and users with the "Plan B" role are asked to join
-

@@ -10,7 +10,7 @@ const { defineField, handleSubmit, handleReset } = useForm({
     validationSchema: {
         password: 'required|min:6',
         repeatPassword: 'required|confirmed:@password',
-    }
+    },
 })
 
 const [pwd, pwdProps] = defineField('password', vuetifyConfig)
@@ -26,7 +26,6 @@ const submit = handleSubmit(async (values) => {
     handleReset()
     showSuccess(t('pages.profile.success.password'))
 })
-
 </script>
 
 <template>
@@ -47,8 +46,8 @@ const submit = handleSubmit(async (values) => {
                         md="6"
                     >
                         <VTextField
-                            v-bind="pwdProps"
                             v-modem="pwd"
+                            v-bind="pwdProps"
                             :label="t('fields.password')"
                             type="password"
                         />

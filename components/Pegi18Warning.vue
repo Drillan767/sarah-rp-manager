@@ -2,11 +2,10 @@
 import { useStorage } from '@vueuse/core'
 
 const { t } = useI18n({
-  useScope: 'local'
+    useScope: 'local',
 })
 
 const display = useStorage('sarah-rp-first-visit', true)
-
 </script>
 
 <template>
@@ -16,7 +15,8 @@ const display = useStorage('sarah-rp-first-visit', true)
         :fullscreen="true"
         :scrim="false"
         transition="dialog-bottom-transition"
-    ><!-- 
+    >
+        <!--
         <VCard>
             <template #text>
                 <VContainer>
@@ -54,7 +54,7 @@ const display = useStorage('sarah-rp-first-visit', true)
             src="https://images7.alphacoders.com/689/689877.jpg"
             :cover="true"
         >
-           <div class="d-flex h-100 justify-center align-center ">
+            <div class="d-flex h-100 justify-center align-center ">
                 <VCard
                     :max-width="750"
                     :width="750"
@@ -95,16 +95,10 @@ const display = useStorage('sarah-rp-first-visit', true)
                         </VContainer>
                     </template>
                 </VCard>
-           </div>
-    </VImg>
+            </div>
+        </VImg>
     </VDialog>
 </template>
-
-<style scoped>
-    .sarah {
-        border-radius: 50%;
-    }
-</style>
 
 <i18n lang="json">
 {

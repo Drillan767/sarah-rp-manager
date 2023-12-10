@@ -7,7 +7,7 @@
         "refuse": "Refuse",
         "edit": "Edit",
         "close": "Close",
-        "delete":  "Delete",
+        "delete": "Delete",
         "register": "Register",
         "required": "The field is required",
         "email": "The email must be valid",
@@ -132,7 +132,7 @@
                 "reuse": "Reuse a character",
                 "no_character": "No character available",
                 "create": "Create a character",
-                "existing" : "Existing character",
+                "existing": "Existing character",
                 "prev": "Previous",
                 "next": "Next",
                 "success": "Registration successful. You will be notified when it will be accepted"

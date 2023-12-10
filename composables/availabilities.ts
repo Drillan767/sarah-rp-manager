@@ -1,9 +1,8 @@
-import type { Availability, GenericDate, SpecificDate } from '~/types/models'
+import type { Dayjs } from 'dayjs'
+import type { Availability } from '~/types/models'
 import { days } from '~/assets/json/availability-time.json'
-import {Dayjs} from "dayjs";
 
 export default function useAvailabilities() {
-
     const dayjs = useDayjs()
 
     function parseTime(timeStr: string) {
@@ -15,11 +14,11 @@ export default function useAvailabilities() {
         const beginMinutes = parseTime(beginTimeStr)
         const endMinutes = parseTime(endTimeStr)
         let newDay = false
-        let nextDayOffset = 0
+        // let nextDayOffset = 0
 
         // Check if the endTime is before the beginTime (spans across two days)
         if (endMinutes < beginMinutes) {
-            nextDayOffset = 24 * 60
+            // nextDayOffset = 24 * 60
             newDay = true
         }
 
@@ -56,9 +55,8 @@ export default function useAvailabilities() {
 
         if (weekends) {
             const saturday = 48 * 5
-            for (let i = saturday; i < 336; i++) {
+            for (let i = saturday; i < 336; i++)
                 grid[i] = 1
-            }
         }
 
         available.forEach((a) => {
@@ -72,20 +70,19 @@ export default function useAvailabilities() {
                     // We are about to reach the end of the grid.
                     // TODO: Recheck this whole algorithm.
                     if (beginIndex > endIndex) {
-                        for (let i = beginIndex; i <= 335; i++) {
+                        for (let i = beginIndex; i <= 335; i++)
                             grid[i]++
-                        }
 
-                        for (let j = 0; j <= endIndex; j++) {
+                        for (let j = 0; j <= endIndex; j++)
                             grid[j]++
-                        }
-                    } else {
-                        for (let i = beginIndex; i <= endIndex; i++) {
+                    }
+                    else {
+                        for (let i = beginIndex; i <= endIndex; i++)
                             grid[i]++
-                        }
                     }
                 }
-            } else {
+            }
+            else {
                 const { halfHours: halfHoursBegin } = halfHoursBetween('00:00', a.begin.hour)
                 const { halfHours: halfHoursEnd } = halfHoursBetween('00:00', a.end.hour)
 
@@ -95,17 +92,15 @@ export default function useAvailabilities() {
                 // We are about to reach the end of the grid.
                 // TODO: Also recheck this whole algorithm.
                 if (endIndex >= 0 && beginIndex > endIndex) {
-                    for (let i = beginIndex; i <= 335; i++) {
+                    for (let i = beginIndex; i <= 335; i++)
                         grid[i]++
-                    }
 
-                    for (let j = 0; j <= endIndex; j++) {
+                    for (let j = 0; j <= endIndex; j++)
                         grid[j]++
-                    }
-                } else {
-                    for (let i = beginIndex; i <= endIndex; i++) {
+                }
+                else {
+                    for (let i = beginIndex; i <= endIndex; i++)
                         grid[i]++
-                    }
                 }
             }
         })
@@ -120,17 +115,15 @@ export default function useAvailabilities() {
                 // We are about to reach the end of the grid.
                 // TODO: Recheck this whole algorithm.
                 if (beginIndex > endIndex) {
-                    for (let i = beginIndex; i <= 335; i++) {
+                    for (let i = beginIndex; i <= 335; i++)
                         grid[i] = grid[i] > 0 ? grid[i] - 1 : 0
-                    }
 
-                    for (let j = 0; j <= endIndex; j++) {
+                    for (let j = 0; j <= endIndex; j++)
                         grid[j] = grid[j] > 0 ? grid[j] - 1 : 0
-                    }
-                } else {
-                    for (let i = beginIndex; i <= endIndex; i++) {
+                }
+                else {
+                    for (let i = beginIndex; i <= endIndex; i++)
                         grid[i] = grid[i] > 0 ? grid[i] - 1 : 0
-                    }
                 }
             }
         })

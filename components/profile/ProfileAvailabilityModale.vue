@@ -1,26 +1,34 @@
 <script setup lang="ts">
-import type { SpecificDate, GenericDate } from '~/types/models'
-import useAvailabilities from "~/composables/availabilities";
+import type { GenericDate, SpecificDate } from '~/types/models'
 
 interface Props {
     show: boolean
-    modalType: 'create' | 'update',
-    currentIndex?: number,
-    availabilityType: 'available' | 'unavailable',
-    currentAvailability?: SpecificDate | GenericDate,
+    modalType: 'create' | 'update'
+    currentIndex?: number
+    availabilityType: 'available' | 'unavailable'
+    currentAvailability?: SpecificDate | GenericDate
 }
 
 interface AvailableDate {
-    type: 'available',
+    type: 'available'
     content: SpecificDate | GenericDate
 }
 
 interface UnavailableDate {
-    type: 'unavailable',
-    content: SpecificDate,
+    type: 'unavailable'
+    content: SpecificDate
 }
 
 type Payload = AvailableDate | UnavailableDate
+
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+    (e: 'addDate', value: Payload): void
+    (e: 'save', value: Payload): any
+    (e: 'update', value: { date: Payload, i: number }): void
+    (e: 'close'): void
+}>()
 
 const maxHours = 15
 
@@ -33,7 +41,7 @@ const defaultGenericDate: GenericDate = {
     end: {
         day: 'monday',
         hour: '00:00',
-    }
+    },
 }
 
 const defaultSPecificDate: SpecificDate = {
@@ -42,17 +50,8 @@ const defaultSPecificDate: SpecificDate = {
     end: '',
 }
 
-const props = defineProps<Props>()
-
-const emit = defineEmits<{
-    (e: 'addDate', value: Payload): void,
-    (e: 'save', value: Payload): any,
-    (e: 'update', value: { date: Payload, i: number }): void,
-    (e: 'close'): void,
-}>()
-
 const { t } = useI18n()
-const { } = useAvailabilities()
+// const { } = useAvailabilities()
 
 const genericAvailability = ref(defaultGenericDate)
 const specificAvailability = ref(defaultSPecificDate)
@@ -74,14 +73,15 @@ watch(() => props.show, (value) => {
             if (props.currentAvailability.isSpecific) {
                 specificAvailability.value = props.currentAvailability
                 dateType.value = 1
-            } else {
+            }
+            else {
                 genericAvailability.value = props.currentAvailability
             }
         }
     }
 })
 
-const close = () => {
+function close() {
     genericAvailability.value = defaultGenericDate
     specificAvailability.value = defaultSPecificDate
     dateType.value = 0
@@ -90,7 +90,7 @@ const close = () => {
     emit('close')
 }
 
-const save = () => {
+function save() {
     let payload: Payload
 
     // Regular availability.
@@ -100,26 +100,25 @@ const save = () => {
             content: genericAvailability.value,
         }
     // Specific availability.
-    } else {
+    }
+    else {
         payload = {
             type: props.availabilityType,
-            content: specificAvailability.value
+            content: specificAvailability.value,
         }
     }
 
-    if (isEditing.value) {
+    if (isEditing.value)
         emit('update', { date: payload, i: props.currentIndex! })
-    } else {
+    else
         emit('save', payload)
-    }
 
     close()
 }
 
-const handleErrorStatus = (value: boolean) => {
+function handleErrorStatus(value: boolean) {
     hasErrors.value = value
 }
-
 </script>
 
 <template>
@@ -143,7 +142,6 @@ const handleErrorStatus = (value: boolean) => {
                 <template v-else>
                     {{ t('pages.profile.availabilities.unself') }}
                 </template>
-
             </VCardTitle>
             <VCardItem>
                 <VItemGroup
@@ -154,35 +152,35 @@ const handleErrorStatus = (value: boolean) => {
                         :fluid="true"
                         class="px-0"
                     >
-                       <VRow>
-                           <VItem v-slot="{ isSelected, toggle }">
-                               <VCol cols="12" md="6">
-                                   <VBtn
-                                       :variant="isSelected ? 'flat': 'outlined'"
-                                       color="blue"
-                                       :block="true"
-                                       :disabled="availabilityType === 'unavailable' || currentAvailability !== undefined"
-                                       @click="toggle"
-                                   >
-                                       {{ t('pages.profile.availabilities.general') }}
-                                   </VBtn>
-                               </VCol>
-                           </VItem>
+                        <VRow>
+                            <VItem v-slot="{ isSelected, toggle }">
+                                <VCol cols="12" md="6">
+                                    <VBtn
+                                        :variant="isSelected ? 'flat' : 'outlined'"
+                                        color="blue"
+                                        :block="true"
+                                        :disabled="availabilityType === 'unavailable' || currentAvailability !== undefined"
+                                        @click="toggle"
+                                    >
+                                        {{ t('pages.profile.availabilities.general') }}
+                                    </VBtn>
+                                </VCol>
+                            </VItem>
 
-                           <VItem v-slot="{ isSelected, toggle }">
-                               <VCol cols="12" md="6">
-                                   <VBtn
-                                       :variant="isSelected ? 'flat': 'outlined'"
-                                       color="blue"
-                                       :block="true"
-                                       :disabled="availabilityType === 'unavailable' || currentAvailability !== undefined"
-                                       @click="toggle"
-                                   >
-                                       {{ t('pages.profile.availabilities.specific') }}
-                                   </VBtn>
-                               </VCol>
-                           </VItem>
-                       </VRow>
+                            <VItem v-slot="{ isSelected, toggle }">
+                                <VCol cols="12" md="6">
+                                    <VBtn
+                                        :variant="isSelected ? 'flat' : 'outlined'"
+                                        color="blue"
+                                        :block="true"
+                                        :disabled="availabilityType === 'unavailable' || currentAvailability !== undefined"
+                                        @click="toggle"
+                                    >
+                                        {{ t('pages.profile.availabilities.specific') }}
+                                    </VBtn>
+                                </VCol>
+                            </VItem>
+                        </VRow>
                     </VContainer>
                 </VItemGroup>
 
@@ -206,8 +204,8 @@ const handleErrorStatus = (value: boolean) => {
                     {{ t('form.cancel') }}
                 </VBtn>
                 <VBtn
-                    @click="save"
                     :disabled="hasErrors"
+                    @click="save"
                 >
                     {{ isEditing ? t('form.save') : t('form.add') }}
                 </VBtn>

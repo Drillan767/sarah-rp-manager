@@ -2,12 +2,12 @@ import type { Database } from '~/types/supabase'
 
 export default defineNuxtRouteMiddleware(async (to) => {
     if (to.name && /roleplays-id-(characters|edit).*/.test(to.name.toString())) {
-
         const supabase = useSupabaseClient<Database>()
         const supabaseUser = useSupabaseUser()
         let rpFound: any = null
 
-        if (!supabaseUser.value) return navigateTo(`/roleplays/${to.params.id}`)
+        if (!supabaseUser.value)
+            return navigateTo(`/roleplays/${to.params.id}`)
 
         const userId = supabaseUser.value.id
 
@@ -43,6 +43,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
             rpFound = data ?? null
         }
 
-        if (!rpFound) return navigateTo(`/roleplays/${to.params.id}`)
+        if (!rpFound)
+            return navigateTo(`/roleplays/${to.params.id}`)
     }
 })

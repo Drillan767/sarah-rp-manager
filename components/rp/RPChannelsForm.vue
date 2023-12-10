@@ -4,12 +4,12 @@ import useValidation from '~/composables/useValidation'
 import useSnackBar from '~/composables/snackbar'
 
 interface Channel {
-    name: string,
-    id?: number,
+    name: string
+    id?: number
 }
 
 interface Props {
-    roleplayId?: string,
+    roleplayId?: string
 }
 
 const props = defineProps<Props>()
@@ -20,12 +20,13 @@ const { showSuccess } = useSnackBar()
 const supabase = useSupabaseClient<Database>()
 
 const loading = ref(false)
-const channels = ref<Channel[]>([]);
+const channels = ref<Channel[]>([])
 const displayDeleteModal = ref(false)
 const selectedChannel = ref<Channel>({} as Channel)
 
-const fetchChannels = async() => {
-    if (!props.roleplayId) return
+async function fetchChannels() {
+    if (!props.roleplayId)
+        return
 
     loading.value = true
     const { data } = await supabase
@@ -34,19 +35,20 @@ const fetchChannels = async() => {
         .eq('private', false)
         .eq('roleplay_id', props.roleplayId)
 
-    if (data) channels.value = data
+    if (data)
+        channels.value = data
 
     loading.value = false
 }
 
-const addChannel = () => {
+function addChannel() {
     channels.value.push({ name: '' })
 }
 
-const submit = async() => {
+async function submit() {
     loading.value = true
     await useFetch('/api/channels/update', {
-        body: channels.value.map((c) => ({
+        body: channels.value.map(c => ({
             roleplay_id: props.roleplayId,
             ...c,
         })),
@@ -54,32 +56,30 @@ const submit = async() => {
     })
 
     loading.value = false
-    showSuccess(t('updateConfirmed', { thing: t('pages.roleplays.channel.self')}))
+    showSuccess(t('updateConfirmed', { thing: t('pages.roleplays.channel.self') }))
 }
 
-const removeChannel = (i: number) => {
-    if ('id' in channels.value[i]) {
+function removeChannel(i: number) {
+    if ('id' in channels.value[i])
         selectedChannel.value = channels.value[i]
-    } else {
+    else
         channels.value.splice(i, 1)
-    }
 }
 
-const deleteChannel = async() => {
+async function deleteChannel() {
     await useFetch('/api/channels/remove', {
         body: { id: selectedChannel.value.id },
         method: 'DELETE',
     })
 
     displayDeleteModal.value = false
-    channels.value = channels.value.filter((r) => r.id !== selectedChannel.value.id)
-
+    channels.value = channels.value.filter(r => r.id !== selectedChannel.value.id)
 }
 
 watch(() => props.roleplayId, (value) => {
-    if (value) fetchChannels()
+    if (value)
+        fetchChannels()
 })
-
 </script>
 
 <template>
@@ -128,17 +128,17 @@ watch(() => props.roleplayId, (value) => {
                     </VRow>
                 </VContainer>
                 <div class="d-flex justify-center">
-                <VBtn
-                    color="blue"
-                    variant="outlined"
-                    rounded="xl"
-                    prepend-icon="mdi-plus-circle-outline"
-                    class="mt-4"
-                    @click="addChannel"
-                >
-                    {{ t('pages.roleplays.form.channel_add') }}
-                </VBtn>
-            </div>
+                    <VBtn
+                        color="blue"
+                        variant="outlined"
+                        rounded="xl"
+                        prepend-icon="mdi-plus-circle-outline"
+                        class="mt-4"
+                        @click="addChannel"
+                    >
+                        {{ t('pages.roleplays.form.channel_add') }}
+                    </VBtn>
+                </div>
             </VCardText>
             <VCardActions>
                 <VSpacer />
@@ -168,8 +168,8 @@ watch(() => props.roleplayId, (value) => {
                         {{ t('form.cancel') }}
                     </VBtn>
                     <VBtn
-                        @click="deleteChannel"
                         color="red"
+                        @click="deleteChannel"
                     >
                         {{ t('form.delete') }}
                     </VBtn>

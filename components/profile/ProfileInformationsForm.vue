@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { Database} from "~/types/supabase"
 import { useForm, useIsFormValid } from 'vee-validate'
+import type { Database } from '~/types/supabase'
 import { vuetifyConfig } from '~/composables/vuetifyConfig'
 import useSnackBar from '~/composables/snackbar'
 
 interface UserData {
-    email: string,
-    username: string,
-    description: string | null,
+    email: string
+    username: string
+    description: string | null
 }
 
 const { t } = useI18n()
@@ -18,7 +18,7 @@ const { showSuccess } = useSnackBar()
 const { defineField, setValues, handleSubmit } = useForm<UserData>({
     validationSchema: {
         username: 'min:4|required',
-    }
+    },
 })
 
 const formValid = useIsFormValid()
@@ -29,7 +29,7 @@ const [description, descriptionProps] = defineField('description', vuetifyConfig
 
 const loading = ref(false)
 
-onMounted(async() => {
+onMounted(async () => {
     loading.value = true
     const { data } = await supabase
         .from('users')
@@ -37,9 +37,9 @@ onMounted(async() => {
         .eq('session_id', session.value!.id)
         .single()
 
-    if (data) {
+    if (data)
         setValues(data)
-    }
+
     loading.value = false
 })
 

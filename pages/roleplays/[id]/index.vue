@@ -2,19 +2,19 @@
 import type { Roleplay } from '~/types/models'
 import type { Database } from '~/types/supabase'
 import { useCurrentUser } from '~/composables/currentUser'
-import RpRegisterForm from "~/components/rp/RpRegisterForm.vue";
+import RpRegisterForm from '~/components/rp/RpRegisterForm.vue'
 
 interface RPDetail extends Omit<Roleplay, 'roles'> {
     roles: {
-        id: number,
-        name: string,
-        description: string,
-        max_users: number,
+        id: number
+        name: string
+        description: string
+        max_users: number
         characters: any[]
-    }[],
+    }[]
     user: {
-        id: number,
-        username: string,
+        id: number
+        username: string
     } | null
 }
 
@@ -44,32 +44,30 @@ const { data: rpData, error } = await supabase
     .eq('id', params.id)
     .single()
 
-if (error || rpData === null) {
+if (error || rpData === null)
     await router.push('/?notfound=1')
-}
 
-if (rpData) roleplay.value = rpData
+if (rpData)
+    roleplay.value = rpData
 
 useHead({
     title: roleplay.value.title,
 })
 
 onMounted(() => {
-    if ('created' in query) {
+    if ('created' in query)
         created.value = true
-    } else if ('updated' in query) {
+    else if ('updated' in query)
         updated.value = true
-    }
 })
 
-const getAvailableSlots = (max: number, current: number) => {
-    const total =  max - current
+function getAvailableSlots(max: number, current: number) {
+    const total = max - current
 
     return total < 9
-    ? `mdi-numeric-${total}-circle`
-    : 'mdi-numeric-9-plus-circle'
+        ? `mdi-numeric-${total}-circle`
+        : 'mdi-numeric-9-plus-circle'
 }
-
 </script>
 
 <template>
@@ -130,7 +128,9 @@ const getAvailableSlots = (max: number, current: number) => {
         <VContainer>
             <VRow>
                 <VCol>
-                    <h2 class="text-h4">{{ t('pages.roleplays.form.role', 2) }}</h2>
+                    <h2 class="text-h4">
+                        {{ t('pages.roleplays.form.role', 2) }}
+                    </h2>
                 </VCol>
             </VRow>
             <VRow>
