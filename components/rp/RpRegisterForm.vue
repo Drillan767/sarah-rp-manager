@@ -324,27 +324,6 @@ watch(selectedCharacter, (value) => {
                     </VCardText>
                 </VCard>
             </template>
-            <!--            <VStepperHeader>
-                <VStepperItem
-                    :complete="currentStep > 1"
-                    :title="t('pages.roleplays.registration.step1')"
-                    :subtitle="roleplay.roles.find((r) => r.id === characterForm.role_id)?.name ?? undefined"
-                    value="1"
-                />
-                <VDivider />
-                <VStepperItem
-                    :complete="currentStep > 2"
-                    :title="t('pages.roleplays.registration.step2')"
-                    subtitle="On verra bien"
-                    value="2"
-                />
-                <VDivider />
-                <VStepperItem
-                    :title="t('pages.roleplays.registration.step3')"
-                    subtitle="On verra bien"
-                    value="2"
-                />
-            </VStepperHeader> -->
 
             <template #actions>
                 <div class="v-stepper-actions">
@@ -386,8 +365,6 @@ watch(selectedCharacter, (value) => {
                 :cover="true"
             />
         </VDialog>
-        <AuthModale
-            v-model:show="showAuthModale"
-        />
+        <RpAuthModale v-model:show="showAuthModale" />
     </VDialog>
 </template>

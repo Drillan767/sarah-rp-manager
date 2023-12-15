@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { useForm, useFieldArray, useIsFormValid } from 'vee-validate'
 import type { Database } from '~/types/supabase'
-import useValidation from '~/composables/useValidation'
+import { vuetifyConfig } from '~/composables/vuetifyConfig'
 import useSnackBar from '~/composables/snackbar'
 
 interface Channel {
@@ -15,14 +16,23 @@ interface Props {
 const props = defineProps<Props>()
 
 const { t } = useI18n()
-const { requiredRule, maxLengthRule } = useValidation()
 const { showSuccess } = useSnackBar()
 const supabase = useSupabaseClient<Database>()
 
 const loading = ref(false)
-const channels = ref<Channel[]>([])
+// const channels = ref<Channel[]>([])
 const displayDeleteModal = ref(false)
 const selectedChannel = ref<Channel>({} as Channel)
+
+const { defineField, setValues } = useForm<Channel[]>({
+    validationSchema: {
+        name: 'required|max:25',
+    },
+})
+
+const { push, fields: channels } = useFieldArray('channels')
+
+// const [name, nameProps] = defineField('name', vuetifyConfig)
 
 async function fetchChannels() {
     if (!props.roleplayId)
@@ -36,14 +46,15 @@ async function fetchChannels() {
         .eq('roleplay_id', props.roleplayId)
 
     if (data)
-        channels.value = data
+        setValues(data)
+    // channels.value = data
 
     loading.value = false
 }
 
-function addChannel() {
+/* function addChannel() {
     channels.value.push({ name: '' })
-}
+} */
 
 async function submit() {
     loading.value = true
@@ -106,11 +117,8 @@ watch(() => props.roleplayId, (value) => {
                                     <VRow>
                                         <VCol cols="10">
                                             <VTextField
-                                                v-model="channel.name"
+                                                v-model="channel.value"
                                                 :label="t('pages.roleplays.form.channel_name')"
-                                                :rules="[requiredRule, maxLengthRule(channel.name, 25)]"
-                                                variant="outlined"
-                                                color="primary"
                                             />
                                         </VCol>
                                         <VCol cols="2">
@@ -134,7 +142,7 @@ watch(() => props.roleplayId, (value) => {
                         rounded="xl"
                         prepend-icon="mdi-plus-circle-outline"
                         class="mt-4"
-                        @click="addChannel"
+                        @click="push"
                     >
                         {{ t('pages.roleplays.form.channel_add') }}
                     </VBtn>
