@@ -12,6 +12,14 @@ export default defineNuxtPlugin((nuxtApp) => {
                 variant: 'outlined',
                 color: 'primary',
             },
+            VSelect: {
+                variant: 'outlined',
+                color: 'primary',
+            },
+            VFileInput: {
+                variant: 'outlined',
+                color: 'primary',
+            },
         },
     })
 

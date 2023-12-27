@@ -1,8 +1,8 @@
 <script setup lang="ts">
-const props = defineProps<{ show: boolean }>()
+const props = defineProps<{ modelValue: boolean }>()
 
 const emit = defineEmits<{
-    (e: 'update:show', value: boolean): void
+    (e: 'update:modelValue', value: boolean): void
 }>()
 const { t } = useI18n()
 
@@ -10,8 +10,8 @@ const action = ref<'login' | 'register'>('login')
 const loading = ref(false)
 
 const showProxy = computed({
-    get: () => props.show,
-    set: value => emit('update:show', value),
+    get: () => props.modelValue,
+    set: value => emit('update:modelValue', value),
 })
 
 function authSuccessful() {

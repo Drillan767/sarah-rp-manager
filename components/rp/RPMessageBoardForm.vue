@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useForm } from 'vee-validate'
 import type { Database } from '~/types/supabase'
 import { vuetifyConfig } from '~/composables/vuetifyConfig'
 import useSnackBar from '~/composables/snackbar'

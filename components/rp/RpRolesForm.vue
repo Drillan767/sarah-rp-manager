@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import RpRole from './RpRole.vue'
 import type { CreatedRole, Role } from '~/types/models'
-import useValidation from '~/composables/useValidation'
 
 interface Props {
     edit: boolean
@@ -15,7 +15,6 @@ const emit = defineEmits<{
     (e: 'update:roles', value: (CreatedRole | Role)[]): void
 }>()
 const { t } = useI18n()
-const { requiredRule, minValueRule } = useValidation()
 
 const rolesProxy = computed({
     get: () => props.roles,
@@ -54,58 +53,15 @@ function removeRole(i: number) {
             <VContainer>
                 <VRow>
                     <VCol
-                        v-for="(role, i) in rolesProxy"
+                        v-for="(_, i) in rolesProxy"
                         :key="i"
                         cols="12"
                         md="6"
                     >
-                        <VContainer>
-                            <VRow
-                                :dense="true"
-                            >
-                                <VCol cols="6">
-                                    <VTextField
-                                        v-model="role.name"
-                                        :label="t('pages.roleplays.form.roles_name')"
-                                        variant="outlined"
-                                        color="primary"
-                                        :rules="[requiredRule]"
-                                    />
-                                </VCol>
-                                <VCol cols="3">
-                                    <VTextField
-                                        v-model="role.max_users"
-                                        :label="t('pages.roleplays.form.roles_max_nb')"
-                                        variant="outlined"
-                                        type="number"
-                                        color="primary"
-                                        :rules="[minValueRule(1, role.max_users)]"
-                                    />
-                                </VCol>
-                                <VCol
-                                    cols="3"
-                                    class="d-flex justify-end"
-                                >
-                                    <VBtn
-                                        icon="mdi-trash-can-outline"
-                                        color="error"
-                                        variant="flat"
-                                        @click="removeRole(i)"
-                                    />
-                                </VCol>
-                                <VCol cols="12">
-                                    <VTextarea
-                                        v-model="role.description"
-                                        label="Description"
-                                        variant="outlined"
-                                        rows="2"
-                                        :rules="[requiredRule]"
-                                        :auto-grow="true"
-                                        color="primary"
-                                    />
-                                </VCol>
-                            </VRow>
-                        </VContainer>
+                        <RpRole
+                            v-model="rolesProxy[i]"
+                            @remove="removeRole(i)"
+                        />
                     </VCol>
                 </VRow>
             </VContainer>

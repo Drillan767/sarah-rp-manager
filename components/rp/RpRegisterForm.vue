@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import Step1 from './register/Step1.vue'
+import ReuseCharacterForm from './register/ReuseCharacterForm.vue'
+import CreateCharacterForm from './register/CreateCharacterForm.vue'
 import type { Database } from '~/types/supabase'
 import type { Roleplay } from '~/types/models'
 import useSnackBar from '~/composables/snackbar'
 import { useCurrentUser } from '~/composables/currentUser'
-import useValidation from '~/composables/useValidation'
 
 interface RoleDetail {
     id: number
@@ -43,31 +45,19 @@ const props = defineProps<{
     show: boolean
 }>()
 
-const emit = defineEmits<{
-    (e: 'close'): void
-}>()
-
 const { t } = useI18n()
 const supabase = useSupabaseClient<Database>()
 const currentUser = useCurrentUser()
-const { requiredRule, imageRule } = useValidation()
 const { showSuccess } = useSnackBar()
 
-const showAuthModale = ref(false)
-const currentStep = ref(1)
-const preview = ref('')
-const showPreviewModal = ref(false)
-const loading = ref(false)
+const creationDecision = ref<'reuse' | 'create'>('reuse')
 const userCharacters = ref<UserCharacter[]>([])
 const selectedCharacter = ref<UserCharacter>()
-const creationDecision = ref<'reuse' | 'create'>('reuse')
-const formValid = ref<boolean>()
-
-const steps = [
-    t('pages.roleplays.registration.step1'),
-    t('pages.roleplays.registration.step2'),
-    t('pages.roleplays.registration.step3'),
-]
+const showAuthModale = ref(false)
+const formValid = ref(false)
+const currentStep = ref(1)
+const preview = ref('')
+const loading = ref(false)
 
 const characterForm = ref<CharacterFormType>({
     name: '',
@@ -77,40 +67,21 @@ const characterForm = ref<CharacterFormType>({
     status: 0,
 })
 
-const cantProceed = computed(() => {
-    if (currentStep.value === 1)
-        return [undefined, 0].includes(characterForm.value.role_id)
-    if (currentStep.value === 2) {
-        return creationDecision.value === 'create'
-            ? characterForm.value.name === '' || characterForm.value.description === '' || characterForm.value.illustration === null
-            : selectedCharacter.value === undefined || !('id' in selectedCharacter.value)
-    }
+const steps = [
+    t('pages.roleplays.registration.step1'),
+    t('pages.roleplays.registration.step2'),
+    t('pages.roleplays.registration.step3'),
+]
 
-    return false
-})
+async function fetchCharactersList() {
+    const { data } = await supabase
+        .from('characters')
+        .select('*')
+        .eq('user_id', currentUser.value.id)
 
-onMounted(() => {
-    if (currentUser.value.id === 0)
-        showAuthModale.value = true
-})
-
-function roleUnavailble(role: RoleDetail) {
-    if (role.max_users - role.characters[0] === 0)
-        return true
-
-    const characterRolesId = userCharacters.value.map(uc => uc.role_id)
-    const rpRolesId = props.roleplay.roles.map(r => r.id)
-    const commonIds = characterRolesId.filter(x => rpRolesId.includes(x))
-
-    return commonIds.includes(role.id)
-}
-
-function handleImage(e: Event) {
-    const files = (e.target as HTMLInputElement).files
-
-    if (files) {
-        preview.value = URL.createObjectURL(files[0])
-        characterForm.value.illustration = files[0]
+    if (data) {
+        userCharacters.value = data
+        selectedCharacter.value = data[0]
     }
 }
 
@@ -141,31 +112,10 @@ async function submit() {
     showSuccess(t('pages.roleplays.registration.success'))
 }
 
-function close() {
-    emit('close')
-    currentStep.value = 1
-    preview.value = ''
-    userCharacters.value = []
-    characterForm.value = {
-        name: '',
-        description: '',
-        role_id: 0,
-        illustration: null,
-        status: 0,
-    }
-}
-
-async function fetchCharactersList() {
-    const { data } = await supabase
-        .from('characters')
-        .select('*')
-        .eq('user_id', currentUser.value.id)
-
-    if (data) {
-        userCharacters.value = data
-        selectedCharacter.value = data[0]
-    }
-}
+onMounted(() => {
+    if (currentUser.value.id === 0)
+        showAuthModale.value = true
+})
 
 watch(() => props.show, async (value) => {
     if (value)
@@ -175,14 +125,6 @@ watch(() => props.show, async (value) => {
 watch(currentUser, async (value) => {
     if (value.id !== 0)
         await fetchCharactersList()
-})
-
-watch(selectedCharacter, (value) => {
-    if (value) {
-        preview.value = value.illustration
-        characterForm.value.name = value.name
-        characterForm.value.description = value.description
-    }
 })
 </script>
 
@@ -198,111 +140,52 @@ watch(selectedCharacter, (value) => {
             :next-text="t('pages.roleplays.registration.next')"
         >
             <template #item.1>
-                <VItemGroup
+                <Step1
                     v-model="characterForm.role_id"
-                    :mandatory="true"
-                >
-                    <VItem
-                        v-for="(role, i) in roleplay.roles"
-                        :key="i"
-                        v-slot="{ isSelected, toggle }"
-                        :value="role.id"
-                    >
-                        <VCard
-                            color="blue"
-                            :variant="isSelected ? 'flat' : 'outlined' "
-                            :disabled="roleUnavailble(role)"
-                            class="mb-2"
-                            @click="toggle"
-                        >
-                            <template #title>
-                                {{ role.name }}
-                            </template>
-                            <template #text>
-                                {{ role.description }}
-                            </template>
-                        </VCard>
-                    </VItem>
-                </VItemGroup>
+                    v-model:form-valid="formValid"
+                    :roles="roleplay.roles"
+                    :characters="userCharacters"
+                />
             </template>
 
             <template #item.2>
-                <div class="d-flex mb-4 justify-space-around ">
-                    <VBtn
-                        :variant="creationDecision === 'reuse' ? 'outlined' : undefined"
-                        @click="creationDecision = 'reuse'"
-                    >
-                        {{ t('pages.roleplays.registration.reuse') }}
-                    </VBtn>
-                    <VBtn
-                        :variant="creationDecision === 'create' ? 'outlined' : undefined"
-                        @click="creationDecision = 'create'"
-                    >
-                        {{ t('pages.roleplays.registration.create') }}
-                    </VBtn>
-                </div>
-                <VForm
-                    v-if="creationDecision === 'create'"
-                    v-model="formValid"
+                <VItemGroup
+                    v-model="creationDecision"
+                    class="d-flex justify-space-evenly"
+                    :mandatory="true"
                 >
-                    <VTextField
-                        v-model="characterForm.name"
-                        :label="t('fields.name')"
-                        color="primary"
-                        variant="outlined"
-                        :rules="[requiredRule]"
-                    />
-
-                    <div class="d-flex">
-                        <VFileInput
-                            :class="{ 'mr-5': preview !== '' }"
-                            label="Illustration"
-                            color="primary"
-                            variant="outlined"
-                            accept="image/*"
-                            :clearable="true"
-                            prepend-icon="mdi-image-album"
-                            :rules="[imageRule(false, characterForm.illustration)]"
-                            hint="max: 2 mb"
-                            @change="handleImage"
-                        />
-                        <VBtn
-                            v-if="preview !== ''"
-                            color="primary"
-                            variant="outlined"
-                            icon="mdi-image-area"
-                            @click.prevent="showPreviewModal = true"
-                        />
-                    </div>
-                    <VTextarea
-                        v-model="characterForm.description"
-                        label="Description"
-                        variant="outlined"
-                        :auto-grow="true"
-                        rows="2"
-                        color="primary"
-                    />
-                </VForm>
-                <div v-if="creationDecision === 'reuse'">
-                    <VSelect
-                        v-model="selectedCharacter"
-                        variant="outlined"
-                        label="Personnage existant"
-                        :items="userCharacters"
-                        :return-object="true"
-                        item-title="name"
-                        item-value="id"
-                        :no-data-text="t('pages.roleplays.registration.no_character')"
-                        :rules="[requiredRule]"
+                    <VItem
+                        v-slot="{ isSelected, toggle }"
+                        value="reuse"
                     >
-                        <template #item="{ props: select, item }">
-                            <VListItem
-                                v-bind="select"
-                                :prepend-avatar="item.raw.illustration"
-                            />
-                        </template>
-                    </VSelect>
-                </div>
+                        <VBtn
+                            :variant="isSelected ? 'outlined' : undefined"
+                            @click="toggle"
+                        >
+                            {{ t('pages.roleplays.registration.reuse') }}
+                        </VBtn>
+                    </VItem>
+                    <VItem
+                        v-slot="{ isSelected, toggle }"
+                        value="create"
+                    >
+                        <VBtn
+                            :variant="isSelected ? 'outlined' : undefined"
+                            @click="toggle"
+                        >
+                            {{ t('pages.roleplays.registration.create') }}
+                        </VBtn>
+                    </VItem>
+                </VItemGroup>
+                <ReuseCharacterForm
+                    v-if="creationDecision === 'reuse'"
+                    v-model:form-valid="formValid"
+                    :characters="userCharacters"
+                />
+                <CreateCharacterForm
+                    v-if="creationDecision === 'create'"
+                    v-model:form-valid="formValid"
+                />
             </template>
             <template #item.3>
                 <VCard elevation="2">
@@ -337,7 +220,7 @@ watch(selectedCharacter, (value) => {
                     <VBtn
                         v-if="currentStep < 3"
                         :tonal="true"
-                        :disabled="currentStep === steps.length || cantProceed || formValid === false"
+                        :disabled="currentStep === steps.length || formValid === false"
                         @click="currentStep++"
                     >
                         {{ t('pages.roleplays.registration.next') }}
@@ -354,17 +237,6 @@ watch(selectedCharacter, (value) => {
                 </div>
             </template>
         </VStepper>
-        <VDialog
-            v-model="showPreviewModal"
-            max-width="600"
-        >
-            <VImg
-                :src="preview"
-                :width="600"
-                aspect-ratio="16/9"
-                :cover="true"
-            />
-        </VDialog>
-        <RpAuthModale v-model:show="showAuthModale" />
+        <RpAuthModale v-model="showAuthModale" />
     </VDialog>
 </template>
