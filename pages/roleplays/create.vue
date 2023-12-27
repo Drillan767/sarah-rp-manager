@@ -6,7 +6,7 @@ interface FormType {
     start_date: string
     description: string
     public: boolean
-    illustration: File | null
+    illustration: File[] | undefined
     roles: {
         roleplay_id: string
         name: string
@@ -28,7 +28,7 @@ const form = ref<FormType>({
     start_date: '',
     description: '',
     public: true,
-    illustration: null,
+    illustration: undefined,
     roles: [
         {
             name: '',
@@ -55,7 +55,7 @@ async function submit() {
     formData.append('public', isPublic ? '1' : '0')
     formData.append('start_date', start_date)
     formData.append('description', description)
-    formData.append('illustration', illustration)
+    formData.append('illustration', illustration[0])
     formData.append('description', description)
     formData.append('user_id', currentUser.value.id.toString())
 
@@ -114,8 +114,8 @@ const links = [
             <VRow>
                 <VCol>
                     <RpForm
+                        v-model:form="form"
                         :loading="loading"
-                        :form="form"
                         :edit="false"
                     />
                 </VCol>

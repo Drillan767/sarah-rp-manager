@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useForm } from 'vee-validate'
 import useSnackBar from '~/composables/snackbar'
 
 const { t } = useI18n()
@@ -46,7 +45,7 @@ const submit = handleSubmit(async (values) => {
                         md="6"
                     >
                         <VTextField
-                            v-modem="pwd"
+                            v-model="pwd"
                             v-bind="pwdProps"
                             :label="t('fields.password')"
                             type="password"

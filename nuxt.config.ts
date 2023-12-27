@@ -48,6 +48,7 @@ export default defineNuxtConfig({
                 '/register',
                 '/forgot-password',
                 '/new-password',
+                '/roleplays',
                 '/roleplays/*',
             ],
         },

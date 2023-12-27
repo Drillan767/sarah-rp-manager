@@ -46,4 +46,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
         if (!rpFound)
             return navigateTo(`/roleplays/${to.params.id}`)
     }
+
+    if (to.name && to.name === '/my-roleplays') {
+        const supabaseUser = useSupabaseUser()
+        if (!supabaseUser.value)
+            return navigateTo('/')
+    }
 })

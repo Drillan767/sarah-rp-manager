@@ -6,7 +6,7 @@ import useSnackBar from '~/composables/snackbar'
 interface EditForm {
     title: string
     start_date: string | null
-    illustration: File | null
+    illustration: File[] | undefined
     description: string
     public: boolean
 }
@@ -30,7 +30,7 @@ const roleplay = ref<EditRoleplay>({} as EditRoleplay)
 const form = ref<EditForm>({
     title: '',
     start_date: null,
-    illustration: null,
+    illustration: undefined,
     description: '',
     public: true,
 })
@@ -89,7 +89,7 @@ async function fetchRP() {
             start_date: data.start_date,
             description: data.description,
             public: data.public,
-            illustration: null,
+            illustration: undefined,
         })
     }
 
@@ -122,7 +122,7 @@ async function saveRP() {
         formData.append('start_date', start_date)
     formData.append('description', description)
     if (illustration)
-        formData.append('illustration', illustration)
+        formData.append('illustration', illustration[0])
     formData.append('description', description)
 
     await useFetch('/api/rp/update', {

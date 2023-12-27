@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { useForm, useIsFormValid } from 'vee-validate'
 import Wysiwyg from '~/components/rp/Wysiwyg.vue'
-import useValidation from '~/composables/useValidation'
+import { vuetifyConfig } from '@/composables/vuetifyConfig'
 
 interface Props {
     loading: boolean
@@ -8,7 +9,7 @@ interface Props {
         title: string
         start_date: string | null
         description: string
-        illustration: File | null
+        illustration: File[] | undefined
         public: boolean
     }
     currentPreview?: string
@@ -18,27 +19,39 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     edit: false,
 })
+
 const emit = defineEmits<{
-    (e: 'input', value: Props['form']): void
+    (e: 'update:form', value: Props['form']): void
     (e: 'save'): void
 }>()
+
 const { t } = useI18n()
 const dayjs = useDayjs()
-const { requiredRule, imageRule, notBeforeRule } = useValidation()
+
+const { defineField } = useForm<Props['form']>({
+    validationSchema: {
+        title: 'required',
+        illustration: props.edit ? 'image|max:2000' : 'required|image|max:2000',
+        description: 'required',
+    },
+    initialValues: props.form,
+})
+
+const [title, titleProps] = defineField('title', vuetifyConfig)
+const [illustration, illustrationProps] = defineField('illustration', vuetifyConfig)
+const [startDate, startDateProps] = defineField('start_date', vuetifyConfig)
+const [description] = defineField('description', vuetifyConfig)
+const [isPublic, publicProps] = defineField('public', vuetifyConfig)
+const formValid = useIsFormValid()
 
 const minDate = dayjs().format('YYYY-MM-DDT00:00')
-
-/* const emit = defineEmits<{
-    input: [value: Props['form']],
-
-}>() */
 
 const preview = ref('')
 const showImage = ref(false)
 
 const formProxy = computed({
     get: () => props.form,
-    set: value => emit('input', value),
+    set: value => emit('update:form', value),
 })
 
 onMounted(() => {
@@ -54,7 +67,7 @@ function handleImage(e: Event) {
 
     if (files) {
         preview.value = URL.createObjectURL(files[0])
-        formProxy.value.illustration = files[0]
+        formProxy.value.illustration = Array.from(files)
     }
 }
 </script>
@@ -72,50 +85,48 @@ function handleImage(e: Event) {
                 <VRow>
                     <VCol cols="12" md="6">
                         <VTextField
-                            v-model="formProxy.title"
-                            color="primary"
-                            variant="outlined"
+                            v-bind="titleProps"
+                            v-model="title"
                             :label="t('pages.roleplays.form.title')"
-                            :rules="[requiredRule]"
                         />
                     </VCol>
                     <VCol cols="12" md="6">
                         <VTextField
-                            v-model="formProxy.start_date"
-                            color="primary"
-                            variant="outlined"
+                            v-bind="startDateProps"
+                            v-model="startDate"
                             type="date"
                             :min="minDate"
                             :label="t('pages.roleplays.form.begin')"
-                            :rules="[notBeforeRule(minDate, formProxy.start_date ?? ''), requiredRule]"
                         />
                     </VCol>
                 </VRow>
                 <VRow>
                     <VCol cols="12" md="6" class="d-flex">
                         <VFileInput
-                            :class="{ 'mr-5': preview !== '' }"
-                            label="Illustration"
-                            color="primary"
-                            variant="outlined"
+                            v-bind="illustrationProps"
+                            v-model="illustration"
                             accept="image/*"
                             :clearable="true"
-                            prepend-icon="mdi-image-album"
-                            :rules="[imageRule(edit, formProxy.illustration)]"
+                            label="Illustration"
                             hint="max: 2 mb"
                             @change="handleImage"
-                        />
-                        <VBtn
-                            v-if="preview !== ''"
-                            color="primary"
-                            variant="outlined"
-                            icon="mdi-image-area"
-                            @click.prevent="showImage = true"
-                        />
+                        >
+                            <template
+                                v-if="preview !== ''"
+                                #append
+                            >
+                                <VAvatar
+                                    :image="preview"
+                                    class="cursor-pointer"
+                                    @click.prevent="showImage = true"
+                                />
+                            </template>
+                        </VFileInput>
                     </VCol>
                     <VCol cols="12" md="6">
                         <VSwitch
-                            v-model="formProxy.public"
+                            v-bind="publicProps"
+                            v-model="isPublic"
                             color="primary"
                             :label="t('pages.roleplays.form.public')"
                             :hide-details="true"
@@ -124,7 +135,9 @@ function handleImage(e: Event) {
                 </VRow>
                 <VRow>
                     <VCol>
-                        <Wysiwyg v-model="formProxy.description" />
+                        <Wysiwyg
+                            v-model="description"
+                        />
                     </VCol>
                 </VRow>
                 <VDialog
@@ -144,6 +157,7 @@ function handleImage(e: Event) {
             <VSpacer />
             <VBtn
                 color="primary"
+                :disabled="!formValid"
                 @click.prevent="emit('save')"
             >
                 {{ t('form.save') }}
