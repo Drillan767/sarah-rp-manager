@@ -21,7 +21,7 @@ useHead({
 })
 
 watch(currentUser, async (value) => {
-    if (value.id !== 0) {
+    if (value.id && value.id !== 0) {
         const { data } = await supabase
             .from('roleplays')
             .select(`

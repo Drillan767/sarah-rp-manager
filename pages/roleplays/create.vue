@@ -7,12 +7,6 @@ interface FormType {
     description: string
     public: boolean
     illustration: File[] | undefined
-    roles: {
-        roleplay_id: string
-        name: string
-        max_users: number
-        description: string
-    }[]
 }
 
 const { t } = useI18n()
@@ -29,21 +23,22 @@ const form = ref<FormType>({
     description: '',
     public: true,
     illustration: undefined,
-    roles: [
-        {
-            name: '',
-            max_users: 1,
-            description: '',
-            roleplay_id: '',
-
-        },
-    ],
 })
+
+const roles = ref([
+    {
+        name: '',
+        max_users: 1,
+        description: '',
+        roleplay_id: '',
+
+    },
+])
 
 const loading = ref(false)
 
 async function submit() {
-    const { title, public: isPublic, start_date, description, illustration, roles } = form.value
+    const { title, public: isPublic, start_date, description, illustration } = form.value
 
     if (!illustration)
         return
@@ -68,7 +63,7 @@ async function submit() {
     // Store related roles.
     await useFetch('/api/roles/create', {
         method: 'POST',
-        body: roles.map(r => ({
+        body: roles.value.map(r => ({
             ...r,
             roleplay_id: data.value,
         })),
@@ -123,8 +118,8 @@ const links = [
             <VRow>
                 <VCol>
                     <RpRolesForm
+                        v-model:roles="roles"
                         :loading="loading"
-                        :roles="form.roles"
                         :edit="false"
                     />
                 </VCol>

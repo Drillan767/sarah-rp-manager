@@ -28,7 +28,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const dayjs = useDayjs()
 
-const { defineField } = useForm<Props['form']>({
+const { defineField, setValues, controlledValues } = useForm<Props['form']>({
     validationSchema: {
         title: 'required',
         illustration: props.edit ? 'image|max:2000' : 'required|image|max:2000',
@@ -49,16 +49,10 @@ const minDate = dayjs().format('YYYY-MM-DDT00:00')
 const preview = ref('')
 const showImage = ref(false)
 
-const formProxy = computed({
-    get: () => props.form,
-    set: value => emit('update:form', value),
-})
-
 onMounted(() => {
     if (props.edit) {
         if (props.currentPreview)
             preview.value = props.currentPreview
-        formProxy.value.start_date = dayjs(formProxy.value.start_date).format('YYYY-MM-DD')
     }
 })
 
@@ -67,8 +61,33 @@ function handleImage(e: Event) {
 
     if (files) {
         preview.value = URL.createObjectURL(files[0])
-        formProxy.value.illustration = Array.from(files)
+        setValues({
+            illustration: Array.from(files),
+        })
     }
+}
+
+watch(illustration, (value) => {
+    if (!value || value.length === 0)
+        preview.value = ''
+})
+
+watch(() => props.form, (newVal, oldVal) => {
+    if (oldVal.title === '' && newVal.title.length > 0) {
+        const { start_date, ...fields } = newVal
+        setValues({
+            ...fields,
+            start_date: dayjs(start_date).format('YYYY-MM-DD'),
+        })
+        if (props.currentPreview)
+            preview.value = props.currentPreview
+    }
+})
+
+watch(controlledValues, value => emit('update:form', value))
+
+function submit() {
+    emit('save')
 }
 </script>
 
@@ -158,7 +177,7 @@ function handleImage(e: Event) {
             <VBtn
                 color="primary"
                 :disabled="!formValid"
-                @click.prevent="emit('save')"
+                @click.prevent="submit"
             >
                 {{ t('form.save') }}
             </VBtn>

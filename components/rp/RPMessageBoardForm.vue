@@ -61,15 +61,13 @@ watch(() => props.message, value => setValues({ message: value }))
                     {{ t('form.edit') }} {{ t('pages.roleplays.form.message') }}
                 </template>
                 <template #text>
-                    <VForm>
-                        <VTextField
-                            v-bind="messageProps"
-                            v-model="message"
-                            label="Message"
-                            :clearable="true"
-                            :counter="255"
-                        />
-                    </VForm>
+                    <VTextField
+                        v-bind="messageProps"
+                        v-model="message"
+                        label="Message"
+                        :clearable="true"
+                        :counter="255"
+                    />
                 </template>
                 <template #actions>
                     <VSpacer />
