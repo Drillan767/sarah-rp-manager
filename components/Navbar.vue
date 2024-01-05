@@ -37,9 +37,10 @@ onMounted(async () => {
 <template>
     <VAppBar class="px-6">
         <RouterLink to="/">
-            <VAvatar :tile="true">
-                <VImg src="/sarah.jpg" />
-            </VAvatar>
+            <VAvatar
+                :tile="true"
+                image="/sarah.jpg"
+            />
         </RouterLink>
         <VToolbarTitle>
             Le Jardin de Sarah
@@ -54,59 +55,38 @@ onMounted(async () => {
                     icon
                     v-bind="props"
                 >
-                    <VAvatar>
-                        <VImg
-                            src="/default-avatar.webp"
-                        />
-                    </VAvatar>
+                    <VAvatar image="/default-avatar.webp" />
                 </VBtn>
             </template>
             <VList>
-                <VListItem to="/profile">
-                    <template #prepend>
-                        <VIcon icon="mdi-account" />
-                    </template>
-                    <VListItemTitle>
-                        {{ t('account.self') }}
-                    </VListItemTitle>
-                </VListItem>
-                <VListItem to="/roleplays">
-                    <template #prepend>
-                        <VIcon icon="mdi-book-open-page-variant-outline" />
-                    </template>
-                    <VListItemTitle>
-                        {{ t('pages.roleplays.navlink') }}
-                    </VListItemTitle>
-                </VListItem>
+                <VListItem
+                    to="/profile"
+                    prepend-icon="mdi-account"
+                    :title="t('account.self')"
+                />
+                <VListItem
+                    to="/my-roleplays"
+                    prepend-icon="mdi-book-open-page-variant-outline"
+                    :title="t('pages.roleplays.navlink')"
+                />
                 <VListItem
                     v-if="currentUser.superadmin"
                     to="/administration"
-                >
-                    <template #prepend>
-                        <VIcon icon="mdi-security" />
-                    </template>
-                    <VListItemTitle>
-                        Administration
-                    </VListItemTitle>
-                </VListItem>
+                    prepend-icon="mdi-security"
+                    title="Administration"
+                />
                 <VDivider />
-                <VListItem @click="logout">
-                    <template #prepend>
-                        <VIcon icon="mdi-logout" />
-                    </template>
-                    <VListItemTitle>
-                        {{ t('account.logout') }}
-                    </VListItemTitle>
-                </VListItem>
+                <VListItem
+                    prepend-icon="mdi-logout"
+                    :title="t('account.logout')"
+                    @click="logout"
+                />
                 <VDivider />
-                <VListItem @click="switchTheme">
-                    <template #prepend>
-                        <VIcon :icon="theme.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'" />
-                    </template>
-                    <VListItemTitle>
-                        {{ t(theme.current.value.dark ? 'account.light' : 'account.dark') }}
-                    </VListItemTitle>
-                </VListItem>
+                <VListItem
+                    :prepend-icon="theme.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'"
+                    :title="t(theme.current.value.dark ? 'account.light' : 'account.dark')"
+                    @click="switchTheme"
+                />
             </VList>
         </VMenu>
         <VBtn

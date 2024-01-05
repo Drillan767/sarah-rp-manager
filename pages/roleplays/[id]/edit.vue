@@ -22,7 +22,6 @@ const { params } = route
 const tabs = ref(2)
 const loadingRP = ref(false)
 const loadingRoles = ref(false)
-const loading = ref(false)
 const displayDeleteModale = ref(false)
 const roles = ref<Role[]>([])
 const roleDeleting = ref<Role>({} as Role)
@@ -246,13 +245,6 @@ const links = computed(() => ([
                 @click.prevent="deleteRoleplay"
             >
                 {{ t('form.delete') }}
-            </VBtn>
-            <VBtn
-                color="primary"
-                type="submit"
-                :disabled="loading"
-            >
-                {{ t('form.save') }}
             </VBtn>
         </div>
         <VDialog
