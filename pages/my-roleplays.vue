@@ -20,22 +20,27 @@ useHead({
     title: t('pages.roleplays.navlink'),
 })
 
-watch(currentUser, async (value) => {
-    if (value.id && value.id !== 0) {
-        const { data } = await supabase
-            .from('roleplays')
-            .select(`
-                id,
-                title,
-                illustration,
-                public,
-                start_date
-            `)
-            .eq('user_id', value.id)
+async function fetchRPs() {
+    const { data } = await supabase
+        .from('roleplays')
+        .select(`
+            id,
+            title,
+            illustration,
+            public,
+            start_date
+        `)
+        .eq('user_id', currentUser.value.id)
 
-        if (data)
-            roleplays.value = data
-    }
+    if (data)
+        roleplays.value = data
+}
+
+onMounted(async () => await fetchRPs())
+
+watch(currentUser, async (value) => {
+    if (value.id && value.id !== 0)
+        await fetchRPs()
 })
 </script>
 
