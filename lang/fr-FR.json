@@ -153,6 +153,8 @@
                 "self": "Canaux de discussion"
             },
             "delete": {
+                "rp": "Confirmer la suppression du roleplay ?",
+                "rp_message": "La suppression du roleplay supprimera également les personnages inscrits, rôles, conversations et canaux de conversation liés.\n Confirmer ?",
                 "role": "Confirmer la suppression du rôle ?",
                 "role_message": "La suppression du rôle {role} est irréversible, et chacun des personnages liés à celui-ci le seront également.\n Confirmer ?",
                 "channel": "Confirmer la suppression du canal de discussion ?",

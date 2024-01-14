@@ -35,14 +35,16 @@ interface UserCharacter {
 interface CharacterFormType {
     name: string
     description: string
-    role_id: number
-    illustration: File | null
-    status: number
+    illustration: File[] | undefined
 }
 
 const props = defineProps<{
     roleplay: RPDetail
     show: boolean
+}>()
+
+const emit = defineEmits<{
+    (e: 'close'): void
 }>()
 
 const { t } = useI18n()
@@ -58,13 +60,12 @@ const formValid = ref(false)
 const currentStep = ref(1)
 const preview = ref('')
 const loading = ref(false)
+const roleId = ref(0)
 
 const characterForm = ref<CharacterFormType>({
     name: '',
     description: '',
-    role_id: 0,
-    illustration: null,
-    status: 0,
+    illustration: undefined,
 })
 
 const steps = [
@@ -92,11 +93,11 @@ async function submit() {
     formData.append('name', characterForm.value.name)
     formData.append('description', characterForm.value.description)
     formData.append('user_id', currentUser.value.id.toString())
-    formData.append('role_id', characterForm.value.role_id.toString())
+    formData.append('role_id', roleId.value.toString())
     formData.append('status', '0')
 
     if (creationDecision.value === 'create' && characterForm.value.illustration)
-        formData.append('illustration', characterForm.value.illustration)
+        formData.append('illustration', characterForm.value.illustration[0])
 
     else
         formData.append('illustration', preview.value)
@@ -108,23 +109,26 @@ async function submit() {
 
     loading.value = false
 
-    close()
+    emit('close')
     showSuccess(t('pages.roleplays.registration.success'))
 }
-
-onMounted(() => {
-    if (currentUser.value.id === 0)
-        showAuthModale.value = true
-})
 
 watch(() => props.show, async (value) => {
     if (value)
         await fetchCharactersList()
+
+    if (currentUser.value.id === 0)
+        showAuthModale.value = true
 })
 
 watch(currentUser, async (value) => {
     if (value.id !== 0)
         await fetchCharactersList()
+})
+
+watch(characterForm, (value) => {
+    if (value.illustration)
+        preview.value = URL.createObjectURL(value.illustration[0])
 })
 </script>
 
@@ -141,7 +145,7 @@ watch(currentUser, async (value) => {
         >
             <template #item.1>
                 <Step1
-                    v-model="characterForm.role_id"
+                    v-model="roleId"
                     v-model:form-valid="formValid"
                     :roles="roleplay.roles"
                     :characters="userCharacters"
@@ -180,10 +184,13 @@ watch(currentUser, async (value) => {
                 <ReuseCharacterForm
                     v-if="creationDecision === 'reuse'"
                     v-model:form-valid="formValid"
+                    v-model:character="characterForm"
+                    v-model:preview="preview"
                     :characters="userCharacters"
                 />
                 <CreateCharacterForm
                     v-if="creationDecision === 'create'"
+                    v-model:character="characterForm"
                     v-model:form-valid="formValid"
                 />
             </template>
@@ -200,7 +207,7 @@ watch(currentUser, async (value) => {
                         </VCardTitle>
                     </VImg>
                     <v-card-subtitle class="pt-4">
-                        {{ roleplay.roles.find((r) => r.id === characterForm.role_id)?.name ?? '' }}
+                        {{ roleplay.roles.find((r) => r.id === roleId)?.name ?? '' }}
                     </v-card-subtitle>
                     <VCardText>
                         {{ characterForm.description }}
@@ -237,6 +244,8 @@ watch(currentUser, async (value) => {
                 </div>
             </template>
         </VStepper>
-        <RpAuthModale v-model="showAuthModale" />
+        <RpAuthModale
+            v-model="showAuthModale"
+        />
     </VDialog>
 </template>

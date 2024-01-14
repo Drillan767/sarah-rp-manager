@@ -153,6 +153,8 @@
                 "self": "Discussion channels"
             },
             "delete": {
+                "rp": "Confirm the roleplay's deletion?",
+                "rp_message": "Deleting the roleplay will also delete ",
                 "role": "Confirm the role's deletion?",
                 "role_message": "Deleting the \"{role}\" role cannot be undone, and each linked characters will also be deleted on their own.\n Confirm?",
                 "channel": "Confirme the canal's deletion?",

@@ -7,6 +7,7 @@ interface CharacterForm {
 
 const emit = defineEmits<{
     (e: 'update:formValid', value: boolean): void
+    (e: 'update:character', value: CharacterForm): void
 }>()
 
 const { t } = useI18n()
@@ -14,7 +15,7 @@ const { t } = useI18n()
 const preview = ref('')
 const showPreviewModal = ref(false)
 
-const { defineField } = useForm<CharacterForm>({
+const { defineField, controlledValues } = useForm<CharacterForm>({
     validationSchema: {
         name: 'required',
         illustration: 'image|max:2000|required',
@@ -35,6 +36,7 @@ function handleImage(e: Event) {
         preview.value = URL.createObjectURL(files[0])
 }
 
+watch(controlledValues, value => emit('update:character', value))
 watch(illustration, (value) => {
     if (!value || value.length === 0)
         preview.value = ''

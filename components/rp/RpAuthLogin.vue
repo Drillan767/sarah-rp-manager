@@ -14,12 +14,12 @@ const props = defineProps<{ loading: boolean }>()
 const emit = defineEmits<{
     (e: 'update:loading', value: boolean): void
     (e: 'login'): void
+    (e: 'cancel'): void
 }>()
 
 const currentUser = useCurrentUser()
 const { showSuccess } = useSnackBar()
 const { t } = useI18n()
-const router = useRouter()
 const supabase = useSupabaseClient<Database>()
 
 const loadingProxy = computed({
@@ -102,7 +102,7 @@ const submit = handleSubmit(async (loginForm) => {
                 <VCol class="d-flex justify-end pe-0">
                     <VBtn
                         variant="text"
-                        @click="router.push('/')"
+                        @click="emit('cancel')"
                     >
                         {{ t('form.cancel') }}
                     </VBtn>

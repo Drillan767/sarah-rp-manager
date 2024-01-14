@@ -14,7 +14,11 @@ interface Props {
 
 defineProps<Props>()
 
-const emit = defineEmits<{ (e: 'update:formValid', value: boolean): void }>()
+const emit = defineEmits<{
+    (e: 'update:formValid', value: boolean): void
+    (e: 'update:preview', value: string): void
+    (e: 'update:character', value: { name: string, description: string }): void
+}>()
 
 const { t } = useI18n()
 
@@ -28,6 +32,12 @@ const [character, characterProps] = defineField('character', vuetifyConfig)
 
 const formValid = useIsFormValid()
 
+watch(character, (value) => {
+    if (value) {
+        emit('update:character', { name: value.name, description: value.description })
+        emit('update:preview', value.illustration)
+    }
+})
 watch(formValid, value => emit('update:formValid', value))
 </script>
 

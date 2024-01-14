@@ -14,7 +14,7 @@ const showProxy = computed({
     set: value => emit('update:modelValue', value),
 })
 
-function authSuccessful() {
+function close() {
     showProxy.value = false
 }
 </script>
@@ -54,13 +54,15 @@ function authSuccessful() {
                     <VWindowItem value="login">
                         <RpAuthLogin
                             v-model:loading="loading"
-                            @login="authSuccessful"
+                            @login="close"
+                            @cancel="close"
                         />
                     </VWindowItem>
                     <VWindowItem value="register">
                         <RpAuthRegister
                             v-model:loading="loading"
-                            @register="authSuccessful"
+                            @register="close"
+                            @cancel="close"
                         />
                     </VWindowItem>
                 </VWindow>

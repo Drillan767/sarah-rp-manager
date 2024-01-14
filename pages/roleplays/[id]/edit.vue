@@ -15,6 +15,7 @@ type EditRoleplay = Omit<Roleplay, 'roles'>
 
 const supabase = useSupabaseClient<Database>()
 const route = useRoute()
+const router = useRouter()
 const { t } = useI18n()
 const { showSuccess } = useSnackBar()
 const { params } = route
@@ -22,7 +23,9 @@ const { params } = route
 const tabs = ref(2)
 const loadingRP = ref(false)
 const loadingRoles = ref(false)
-const displayDeleteModale = ref(false)
+const loadingDeletion = ref(false)
+const displayRpDeleteModale = ref(false)
+const displayRoleDeleteModale = ref(false)
 const roles = ref<Role[]>([])
 const roleDeleting = ref<Role>({} as Role)
 const roleplay = ref<EditRoleplay>({} as EditRoleplay)
@@ -45,16 +48,20 @@ onMounted(async () => {
 
 function handleRoleDeletion(role: Role) {
     roleDeleting.value = role
-    displayDeleteModale.value = true
+    displayRoleDeleteModale.value = true
 }
 
 async function deleteRoleplay() {
+    loadingDeletion.value = true
     await useFetch('/api/rp/remove', {
         method: 'DELETE',
         body: {
             id: roleplay.value.id,
         },
     })
+
+    loadingDeletion.value = false
+    await router.push('/my-roleplays')
 }
 
 async function deleteRole() {
@@ -66,7 +73,7 @@ async function deleteRole() {
         method: 'DELETE',
     })
 
-    displayDeleteModale.value = false
+    displayRoleDeleteModale.value = false
     roles.value = roles.value.filter(r => r.id !== roleDeleting.value.id)
     loadingRoles.value = false
 
@@ -242,31 +249,55 @@ const links = computed(() => ([
         <div class="d-flex justify-end my-4 gap-4">
             <VBtn
                 color="red"
-                @click.prevent="deleteRoleplay"
+                @click.prevent="displayRpDeleteModale = true"
             >
                 {{ t('form.delete') }}
             </VBtn>
         </div>
         <VDialog
-            v-model="displayDeleteModale"
+            v-model="displayRpDeleteModale"
             width="800"
         >
-            <VCard>
-                <template #title>
-                    {{ t('pages.roleplays.delete.role') }}
-                </template>
-                <template #text>
-                    {{ t('pages.roleplays.delete.role_message') }}
-                </template>
+            <VCard
+                :title="t('pages.roleplays.delete.rp')"
+                :text="t('pages.roleplays.delete.rp_message')"
+            >
                 <template #actions>
                     <VSpacer />
                     <VBtn
-                        @click="displayDeleteModale = false"
+                        @click="displayRpDeleteModale = false"
                     >
                         {{ t('form.cancel') }}
                     </VBtn>
                     <VBtn
                         color="red"
+                        @click="deleteRoleplay"
+                    >
+                        {{ t('form.delete') }}
+                    </VBtn>
+                </template>
+            </VCard>
+        </VDialog>
+        <VDialog
+            v-model="displayRoleDeleteModale"
+            width="800"
+        >
+            <VCard
+                :title="t('pages.roleplays.delete.role')"
+                :text="t('pages.roleplays.delete.role_message')"
+            >
+                <template #actions>
+                    <VSpacer />
+                    <VBtn
+                        :disabled="loadingDeletion"
+                        @click="displayRoleDeleteModale = false"
+                    >
+                        {{ t('form.cancel') }}
+                    </VBtn>
+                    <VBtn
+                        color="red"
+                        :disabled="loadingDeletion"
+                        :loading="loadingDeletion"
                         @click="deleteRole"
                     >
                         {{ t('form.delete') }}
