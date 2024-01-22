@@ -31,7 +31,6 @@ const roles = ref([
         max_users: 1,
         description: '',
         roleplay_id: '',
-
     },
 ])
 
@@ -48,7 +47,8 @@ async function submit() {
     const formData = new FormData()
     formData.append('title', title)
     formData.append('public', isPublic ? '1' : '0')
-    formData.append('start_date', start_date)
+    if (start_date.length > 0)
+        formData.append('start_date', start_date)
     formData.append('description', description)
     formData.append('illustration', illustration[0])
     formData.append('description', description)

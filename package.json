@@ -25,20 +25,20 @@
         "@vueuse/router": "^10.7.2",
         "vite-plugin-vuetify": "^2.0.1",
         "vue3-emoji-picker": "^1.1.8",
-        "vuetify": "^3.4.10"
+        "vuetify": "^3.5.1"
     },
     "devDependencies": {
-        "@antfu/eslint-config": "^2.6.2",
+        "@antfu/eslint-config": "^2.6.3",
         "@nuxt/devtools": "1.0.8",
         "@nuxtjs/i18n": "^8.0.0",
         "@nuxtjs/supabase": "^1.1.5",
         "dayjs-nuxt": "^2.1.9",
         "eslint": "^8.56.0",
-        "nuxt": "^3.9.1",
-        "sass": "^1.69.7",
-        "supabase": "^1.131.4",
+        "nuxt": "^3.9.3",
+        "sass": "^1.70.0",
+        "supabase": "^1.131.5",
         "typescript": "^5.3.3",
-        "vue": "^3.4.13",
+        "vue": "^3.4.15",
         "vue-router": "^4.2.5"
     }
 }

@@ -150,7 +150,7 @@
                 "blocked": "L'utilisateur a été bloqué et tous ses personnages ont été supprimés pour ce roleplay"
             },
             "channel": {
-                "self": "Canaux de discussion"
+                "self": "Canal de discussion | Canaux de discussion"
             },
             "delete": {
                 "rp": "Confirmer la suppression du roleplay ?",

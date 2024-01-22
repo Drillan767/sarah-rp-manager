@@ -42,6 +42,7 @@ export interface Channel {
     roleplay_id: string
     private: boolean
     allowed_roles: any
+    internal: boolean
 }
 
 export interface Character {

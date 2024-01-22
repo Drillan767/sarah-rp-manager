@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
             description: payload.description,
             illustration: '',
             public: payload.public === '1',
-            start_date: payload.start_date,
+            start_date: payload.start_date ?? null,
             user_id: Number.parseInt(payload.user_id),
         })
         .select('id')
@@ -49,6 +49,24 @@ export default defineEventHandler(async (event) => {
 
     if (updateError)
         throw createError({ statusCode: 400, message: updateError.message })
+
+    const { error: channelError } = await supabase
+        .from('channels')
+        .insert([
+            {
+                name: 'Canal principal',
+                roleplay_id: rpId,
+                internal: true,
+            },
+            {
+                name: 'Canal secondaire',
+                roleplay_id: rpId,
+                internal: true,
+            },
+        ])
+
+    if (channelError)
+        throw createError({ statusCode: 400, message: channelError.message })
 
     return rpId
 })

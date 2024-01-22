@@ -1,188 +1,147 @@
 <script setup lang="ts">
-import { useForm, useFieldArray, useIsFormValid } from 'vee-validate'
 import type { Database } from '~/types/supabase'
-import { vuetifyConfig } from '~/composables/vuetifyConfig'
 import useSnackBar from '~/composables/snackbar'
 
 interface Channel {
+    id: number
     name: string
-    id?: number
+    roleplay_id: string
 }
 
 interface Props {
     roleplayId?: string
+    loading: boolean
+    channels: Channel[]
 }
 
-const props = defineProps<Props>()
-
-const { t } = useI18n()
-const { showSuccess } = useSnackBar()
-const supabase = useSupabaseClient<Database>()
-
-const loading = ref(false)
-// const channels = ref<Channel[]>([])
-const displayDeleteModal = ref(false)
-const selectedChannel = ref<Channel>({} as Channel)
-
-const { defineField, setValues } = useForm<Channel[]>({
-    validationSchema: {
-        name: 'required|max:25',
-    },
+const props = withDefaults(defineProps<Props>(), {
+    roleplayId: undefined,
 })
 
-const { push, fields: channels } = useFieldArray('channels')
+const emit = defineEmits<{
+    (e: 'update'): void
+    (e: 'update:loading', value: boolean): void
+    (e: 'fetch'): void
+    (e: 'delete', value: number): void
+}>()
 
-// const [name, nameProps] = defineField('name', vuetifyConfig)
+const { t } = useI18n()
+const supabase = useSupabaseClient<Database>()
+const { showSuccess } = useSnackBar()
 
-async function fetchChannels() {
+const channelsList = ref<Channel[]>([])
+const selectedChannel = ref<Channel>({} as Channel)
+const displayDeleteModal = ref(false)
+
+const loadingProxy = computed({
+    get: () => props.loading,
+    set: value => emit('update:loading', value),
+})
+
+const cantUpdate = computed(() => {
+    const channelNames = channelsList.value.map(c => c.name)
+    return channelNames.includes('') || new Set(channelNames).size !== channelNames.length
+})
+
+async function handleDeleteChannel(channel: Channel) {
+    if (channel.id === 0) {
+        channelsList.value.filter(c => c.id !== 0)
+    }
+    else {
+        selectedChannel.value = channel
+        displayDeleteModal.value = true
+    }
+}
+
+function addChannel() {
     if (!props.roleplayId)
         return
 
-    loading.value = true
-    const { data } = await supabase
-        .from('channels')
-        .select('id, name')
-        .eq('private', false)
-        .eq('roleplay_id', props.roleplayId)
-
-    if (data)
-        setValues(data)
-    // channels.value = data
-
-    loading.value = false
-}
-
-/* function addChannel() {
-    channels.value.push({ name: '' })
-} */
-
-async function submit() {
-    loading.value = true
-    await useFetch('/api/channels/update', {
-        body: channels.value.map(c => ({
-            roleplay_id: props.roleplayId,
-            ...c,
-        })),
-        method: 'POST',
+    channelsList.value.push({
+        id: 0,
+        name: '',
+        roleplay_id: props.roleplayId,
     })
-
-    loading.value = false
-    showSuccess(t('updateConfirmed', { thing: t('pages.roleplays.channel.self') }))
-}
-
-function removeChannel(i: number) {
-    if ('id' in channels.value[i])
-        selectedChannel.value = channels.value[i]
-    else
-        channels.value.splice(i, 1)
 }
 
 async function deleteChannel() {
-    await useFetch('/api/channels/remove', {
-        body: { id: selectedChannel.value.id },
-        method: 'DELETE',
-    })
+    loadingProxy.value = true
+    await supabase
+        .from('channels')
+        .delete()
+        .eq('id', selectedChannel.value.id)
 
     displayDeleteModal.value = false
-    channels.value = channels.value.filter(r => r.id !== selectedChannel.value.id)
+    loadingProxy.value = false
+
+    showSuccess(t('form.deleteConfirmed', { thing: t('pages.roleplays.channel.self', 1) }))
+    emit('fetch')
 }
 
-watch(() => props.roleplayId, (value) => {
-    if (value)
-        fetchChannels()
+watch(() => props.channels, (value) => {
+    channelsList.value = value
 })
 </script>
 
 <template>
     <VCard
-        v-if="roleplayId"
-        :loading="loading"
         prepend-icon="mdi-forum"
+        :loading="loading"
+        :title="t('pages.roleplays.channel.self')"
     >
-        <template #title>
-            {{ t('pages.roleplays.channel.self') }}
+        <template #text>
+            <VRow>
+                <RpChannelForm
+                    v-for="(channel, i) in channelsList"
+                    :key="i"
+                    v-model:channel="channelsList[i]"
+                    @delete="handleDeleteChannel(channel)"
+                />
+            </VRow>
         </template>
-        <VForm @submit.prevent="submit">
-            <VCardText>
-                <VContainer>
-                    <VRow>
-                        <VCol
-                            v-for="(channel, i) in channels"
-                            :key="i"
-                            cols="12"
-                            md="4"
-                        >
-                            <VCard>
-                                <VCardText>
-                                    <VRow>
-                                        <VCol cols="10">
-                                            <VTextField
-                                                v-model="channel.value"
-                                                :label="t('pages.roleplays.form.channel_name')"
-                                            />
-                                        </VCol>
-                                        <VCol cols="2">
-                                            <VBtn
-                                                icon="mdi-trash-can-outline"
-                                                color="error"
-                                                variant="flat"
-                                                @click="removeChannel(i)"
-                                            />
-                                        </VCol>
-                                    </VRow>
-                                </VCardText>
-                            </VCard>
-                        </VCol>
-                    </VRow>
-                </VContainer>
-                <div class="d-flex justify-center">
-                    <VBtn
-                        color="blue"
-                        variant="outlined"
-                        rounded="xl"
-                        prepend-icon="mdi-plus-circle-outline"
-                        class="mt-4"
-                        @click="push"
-                    >
-                        {{ t('pages.roleplays.form.channel_add') }}
-                    </VBtn>
-                </div>
-            </VCardText>
-            <VCardActions>
+        <template #actions>
+            <VSpacer />
+            <VBtn
+                color="green"
+                prepend-icon="mdi-plus"
+                @click="addChannel"
+            >
+                Ajouter un canal
+            </VBtn>
+            <VBtn
+                color="primary"
+                :disabled="cantUpdate"
+                @click="emit('update')"
+            >
+                {{ t('form.save') }}
+            </VBtn>
+        </template>
+    </VCard>
+    <VDialog
+        v-model="displayDeleteModal"
+        width="800"
+    >
+        <VCard
+            :title="t('pages.roleplays.delete.channel')"
+            :text="t('pages.roleplays.delete.channel_message')"
+        >
+            <template #actions>
                 <VSpacer />
                 <VBtn
-                    color="primary"
-                    type="submit"
+                    :disabled="loadingProxy"
+                    @click="displayDeleteModal = false"
                 >
-                    {{ t('form.save') }}
+                    {{ t('form.cancel') }}
                 </VBtn>
-            </VCardActions>
-        </VForm>
-        <VDialog
-            v-model="displayDeleteModal"
-        >
-            <VCard>
-                <template #title>
-                    {{ t('pages.roleplays.delete.channel') }}
-                </template>
-                <template #text>
-                    {{ t('pages.roleplays.delete.channel_message') }}
-                </template>
-                <template #actions>
-                    <VSpacer />
-                    <VBtn
-                        @click="displayDeleteModal = false"
-                    >
-                        {{ t('form.cancel') }}
-                    </VBtn>
-                    <VBtn
-                        color="red"
-                        @click="deleteChannel"
-                    >
-                        {{ t('form.delete') }}
-                    </VBtn>
-                </template>
-            </VCard>
-        </VDialog>
-    </VCard>
+                <VBtn
+                    color="red"
+                    :disabled="loadingProxy"
+                    :loading="loadingProxy"
+                    @click="deleteChannel"
+                >
+                    {{ t('form.delete') }}
+                </VBtn>
+            </template>
+        </VCard>
+    </VDialog>
 </template>

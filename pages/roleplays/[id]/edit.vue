@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Role, Roleplay } from '~/types/models'
+import type { Channel, Role, Roleplay } from '~/types/models'
 import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
 
@@ -23,12 +23,14 @@ const { params } = route
 const tabs = ref(2)
 const loadingRP = ref(false)
 const loadingRoles = ref(false)
+const loadingChannels = ref(false)
 const loadingDeletion = ref(false)
 const displayRpDeleteModale = ref(false)
 const displayRoleDeleteModale = ref(false)
 const roles = ref<Role[]>([])
 const roleDeleting = ref<Role>({} as Role)
 const roleplay = ref<EditRoleplay>({} as EditRoleplay)
+const channels = ref<Channel[]>([])
 const form = ref<EditForm>({
     title: '',
     start_date: null,
@@ -44,6 +46,7 @@ useHead({
 onMounted(async () => {
     await fetchRP()
     await fetchRoles()
+    await fetchChannels()
 })
 
 function handleRoleDeletion(role: Role) {
@@ -115,6 +118,20 @@ async function fetchRoles() {
     loadingRoles.value = false
 }
 
+async function fetchChannels() {
+    loadingChannels.value = true
+    channels.value = []
+    const { data } = await supabase
+        .from('channels')
+        .select('*')
+        .eq('roleplay_id', params.id)
+
+    if (data)
+        channels.value = data
+
+    loadingChannels.value = false
+}
+
 async function saveRP() {
     loadingRP.value = true
 
@@ -137,6 +154,8 @@ async function saveRP() {
     })
 
     loadingRP.value = false
+
+    showSuccess(t('form.updateConfirmed', { thing: t('pages.roleplays.self', 1) }))
 }
 
 async function updateRoles() {
@@ -152,6 +171,22 @@ async function updateRoles() {
     })
 
     loadingRoles.value = false
+    showSuccess(t('form.updateConfirmed', { thing: t('pages.roleplays.form.role', 1) }))
+
+    await fetchChannels()
+}
+
+async function updateChannels() {
+    loadingChannels.value = true
+    await useFetch('/api/channels/update', {
+        method: 'POST',
+        body: channels.value,
+    })
+
+    loadingChannels.value = false
+    showSuccess(t('form.updateConfirmed', { thing: t('pages.roleplays.channel.self', 1) }))
+
+    await fetchChannels()
 }
 
 const links = computed(() => ([
@@ -242,7 +277,11 @@ const links = computed(() => ([
         <VRow>
             <VCol>
                 <RPChannelsForm
+                    v-model:loading="loadingChannels"
                     :roleplay-id="roleplay.id"
+                    :channels="channels"
+                    @update="updateChannels"
+                    @fetch="fetchChannels"
                 />
             </VCol>
         </VRow>

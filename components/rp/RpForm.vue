@@ -73,7 +73,7 @@ watch(illustration, (value) => {
 })
 
 watch(() => props.form, (newVal, oldVal) => {
-    if (oldVal.title === '' && newVal.title.length > 0) {
+    if (props.edit && oldVal.title === '' && newVal.title.length > 0) {
         const { start_date, ...fields } = newVal
         setValues({
             ...fields,
