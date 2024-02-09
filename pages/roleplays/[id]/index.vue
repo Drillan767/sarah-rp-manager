@@ -12,6 +12,10 @@ interface RPDetail extends Omit<Roleplay, 'roles'> {
         max_users: number
         characters: any[]
     }[]
+    channels: {
+        id: number
+        private: boolean
+    }[]
     user: {
         id: number
         username: string
@@ -31,6 +35,8 @@ const updated = ref(false)
 const roleplay = ref<RPDetail>({} as RPDetail)
 const showRegistrationModale = ref(false)
 
+const hasChannels = computed(() => roleplay.value.channels.filter(c => c.private !== false).length > 0)
+
 const { data: rpData, error } = await supabase
     .from('roleplays')
     .select(`
@@ -39,6 +45,7 @@ const { data: rpData, error } = await supabase
             *,
             characters(count)
         ),
+        channels(id, private),
         user:users(id, username)
     `)
     .eq('id', params.id)
@@ -91,9 +98,19 @@ function getAvailableSlots(max: number, current: number) {
                 </div>
                 <div>
                     <VBtn
+                        color="primary"
+                        prepend-icon="mdi-forum-outline"
+                        variant="outlined"
+                        :to="`/channels/${roleplay.id}`"
+                        :disabled="!hasChannels"
+                    >
+                        Discuter
+                    </VBtn>
+                    <VBtn
                         color="green"
                         variant="outlined"
                         prepend-icon="mdi-book-plus-outline"
+                        class="ml-4"
                         @click="showRegistrationModale = true"
                     >
                         {{ t('form.register') }}
