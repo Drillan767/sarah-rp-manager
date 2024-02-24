@@ -35,7 +35,11 @@ const updated = ref(false)
 const roleplay = ref<RPDetail>({} as RPDetail)
 const showRegistrationModale = ref(false)
 
-const hasChannels = computed(() => roleplay.value.channels.filter(c => c.private !== false).length > 0)
+const canAccessChannels = computed(() =>
+    roleplay.value.roles.some(role =>
+        role.characters.some(c => c.user_id === currentUser.value.id)))
+
+const hasChannels = computed(() => roleplay.value.channels.some(c => !c.private))
 
 const { data: rpData, error } = await supabase
     .from('roleplays')
@@ -43,7 +47,10 @@ const { data: rpData, error } = await supabase
         *,
         roles(
             *,
-            characters(count)
+            characters(
+                user_id,
+                status
+            )
         ),
         channels(id, private),
         user:users(id, username)
@@ -102,7 +109,7 @@ function getAvailableSlots(max: number, current: number) {
                         prepend-icon="mdi-forum-outline"
                         variant="outlined"
                         :to="`/channels/${roleplay.id}`"
-                        :disabled="!hasChannels"
+                        :disabled="!hasChannels || !canAccessChannels"
                     >
                         Discuter
                     </VBtn>
@@ -169,7 +176,7 @@ function getAvailableSlots(max: number, current: number) {
                         <VCardActions>
                             <VSpacer />
                             <VChip
-                                :prepend-icon="getAvailableSlots(role.max_users, role.characters[0].count)"
+                                :prepend-icon="getAvailableSlots(role.max_users, role.characters.length)"
                                 variant="outlined"
                                 color="blue"
                             >
