@@ -6,6 +6,12 @@ export interface SpecificDate {
     end: string
 }
 
+export interface CurrentUser {
+    handle: string
+    username: string
+    avatar: string
+}
+
 export interface GenericDate {
     isSpecific: false
     begin: {

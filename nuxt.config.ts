@@ -40,18 +40,7 @@ export default defineNuxtConfig({
     },
 
     supabase: {
-        redirectOptions: {
-            login: '/login',
-            callback: '/callback',
-            exclude: [
-                '/',
-                '/register',
-                '/forgot-password',
-                '/new-password',
-                '/roleplays',
-                '/roleplays/*',
-            ],
-        },
+        redirect: false,
     },
 
     app: {

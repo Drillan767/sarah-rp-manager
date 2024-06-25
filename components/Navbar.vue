@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useTheme } from 'vuetify'
 import type { Database } from '~/types/supabase'
-import { useCurrentUser } from '~/composables/currentUser'
+import type { CurrentUser } from '~/types/models'
+
+const currentUser = useState<CurrentUser>('current-user')
 
 const { t } = useI18n()
 const theme = useTheme()
@@ -9,18 +11,38 @@ const theme = useTheme()
 const supabase = useSupabaseClient<Database>()
 const router = useRouter()
 const user = useSupabaseUser()
-const currentUser = useCurrentUser()
 
 async function logout() {
     await supabase.auth.signOut()
-    await router.push('/connexion')
+    await router.push('/')
 }
 
 function switchTheme() {
     theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
 }
 
-onMounted(async () => {
+async function login() {
+    await supabase.auth.signInWithOAuth({
+        provider: 'twitter',
+        options: {
+            redirectTo: 'http://localhost:3000/confirm',
+        },
+    })
+}
+
+watch(user, (value) => {
+    if (value) {
+        const { user_metadata: twitter } = value
+
+        currentUser.value = {
+            handle: twitter.user_name,
+            username: twitter.name,
+            avatar: twitter.picture,
+        }
+    }
+}, { immediate: true })
+
+/* onMounted(async () => {
     if (user.value) {
         const { data } = await supabase
             .from('users')
@@ -31,7 +53,7 @@ onMounted(async () => {
         if (data)
             currentUser.value = data
     }
-})
+}) */
 </script>
 
 <template>
@@ -46,16 +68,20 @@ onMounted(async () => {
             Le Jardin de Sarah
         </VToolbarTitle>
 
-        <span class="d-none d-sm-inline mr-4">
-            {{ currentUser.username }}
-        </span>
-        <VMenu v-if="currentUser.id !== 0" anchor="bottom end">
+        <VListItem
+            v-if="currentUser"
+            :title="currentUser.username"
+            :subtitle="`@${currentUser.handle}`"
+            class="text-right"
+        />
+
+        <VMenu v-if="currentUser" anchor="bottom end">
             <template #activator="{ props }">
                 <VBtn
-                    icon
                     v-bind="props"
+                    icon
                 >
-                    <VAvatar image="/default-avatar.webp" />
+                    <VAvatar :image="currentUser.avatar" />
                 </VBtn>
             </template>
             <VList>
@@ -69,12 +95,12 @@ onMounted(async () => {
                     prepend-icon="mdi-book-open-page-variant-outline"
                     :title="t('pages.roleplays.navlink')"
                 />
-                <VListItem
+                <!-- <VListItem
                     v-if="currentUser.superadmin"
                     to="/administration"
                     prepend-icon="mdi-security"
                     title="Administration"
-                />
+                /> -->
                 <VDivider />
                 <VListItem
                     prepend-icon="mdi-logout"
@@ -91,8 +117,8 @@ onMounted(async () => {
         </VMenu>
         <VBtn
             v-else
-            to="/login"
             color="primary"
+            @click="login"
         >
             {{ t('login.action') }}
         </VBtn>
