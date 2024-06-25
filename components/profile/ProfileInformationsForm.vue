@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useForm, useIsFormValid } from 'vee-validate'
 import type { Database } from '~/types/supabase'
+import type { CurrentUser } from '~/types/models'
 import { vuetifyConfig } from '~/composables/vuetifyConfig'
 import useSnackBar from '~/composables/snackbar'
 
 interface UserData {
-    email: string
+    handle: string
     username: string
     description: string | null
 }
@@ -14,16 +15,13 @@ const { t } = useI18n()
 const supabase = useSupabaseClient<Database>()
 const session = useSupabaseUser()
 const { showSuccess } = useSnackBar()
+const currentUser = useState<CurrentUser>('current-user')
 
-const { defineField, setValues, handleSubmit } = useForm<UserData>({
-    validationSchema: {
-        username: 'min:4|required',
-    },
-})
+const { defineField, setValues, handleSubmit } = useForm<UserData>()
 
 const formValid = useIsFormValid()
 
-const [email, emailProps] = defineField('email', vuetifyConfig)
+const [handle, handleProps] = defineField('handle', vuetifyConfig)
 const [username, usernameProps] = defineField('username', vuetifyConfig)
 const [description, descriptionProps] = defineField('description', vuetifyConfig)
 
@@ -33,7 +31,7 @@ onMounted(async () => {
     loading.value = true
     const { data } = await supabase
         .from('users')
-        .select('email, username, description')
+        .select('description')
         .eq('session_id', session.value!.id)
         .single()
 
@@ -48,13 +46,24 @@ const submit = handleSubmit(async (values) => {
 
     await supabase
         .from('users')
-        .update(values)
+        .update({
+            description: values.description,
+        })
         .eq('session_id', session.value!.id)
 
     loading.value = false
 
     showSuccess(t('pages.profile.success.infos'))
 })
+
+watch(currentUser, (value) => {
+    if (value) {
+        setValues({
+            handle: `@${value.handle}`,
+            username: value.username,
+        })
+    }
+}, { immediate: true })
 </script>
 
 <template>
@@ -75,8 +84,8 @@ const submit = handleSubmit(async (values) => {
                         md="6"
                     >
                         <VTextField
-                            v-bind="emailProps"
-                            v-model="email"
+                            v-bind="handleProps"
+                            v-model="handle"
                             :label="t('fields.email')"
                             :disabled="true"
                         />
@@ -89,6 +98,7 @@ const submit = handleSubmit(async (values) => {
                             v-bind="usernameProps"
                             v-model="username"
                             :label="t('fields.username')"
+                            :disabled="true"
                         />
                     </VCol>
                 </VRow>

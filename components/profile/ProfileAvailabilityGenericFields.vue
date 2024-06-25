@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { GenericDate } from '~/types/models'
 import useAvailabilities from '~/composables/availabilities'
-import { days } from '~/assets/json/availability-time.json'
+import { days, hours } from '~/assets/json/availability-time.json'
 
 interface Props {
     maxHours: number

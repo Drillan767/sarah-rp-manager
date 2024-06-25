@@ -18,15 +18,14 @@ const links = [
 
 <template>
     <VContainer>
+        <Breadcrumb :links="links" />
         <VRow>
             <VCol>
-                <Breadcrumb :links="links" />
                 <h1 class="text-h3">
                     {{ t('pages.profile.title') }}
                 </h1>
                 <ProfileInformationsForm />
                 <ProfileAvailabilityForm />
-                <ProfilePasswordForm />
             </VCol>
         </VRow>
     </VContainer>
