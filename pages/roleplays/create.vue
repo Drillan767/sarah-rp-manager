@@ -64,16 +64,13 @@ async function submit() {
         formData.append('description', description)
         formData.append('illustration', illustration)
         formData.append('description', description)
-        formData.append('user_id', currentUser.value.id.toString())
+        formData.append('user_id', currentUser.value.id)
 
         // Stores RP and illustration.
-        const { data, error } = await useFetch('/api/rp/create', {
+        const { data } = await useFetch('/api/rp/create', {
             method: 'POST',
             body: formData,
         })
-
-        if (error)
-            throw new Error(error.value?.message)
 
         // Store related roles.
         await useFetch('/api/roles/create', {
@@ -107,24 +104,6 @@ const links = [
         title: t('pages.roleplays.create'),
     },
 ]
-
-/* Enable delete for user based on user_id
-  (EXISTS ( SELECT count(*) AS count
-   FROM (((characters c
-     JOIN users cu ON ((c.user_id = cu.id)))
-     JOIN roles cr ON ((c.role_id = cr.id)))
-     JOIN users cru ON ((c.user_id = cru.id)))
-  WHERE ((cru.session_id = auth.uid()) OR (cu.session_id = auth.uid()))))
-*/
-
-/* Enable update for rp's creator or related user
-  (EXISTS ( SELECT count(*) AS count
-   FROM (((characters c
-     JOIN users cu ON ((c.user_id = cu.id)))
-     JOIN roles cr ON ((c.role_id = cr.id)))
-     JOIN users cru ON ((c.user_id = cru.id)))
-  WHERE ((cru.session_id = auth.uid()) OR (cu.session_id = auth.uid()))))
-*/
 </script>
 
 <template>
