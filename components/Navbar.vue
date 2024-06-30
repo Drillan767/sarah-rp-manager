@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTheme } from 'vuetify'
+import { useDisplay, useTheme } from 'vuetify'
 import type { Database } from '~/types/supabase'
 import type { CurrentUser } from '~/types/models'
 
@@ -7,6 +7,7 @@ const currentUser = useState<CurrentUser | undefined>('current-user')
 
 const { t } = useI18n()
 const theme = useTheme()
+const { mobile } = useDisplay()
 
 const supabase = useSupabaseClient<Database>()
 const router = useRouter()
@@ -55,11 +56,16 @@ watch(user, (value) => {
         <VToolbarTitle> Le Jardin de Sarah </VToolbarTitle>
 
         <template v-if="currentUser">
-            <VBtn>
+            <VBtn
+                v-if="!mobile"
+                to="/roleplays"
+                class="mr-8"
+            >
                 Tous les roleplays
             </VBtn>
 
             <VListItem
+                v-if="!mobile"
                 :title="currentUser.username"
                 :subtitle="`@${currentUser.handle}`"
                 class="text-right"
@@ -72,6 +78,18 @@ watch(user, (value) => {
                     </VBtn>
                 </template>
                 <VList>
+                    <VListItem
+                        v-if="mobile"
+                        :title="currentUser.username"
+                        :subtitle="`@${currentUser.handle}`"
+                        class="text"
+                    />
+                    <VListItem
+                        v-if="mobile"
+                        title="Tous les roleplays"
+                        to="/roleplays"
+                    />
+                    <VDivider v-if="mobile" />
                     <VListItem
                         to="/profile"
                         prepend-icon="mdi-account"
