@@ -9,7 +9,7 @@ interface Props {
         title: string
         start_date: string | null
         description: string
-        illustration: File[] | undefined
+        illustration: File | undefined
         public: boolean
     }
     currentPreview?: string
@@ -62,13 +62,13 @@ function handleImage(e: Event) {
     if (files) {
         preview.value = URL.createObjectURL(files[0])
         setValues({
-            illustration: Array.from(files),
+            illustration: files[0],
         })
     }
 }
 
 watch(illustration, (value) => {
-    if (!value || value.length === 0)
+    if (!value)
         preview.value = ''
 })
 
@@ -128,6 +128,7 @@ function submit() {
                             :clearable="true"
                             label="Illustration"
                             hint="max: 2 mb"
+
                             @change="handleImage"
                         >
                             <template

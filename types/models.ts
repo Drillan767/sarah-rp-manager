@@ -7,6 +7,7 @@ export interface SpecificDate {
 }
 
 export interface CurrentUser {
+    id: string
     handle: string
     username: string
     avatar: string

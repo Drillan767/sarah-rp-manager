@@ -1,8 +1,14 @@
 import type { Database } from '~/types/supabase'
+import type { CurrentUser } from '~/types/models'
 
 export default defineNuxtRouteMiddleware(async (to) => {
-    if (to.name && /roleplays-id-(characters|edit).*/.test(to.name.toString())) {
-        const supabase = useSupabaseClient<Database>()
+    const currentUser = useState<CurrentUser | undefined>('current-user')
+
+    if (to.name && to.name.toString() === '/roleplays/create' && !currentUser.value)
+        return navigateTo('/')
+    // if (to.name && /roleplays-id-(characters|edit).*/.test(to.name.toString())) {
+
+    /* const supabase = useSupabaseClient<Database>()
         const supabaseUser = useSupabaseUser()
         let rpFound: any = null
 
@@ -51,5 +57,5 @@ export default defineNuxtRouteMiddleware(async (to) => {
         const supabaseUser = useSupabaseUser()
         if (!supabaseUser.value)
             return navigateTo('/')
-    }
+    } */
 })

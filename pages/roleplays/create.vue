@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { useCurrentUser } from '~/composables/currentUser'
+import type { CurrentUser } from '~/types/models'
 
 interface FormType {
     title: string
-    start_date: string
+    start_date: string | null
     description: string
     public: boolean
-    illustration: File[] | undefined
+    illustration: File | undefined
 }
 
-const { t } = useI18n()
-const currentUser = useCurrentUser()
 const router = useRouter()
+
+const currentUser = useState<CurrentUser | undefined>('current-user')
+
+if (!currentUser.value)
+    router.push('/')
+
+const { t } = useI18n()
 
 useHead({
     title: t('pages.roleplays.create'),
@@ -38,40 +43,55 @@ const roles = ref([
 const loading = ref(false)
 
 async function submit() {
-    const { title, public: isPublic, start_date, description, illustration } = form.value
-
-    if (!illustration)
+    if (!currentUser.value)
         return
 
     loading.value = true
 
-    const formData = new FormData()
-    formData.append('title', title)
-    formData.append('public', isPublic ? '1' : '0')
-    formData.append('start_date', start_date)
-    formData.append('description', description)
-    formData.append('illustration', illustration[0])
-    formData.append('description', description)
-    formData.append('user_id', currentUser.value.id.toString())
+    try {
+        const { title, public: isPublic, start_date, description, illustration } = form.value
 
-    // Stores RP and illustration.
-    const { data } = await useFetch('/api/rp/create', {
-        method: 'POST',
-        body: formData,
-    })
+        if (!illustration)
+            return
 
-    // Store related roles.
-    await useFetch('/api/roles/create', {
-        method: 'POST',
-        body: roles.value.map(r => ({
-            ...r,
-            roleplay_id: data.value,
-        })),
-    })
+        loading.value = true
 
-    loading.value = false
+        const formData = new FormData()
+        formData.append('title', title)
+        formData.append('public', isPublic ? '1' : '0')
+        if (start_date && start_date !== 'Invalid Date')
+            formData.append('start_date', start_date)
+        formData.append('description', description)
+        formData.append('illustration', illustration)
+        formData.append('description', description)
+        formData.append('user_id', currentUser.value.id.toString())
 
-    await router.push(`/roleplays/${data.value}/edit?created=1`)
+        // Stores RP and illustration.
+        const { data, error } = await useFetch('/api/rp/create', {
+            method: 'POST',
+            body: formData,
+        })
+
+        if (error)
+            throw new Error(error.value?.message)
+
+        // Store related roles.
+        await useFetch('/api/roles/create', {
+            method: 'POST',
+            body: roles.value.map(r => ({
+                ...r,
+                roleplay_id: data.value,
+            })),
+        })
+
+        await router.push(`/roleplays/${data.value}/edit?created=1`)
+    }
+    catch (e: any) {
+        console.warn(e.message)
+    }
+    finally {
+        loading.value = false
+    }
 }
 
 const links = [
@@ -87,6 +107,24 @@ const links = [
         title: t('pages.roleplays.create'),
     },
 ]
+
+/* Enable delete for user based on user_id
+  (EXISTS ( SELECT count(*) AS count
+   FROM (((characters c
+     JOIN users cu ON ((c.user_id = cu.id)))
+     JOIN roles cr ON ((c.role_id = cr.id)))
+     JOIN users cru ON ((c.user_id = cru.id)))
+  WHERE ((cru.session_id = auth.uid()) OR (cu.session_id = auth.uid()))))
+*/
+
+/* Enable update for rp's creator or related user
+  (EXISTS ( SELECT count(*) AS count
+   FROM (((characters c
+     JOIN users cu ON ((c.user_id = cu.id)))
+     JOIN roles cr ON ((c.role_id = cr.id)))
+     JOIN users cru ON ((c.user_id = cru.id)))
+  WHERE ((cru.session_id = auth.uid()) OR (cu.session_id = auth.uid()))))
+*/
 </script>
 
 <template>

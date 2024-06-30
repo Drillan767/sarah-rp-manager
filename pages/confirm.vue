@@ -4,7 +4,7 @@ import type { CurrentUser } from '~/types/models'
 
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
-const currentUser = useState<CurrentUser>('current-user')
+const currentUser = useState<CurrentUser | undefined>('current-user')
 
 // Get redirect path from cookies
 const cookieName = useRuntimeConfig().public.supabase.cookieName
@@ -18,6 +18,7 @@ watch(user, async () => {
         const { user_metadata: twitter } = user.value
 
         currentUser.value = {
+            id: user.value.id,
             handle: twitter.user_name,
             username: twitter.name,
             avatar: twitter.picture,
@@ -54,5 +55,15 @@ watch(user, async () => {
 </script>
 
 <template>
-    <div>Waiting for login...</div>
+    <div class="h-100">
+        <VOverlay
+            class="align-center justify-center"
+        >
+            <VProgressCircular
+                color="primary"
+                size="64"
+                indeterminate
+            />
+        </VOverlay>
+    </div>
 </template>

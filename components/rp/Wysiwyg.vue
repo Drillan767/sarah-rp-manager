@@ -111,10 +111,8 @@ onBeforeUnmount(() => editor.value?.destroy())
                 </VBtn>
             </VBtnToggle>
         </div>
-        <VCard
-            variant="outlined"
-        >
-            <VCardText>
+        <VCard variant="outlined">
+            <VCardText class="content">
                 <EditorContent :editor="editor" />
             </VCardText>
         </VCard>
@@ -122,9 +120,14 @@ onBeforeUnmount(() => editor.value?.destroy())
 </template>
 
 <style lang="scss">
+.content {
+    min-height: 200px;
+}
 /* Basic editor styles */
 .tiptap {
-    > * + * {
+    outline: none;
+
+    & > * + * {
         margin-top: 0.75em;
     }
 
