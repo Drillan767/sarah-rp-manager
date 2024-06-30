@@ -15,7 +15,7 @@ const { t } = useI18n()
 const supabase = useSupabaseClient<Database>()
 const session = useSupabaseUser()
 const { showSuccess } = useSnackBar()
-const currentUser = useState<CurrentUser>('current-user')
+const currentUser = useState<CurrentUser | undefined>('current-user')
 
 const { defineField, setValues, handleSubmit } = useForm<UserData>()
 
