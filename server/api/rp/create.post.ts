@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
         .storage
         .from('roleplays')
         .upload(rpPath, mediaData.data, {
-            cacheControl: '3600',
+            cacheControl: '86400',
             contentType: `${mediaData.type};charset=UTF-8`,
         })
 
