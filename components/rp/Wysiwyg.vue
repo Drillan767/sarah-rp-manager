@@ -22,6 +22,8 @@ const editor = useEditor({
     },
 })
 
+const focus = () => editor.value?.chain().focus()
+
 onMounted(() => editor.value?.commands.setContent(props.modelValue))
 
 watch(() => props.modelValue, (value) => {
@@ -112,7 +114,7 @@ onBeforeUnmount(() => editor.value?.destroy())
             </VBtnToggle>
         </div>
         <VCard variant="outlined">
-            <VCardText class="content">
+            <VCardText class="content" @click="focus">
                 <EditorContent :editor="editor" />
             </VCardText>
         </VCard>

@@ -9,10 +9,10 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const { defineField, controlledValues } = useForm<Role | CreatedRole>({
+const { defineField, controlledValues, setValues } = useForm<Role | CreatedRole>({
     validationSchema: {
         name: 'required',
-        maxUsers: 'min:1|required',
+        max_users: 'min_value:1|required',
         description: 'required',
     },
     initialValues: props.modelValue,
@@ -21,8 +21,10 @@ const { defineField, controlledValues } = useForm<Role | CreatedRole>({
 const [name, nameProps] = defineField('name', vuetifyConfig)
 const [maxUsers, maxUsersProps] = defineField('max_users', vuetifyConfig)
 const [description, descriptionProps] = defineField('description', vuetifyConfig)
+defineField('free')
 
 watch(controlledValues, value => emit('update:modelValue', value))
+watch(() => props.modelValue, value => setValues(value))
 </script>
 
 <template>
@@ -32,15 +34,16 @@ watch(controlledValues, value => emit('update:modelValue', value))
                 <VTextField
                     v-bind="nameProps"
                     v-model="name"
+                    :disabled="modelValue.free"
                     :label="t('pages.roleplays.form.roles_name')"
                 />
             </VCol>
             <VCol cols="3">
-                <VTextField
+                <VNumberInput
                     v-bind="maxUsersProps"
                     v-model="maxUsers"
                     :label="t('pages.roleplays.form.roles_max_nb')"
-                    type="number"
+                    control-variant="split"
                 />
             </VCol>
             <VCol
@@ -58,6 +61,7 @@ watch(controlledValues, value => emit('update:modelValue', value))
                 <VTextarea
                     v-bind="descriptionProps"
                     v-model="description"
+                    :disabled="modelValue.free"
                     label="Description"
                     rows="2"
                     :auto-grow="true"

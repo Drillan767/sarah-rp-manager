@@ -21,12 +21,15 @@ const rolesProxy = computed({
     set: value => emit('update:roles', value),
 })
 
-function addRole() {
+const freeRoleUsed = computed(() => rolesProxy.value.filter(r => r.free).length > 0)
+
+function addRole(free: boolean = false) {
     rolesProxy.value.push({
-        name: '',
+        name: free ? t('pages.roleplays.form.free_role_name') : '',
         max_users: 1,
-        description: '',
+        description: free ? t('pages.roleplays.form.free_role_description') : '',
         roleplay_id: '',
+        free,
     })
 }
 
@@ -36,7 +39,7 @@ function removeRole(i: number) {
         emit('delete', payload)
     }
     else {
-        rolesProxy.value.splice(i, 1)
+        rolesProxy.value = rolesProxy.value.filter((_role, index) => index !== i)
     }
 }
 </script>
@@ -58,23 +61,39 @@ function removeRole(i: number) {
                         cols="12"
                         md="6"
                     >
-                        <RpRole
-                            v-model="rolesProxy[i]"
-                            @remove="removeRole(i)"
-                        />
+                        <VCard
+                            :color="rolesProxy[i].free ? 'primary' : undefined"
+                            variant="outlined"
+                        >
+                            <RpRole
+                                v-model="rolesProxy[i]"
+                                @remove="removeRole(i)"
+                            />
+                        </VCard>
                     </VCol>
                 </VRow>
             </VContainer>
             <div class="d-flex justify-center">
                 <VBtn
-                    color="blue"
                     variant="outlined"
                     rounded="xl"
                     prepend-icon="mdi-plus-circle-outline"
                     class="mt-4"
-                    @click="addRole"
+                    @click="addRole(false)"
                 >
                     {{ t('pages.roleplays.form.roles_add') }}
+                </VBtn>
+
+                <VBtn
+                    :disabled="freeRoleUsed"
+                    color="blue"
+                    variant="outlined"
+                    rounded="xl"
+                    prepend-icon="mdi-account-question-outline"
+                    class="mt-4 ml-2"
+                    @click="addRole(true)"
+                >
+                    {{ t('pages.roleplays.form.free_roles_add') }}
                 </VBtn>
             </div>
         </template>

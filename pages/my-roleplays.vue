@@ -48,6 +48,7 @@ watch(currentUser, async (value) => {
                 </h1>
                 <VBtn
                     prepend-icon="mdi-plus"
+                    variant="outlined"
                     to="/roleplays/create"
                 >
                     {{ t('pages.roleplays.create') }}

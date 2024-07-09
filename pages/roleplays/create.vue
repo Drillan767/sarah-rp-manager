@@ -5,7 +5,6 @@ interface FormType {
     title: string
     start_date: string | null
     description: string
-    public: boolean
     illustration: File | undefined
 }
 
@@ -26,7 +25,6 @@ const form = ref<FormType>({
     title: '',
     start_date: '',
     description: '',
-    public: true,
     illustration: undefined,
 })
 
@@ -36,11 +34,14 @@ const roles = ref([
         max_users: 1,
         description: '',
         roleplay_id: '',
-
+        free: false,
     },
 ])
 
 const loading = ref(false)
+const formValid = ref(false)
+
+const canSubmit = computed(() => formValid.value && roles.value.length > 0)
 
 async function submit() {
     if (!currentUser.value)
@@ -49,7 +50,7 @@ async function submit() {
     loading.value = true
 
     try {
-        const { title, public: isPublic, start_date, description, illustration } = form.value
+        const { title, start_date, description, illustration } = form.value
 
         if (!illustration)
             return
@@ -58,7 +59,6 @@ async function submit() {
 
         const formData = new FormData()
         formData.append('title', title)
-        formData.append('public', isPublic ? '1' : '0')
         if (start_date && start_date !== 'Invalid Date')
             formData.append('start_date', start_date)
         formData.append('description', description)
@@ -127,6 +127,7 @@ const links = [
                 <VCol>
                     <RpForm
                         v-model:form="form"
+                        v-model:valid="formValid"
                         :loading="loading"
                         :edit="false"
                     />
@@ -145,7 +146,7 @@ const links = [
                 <VBtn
                     color="primary"
                     type="submit"
-                    :disabled="loading"
+                    :disabled="loading || !canSubmit"
                 >
                     {{ t('form.save') }}
                 </VBtn>

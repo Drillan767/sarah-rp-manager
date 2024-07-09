@@ -242,7 +242,6 @@ export interface Database {
                     id: string
                     illustration: string
                     message_board: string
-                    public: boolean
                     start_date: string | null
                     title: string
                     user_id: string
@@ -254,7 +253,6 @@ export interface Database {
                     id?: string
                     illustration: string
                     message_board?: string
-                    public?: boolean
                     start_date?: string | null
                     title: string
                     user_id: string
@@ -266,7 +264,6 @@ export interface Database {
                     id?: string
                     illustration?: string
                     message_board?: string
-                    public?: boolean
                     start_date?: string | null
                     title?: string
                     user_id?: string
@@ -275,7 +272,7 @@ export interface Database {
                     {
                         foreignKeyName: 'roleplays_user_id_fkey'
                         columns: ['user_id']
-                        isOneToOne: true
+                        isOneToOne: false
                         referencedRelation: 'users'
                         referencedColumns: ['session_id']
                     },
