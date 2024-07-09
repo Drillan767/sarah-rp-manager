@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import type { Database } from '~/types/supabase'
+import type { CurrentUser } from '~/types/models'
 
 interface Roleplay {
     id: string
     illustration: string
     title: string
     start_date: string | null
-    public: boolean
 }
 
 const { t } = useI18n()
-
 const supabase = useSupabaseClient<Database>()
-const currentUser = useCurrentUser()
+const currentUser = useState<CurrentUser | undefined>('current-user')
 
 const roleplays = ref<Roleplay[]>([])
 
@@ -20,7 +19,27 @@ useHead({
     title: t('pages.roleplays.navlink'),
 })
 
-watch(currentUser, async (value) => {
+async function loadRoleplays() {
+    if (!currentUser.value)
+        return
+
+    const { data } = await supabase
+        .from('roleplays')
+        .select(`
+            id,
+            title,
+            illustration,
+            start_date
+        `)
+        .eq('user_id', currentUser.value.id)
+
+    if (data)
+        roleplays.value = data
+}
+
+onMounted(loadRoleplays)
+
+/* watch(currentUser, async (value) => {
     if (value.id && value.id !== 0) {
         const { data } = await supabase
             .from('roleplays')
@@ -36,7 +55,7 @@ watch(currentUser, async (value) => {
         if (data)
             roleplays.value = data
     }
-})
+}) */
 </script>
 
 <template>
@@ -72,12 +91,10 @@ watch(currentUser, async (value) => {
                         {{ rp.title }}
                     </VCardTitle>
                     <VCardActions class="justify-end">
-                        <VChip
-                            :label="true"
-                            :color="rp.public ? 'green' : 'orange'"
-                            variant="outlined"
-                            :prepend-icon="rp.public ? 'mdi-check-circle-outline' : 'mdi-alert-circle-outline'"
-                            :text="rp.public ? 'Public' : 'Private'"
+                        <VBtn
+                            variant="text"
+                            color="red"
+                            icon="mdi-trash-can-outline"
                         />
                     </VCardActions>
                 </VCard>
