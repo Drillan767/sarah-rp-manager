@@ -6,9 +6,8 @@ import useSnackBar from '~/composables/snackbar'
 interface EditForm {
     title: string
     start_date: string | null
-    illustration: File[] | undefined
     description: string
-    public: boolean
+    illustration: File | undefined
 }
 
 type EditRoleplay = Omit<Roleplay, 'roles'>
@@ -23,6 +22,7 @@ const tabs = ref(2)
 const loadingRP = ref(false)
 const loadingRoles = ref(false)
 const displayDeleteModale = ref(false)
+const rpValid = ref(false)
 const roles = ref<Role[]>([])
 const roleDeleting = ref<Role>({} as Role)
 const roleplay = ref<EditRoleplay>({} as EditRoleplay)
@@ -31,7 +31,6 @@ const form = ref<EditForm>({
     start_date: null,
     illustration: undefined,
     description: '',
-    public: true,
 })
 
 useHead({
@@ -111,17 +110,16 @@ async function fetchRoles() {
 async function saveRP() {
     loadingRP.value = true
 
-    const { title, public: isPublic, start_date, description, illustration } = form.value
+    const { title, start_date, description, illustration } = form.value
 
     const formData = new FormData()
     formData.append('id', roleplay.value.id)
     formData.append('title', title)
-    formData.append('public', isPublic ? '1' : '0')
     if (start_date)
         formData.append('start_date', start_date)
     formData.append('description', description)
     if (illustration)
-        formData.append('illustration', illustration[0])
+        formData.append('illustration', illustration)
     formData.append('description', description)
 
     await useFetch('/api/rp/update', {
@@ -143,6 +141,8 @@ async function updateRoles() {
 
         })),
     })
+
+    await fetchRoles()
 
     loadingRoles.value = false
 }
@@ -213,9 +213,10 @@ const links = computed(() => ([
         <VRow>
             <VCol>
                 <RpForm
+                    v-model:form="form"
+                    v-model:valid="rpValid"
                     :loading="loadingRP"
                     :current-preview="roleplay.illustration"
-                    :form="form"
                     :edit="true"
                     @save="saveRP"
                 />
