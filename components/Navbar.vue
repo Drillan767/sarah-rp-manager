@@ -56,14 +56,6 @@ watch(user, (value) => {
         <VToolbarTitle> Le Jardin de Sarah </VToolbarTitle>
 
         <template v-if="currentUser">
-            <VBtn
-                v-if="!mobile"
-                to="/roleplays"
-                class="mr-8"
-            >
-                Tous les roleplays
-            </VBtn>
-
             <VListItem
                 v-if="!mobile"
                 :title="currentUser.username"

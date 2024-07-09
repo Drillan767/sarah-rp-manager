@@ -5,12 +5,12 @@ import { vuetifyConfig } from '@/composables/vuetifyConfig'
 
 interface Props {
     loading: boolean
+    valid: boolean
     form: {
         title: string
         start_date: string | null
         description: string
         illustration: File | undefined
-        public: boolean
     }
     currentPreview?: string
     edit?: boolean
@@ -22,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
     (e: 'update:form', value: Props['form']): void
+    (e: 'update:valid', value: boolean): void
     (e: 'save'): void
 }>()
 
@@ -41,7 +42,6 @@ const [title, titleProps] = defineField('title', vuetifyConfig)
 const [illustration, illustrationProps] = defineField('illustration', vuetifyConfig)
 const [startDate, startDateProps] = defineField('start_date', vuetifyConfig)
 const [description] = defineField('description', vuetifyConfig)
-const [isPublic, publicProps] = defineField('public', vuetifyConfig)
 const formValid = useIsFormValid()
 
 const minDate = dayjs().format('YYYY-MM-DDT00:00')
@@ -85,6 +85,7 @@ watch(() => props.form, (newVal, oldVal) => {
 })
 
 watch(controlledValues, value => emit('update:form', value))
+watch(formValid, value => emit('update:valid', value))
 
 function submit() {
     emit('save')
@@ -102,25 +103,14 @@ function submit() {
         <template #text>
             <VContainer>
                 <VRow>
-                    <VCol cols="12" md="6">
+                    <VCol cols="12" md="5">
                         <VTextField
                             v-bind="titleProps"
                             v-model="title"
                             :label="t('pages.roleplays.form.title')"
                         />
                     </VCol>
-                    <VCol cols="12" md="6">
-                        <VTextField
-                            v-bind="startDateProps"
-                            v-model="startDate"
-                            type="date"
-                            :min="minDate"
-                            :label="t('pages.roleplays.form.begin')"
-                        />
-                    </VCol>
-                </VRow>
-                <VRow>
-                    <VCol cols="12" md="6" class="d-flex">
+                    <VCol cols="12" md="5" class="d-flex">
                         <VFileInput
                             v-bind="illustrationProps"
                             v-model="illustration"
@@ -143,13 +133,14 @@ function submit() {
                             </template>
                         </VFileInput>
                     </VCol>
-                    <VCol cols="12" md="6">
-                        <VSwitch
-                            v-bind="publicProps"
-                            v-model="isPublic"
-                            color="primary"
-                            :label="t('pages.roleplays.form.public')"
-                            :hide-details="true"
+                    <VCol cols="12" md="2">
+                        <VTextField
+                            v-bind="startDateProps"
+                            v-model="startDate"
+                            type="date"
+                            :min="minDate"
+                            :label="t('pages.roleplays.form.begin')"
+                            :clearable="true"
                         />
                     </VCol>
                 </VRow>

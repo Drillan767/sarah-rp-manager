@@ -12,7 +12,6 @@ export default defineEventHandler(async (event) => {
             title: payload.title,
             description: payload.description,
             illustration: '',
-            public: payload.public === '1',
             start_date: payload.start_date,
             user_id: payload.user_id,
         })

@@ -76,7 +76,6 @@ export interface Roleplay {
     message_board: string
     start_date: string | null
     illustration: string
-    public: boolean
     user_id: string
     roles: Role[]
     created_at: string
