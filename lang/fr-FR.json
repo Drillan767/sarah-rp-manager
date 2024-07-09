@@ -120,10 +120,13 @@
                 "public": "Le roleplay est-il publique ?",
                 "message": "l'annonce",
                 "roles_add": "Ajouter un rôle",
+                "free_roles_add": "Ajouter un rôle libre",
                 "roles_max_nb": "Nombre maximum",
                 "roles_name": "Nom du rôle",
                 "channel_add": "Ajouter un canal",
-                "channel_name": "Nom du canal"
+                "channel_name": "Nom du canal",
+                "free_role_name": "Rôle libre",
+                "free_role_description": "Les utilisateurs qui choisiront ce rôle utiliseront leur propre profil utilisé comme personnage"
             },
             "registration": {
                 "step1": "Sélectionner un rôle",
