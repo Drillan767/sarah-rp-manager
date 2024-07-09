@@ -1,6 +1,6 @@
 import { localize, setLocale } from '@vee-validate/i18n'
 import { configure, defineRule } from 'vee-validate'
-import { confirmed, email, image, max, min, required } from '@vee-validate/rules'
+import { confirmed, email, image, max, min, min_value as minValue, required } from '@vee-validate/rules'
 import fr from '@vee-validate/i18n/dist/locale/fr.json'
 import en from '@vee-validate/i18n/dist/locale/en.json'
 import dayjs from 'dayjs'
@@ -15,6 +15,7 @@ export default defineNuxtPlugin(() => {
     defineRule('max', max)
     defineRule('confirmed', confirmed)
     defineRule('image', image)
+    defineRule('min_value', minValue)
 
     // Allows to check wether this email or username already exists, avoiding error post submission.
     defineRule('unique', (value: string, [field]: ['email' | 'username']): Promise<string | boolean> => {
@@ -59,6 +60,7 @@ export default defineNuxtPlugin(() => {
                     ...fr.messages,
                     required: 'Le champ est requis',
                     unique: 'Un utilisateur avec ce {field} existe déjà',
+                    min_value: 'Le champ doit avoir une valeur de 0:{min} ou plus',
                 },
             },
             en: {
@@ -66,6 +68,7 @@ export default defineNuxtPlugin(() => {
                     ...en.messages,
                     required: 'The field is required',
                     unique: 'A user with this {field} already exists',
+                    min_value: 'The field must have a value of 0:{min} or more',
                 },
             },
         }),

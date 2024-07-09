@@ -285,6 +285,7 @@ export interface Database {
                 Row: {
                     created_at: string | null
                     description: string
+                    free: boolean
                     id: number
                     max_users: number
                     name: string
@@ -293,6 +294,7 @@ export interface Database {
                 Insert: {
                     created_at?: string | null
                     description?: string
+                    free?: boolean
                     id?: number
                     max_users?: number
                     name: string
@@ -301,6 +303,7 @@ export interface Database {
                 Update: {
                     created_at?: string | null
                     description?: string
+                    free?: boolean
                     id?: number
                     max_users?: number
                     name?: string

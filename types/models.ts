@@ -37,6 +37,7 @@ export interface CreatedRole {
     max_users: number
     description: string
     roleplay_id: string
+    free: boolean
 }
 
 export type Role = CreatedRole & {

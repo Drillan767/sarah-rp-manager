@@ -1,4 +1,5 @@
-import { createVuetify } from 'vuetify/lib/framework.mjs'
+import { createVuetify } from 'vuetify'
+import { VNumberInput } from 'vuetify/labs/VNumberInput'
 
 export default defineNuxtPlugin((nuxtApp) => {
     const vuetify = createVuetify({
@@ -20,6 +21,14 @@ export default defineNuxtPlugin((nuxtApp) => {
                 variant: 'outlined',
                 color: 'primary',
             },
+            VNumberInput: {
+                variant: 'outlined',
+                color: 'primary',
+                min: 0,
+            },
+        },
+        components: {
+            VNumberInput,
         },
     })
 
