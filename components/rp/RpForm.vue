@@ -85,7 +85,7 @@ watch(() => props.form, (newVal, oldVal) => {
 })
 
 watch(controlledValues, value => emit('update:form', value))
-watch(formValid, value => emit('update:valid', value))
+watch(formValid, value => emit('update:valid', value), { immediate: true })
 
 function submit() {
     emit('save')
