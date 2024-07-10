@@ -9,6 +9,7 @@ const { t } = useI18n()
 const theme = useTheme()
 const { mobile } = useDisplay()
 
+const config = useRuntimeConfig()
 const supabase = useSupabaseClient<Database>()
 const router = useRouter()
 const user = useSupabaseUser()
@@ -29,7 +30,7 @@ async function login() {
     await supabase.auth.signInWithOAuth({
         provider: 'twitter',
         options: {
-            redirectTo: 'http://localhost:3000/confirm',
+            redirectTo: config.public.redirectUrl,
         },
     })
 }
