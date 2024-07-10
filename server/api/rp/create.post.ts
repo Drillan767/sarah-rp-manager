@@ -5,6 +5,7 @@ const supabase_url = `${process.env.SUPABASE_URL}/storage/v1/object/public/rolep
 
 export default defineEventHandler(async (event) => {
     const { payload, supabase, body } = await multipartFormHandler(event)
+
     // Storing initial values into Supabase.
     const { data, error } = await supabase
         .from('roleplays')
@@ -48,6 +49,28 @@ export default defineEventHandler(async (event) => {
 
     if (updateError)
         throw createError({ statusCode: 400, message: updateError.message })
+
+    const { error: channelCreationError } = await supabase
+        .from('channels')
+        .insert([
+            {
+                name: 'Canal principal',
+                roleplay_id: rpId,
+                private: false,
+                allowed_roles: [],
+                internal: true,
+            },
+            {
+                name: 'Canal secondaire',
+                roleplay_id: rpId,
+                private: false,
+                allowed_roles: [],
+                internal: true,
+            },
+        ])
+
+    if (channelCreationError)
+        throw createError({ statusCode: 400, message: channelCreationError.message })
 
     return rpId
 })

@@ -77,11 +77,6 @@ watch(user, (value) => {
                         :subtitle="`@${currentUser.handle}`"
                         class="text"
                     />
-                    <VListItem
-                        v-if="mobile"
-                        title="Tous les roleplays"
-                        to="/roleplays"
-                    />
                     <VDivider v-if="mobile" />
                     <VListItem
                         to="/profile"

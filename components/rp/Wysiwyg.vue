@@ -44,7 +44,7 @@ onBeforeUnmount(() => editor.value?.destroy())
             <VBtnToggle
                 variant="outlined"
                 :divided="true"
-                class="mr-4"
+                class="mr-4 mb-2"
             >
                 <VBtn size="small" :disabled="!editor.can().chain().focus().toggleBold().run()" :class="{ 'v-btn--variant-outlined': editor.isActive('bold') }" @click="editor.chain().focus().toggleBold().run()">
                     <VIcon icon="mdi-format-bold" />
@@ -62,7 +62,7 @@ onBeforeUnmount(() => editor.value?.destroy())
             <VBtnToggle
                 variant="outlined"
                 :divided="true"
-                class="mr-4"
+                class="mr-4 mb-2"
             >
                 <VBtn size="small" :class="{ 'v-btn--variant-outlined': editor.isActive('heading', { level: 2 }) }" @click="editor.chain().focus().toggleHeading({ level: 2 }).run()">
                     h2
@@ -84,7 +84,7 @@ onBeforeUnmount(() => editor.value?.destroy())
             <VBtnToggle
                 variant="outlined"
                 :divided="true"
-                class="mr-4"
+                class="mr-4 mb-2"
             >
                 <VBtn size="small" :class="{ 'v-btn--variant-outlined': editor.isActive('bulletList') }" @click="editor.chain().focus().toggleBulletList().run()">
                     <VIcon icon="mdi-format-list-bulleted" />
@@ -103,7 +103,7 @@ onBeforeUnmount(() => editor.value?.destroy())
             <VBtnToggle
                 variant="outlined"
                 :divided="true"
-                class="mr-4"
+                class="mr-4 mb-2"
             >
                 <VBtn size="small" :disabled="!editor.can().chain().focus().undo().run()" @click="editor.chain().focus().undo().run()">
                     <VIcon icon="mdi-undo" />

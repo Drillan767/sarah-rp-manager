@@ -44,6 +44,8 @@ const formValid = ref(false)
 const canSubmit = computed(() => formValid.value && roles.value.length > 0)
 
 async function submit() {
+    if (!form.value)
+        return
     if (!currentUser.value)
         return
 
@@ -126,6 +128,7 @@ const links = [
             <VRow>
                 <VCol>
                     <RpForm
+                        v-if="form"
                         v-model:form="form"
                         v-model:valid="formValid"
                         :loading="loading"
