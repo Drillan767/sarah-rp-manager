@@ -7,6 +7,7 @@ interface Props {
     loading: boolean
     valid: boolean
     form: {
+        id: number
         title: string
         start_date: string | null
         description: string
@@ -38,6 +39,7 @@ const { defineField, setValues, controlledValues } = useForm<Props['form']>({
     initialValues: props.form,
 })
 
+defineField('id')
 const [title, titleProps] = defineField('title', vuetifyConfig)
 const [illustration, illustrationProps] = defineField('illustration', vuetifyConfig)
 const [startDate, startDateProps] = defineField('start_date', vuetifyConfig)
@@ -62,7 +64,7 @@ function handleImage(e: Event) {
     if (files) {
         preview.value = URL.createObjectURL(files[0])
         setValues({
-            illustration: files[0],
+            illustration: files[0] as File,
         })
     }
 }

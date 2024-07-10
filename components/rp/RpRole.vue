@@ -18,6 +18,7 @@ const { defineField, controlledValues, setValues } = useForm<Role | CreatedRole>
     initialValues: props.modelValue,
 })
 
+defineField('id')
 const [name, nameProps] = defineField('name', vuetifyConfig)
 const [maxUsers, maxUsersProps] = defineField('max_users', vuetifyConfig)
 const [description, descriptionProps] = defineField('description', vuetifyConfig)
