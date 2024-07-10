@@ -31,7 +31,7 @@ watch(() => props.modelValue, value => setValues(value))
 <template>
     <VContainer>
         <VRow :dense="true">
-            <VCol cols="6">
+            <VCol cols="12" md="6">
                 <VTextField
                     v-bind="nameProps"
                     v-model="name"
@@ -39,7 +39,7 @@ watch(() => props.modelValue, value => setValues(value))
                     :label="t('pages.roleplays.form.roles_name')"
                 />
             </VCol>
-            <VCol cols="3">
+            <VCol cols="6" md="3">
                 <VNumberInput
                     v-bind="maxUsersProps"
                     v-model="maxUsers"
@@ -48,7 +48,8 @@ watch(() => props.modelValue, value => setValues(value))
                 />
             </VCol>
             <VCol
-                cols="3"
+                cols="6"
+                md="3"
                 class="d-flex justify-end"
             >
                 <VBtn

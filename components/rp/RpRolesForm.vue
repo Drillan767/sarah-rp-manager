@@ -72,8 +72,34 @@ function removeRole(i: number) {
                         </VCard>
                     </VCol>
                 </VRow>
+                <VRow>
+                    <VCol class="d-flex flex-column align-center justify-center flex-md-row">
+                        <VBtn
+                            variant="outlined"
+                            rounded="xl"
+                            prepend-icon="mdi-plus-circle-outline"
+                            class="mt-4"
+                            @click="addRole(false)"
+                        >
+                            {{ t('pages.roleplays.form.roles_add') }}
+                        </VBtn>
+
+                        <VBtn
+                            :disabled="freeRoleUsed"
+                            color="blue"
+                            variant="outlined"
+                            rounded="xl"
+                            prepend-icon="mdi-account-question-outline"
+                            class="mt-4 ml-2"
+                            @click="addRole(true)"
+                        >
+                            {{ t('pages.roleplays.form.free_roles_add') }}
+                        </VBtn>
+                    </VCol>
+                </VRow>
             </VContainer>
-            <div class="d-flex justify-center">
+
+            <!-- <div class="d-flex justify-center">
                 <VBtn
                     variant="outlined"
                     rounded="xl"
@@ -95,7 +121,7 @@ function removeRole(i: number) {
                 >
                     {{ t('pages.roleplays.form.free_roles_add') }}
                 </VBtn>
-            </div>
+            </div> -->
         </template>
         <template v-if="edit" #actions>
             <VSpacer />
