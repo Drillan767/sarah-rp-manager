@@ -162,6 +162,18 @@ function getAvailableSlots(max: number, current: number) {
                 </VCol>
             </VRow>
         </VContainer>
+        <VDialog
+            v-model="showRegistrationModale"
+            width="400"
+        >
+            <VCard
+                title="Ça arrive fort."
+            >
+                <template #text>
+                    Jbosse dessus promis.
+                </template>
+            </VCard>
+        </VDialog>
         <!-- <RpRegisterForm
             :roleplay="roleplay"
             :show="showRegistrationModale"
