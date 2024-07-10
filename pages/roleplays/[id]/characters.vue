@@ -357,7 +357,7 @@ const blockedListHeaders: DataTableHeader[] = [
                             <VCard
                                 variant="tonal"
                             >
-                                <VImg
+                                <!-- <VImg
                                     src="/default-avatar.webp"
                                     class="align-end"
                                     gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
@@ -367,7 +367,7 @@ const blockedListHeaders: DataTableHeader[] = [
                                     <VCardTitle class="text-white">
                                         {{ t('pages.roleplays.characters.available') }}
                                     </VCardTitle>
-                                </VImg>
+                                </VImg> -->
                                 <VCardActions>
                                     <VSpacer />
                                 </VCardActions>
