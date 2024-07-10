@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { Roleplay } from '~/types/models'
+import type { CurrentUser, Roleplay } from '~/types/models'
 import type { Database } from '~/types/supabase'
-import { useCurrentUser } from '~/composables/currentUser'
 import RpRegisterForm from '~/components/rp/RpRegisterForm.vue'
 
 interface RPDetail extends Omit<Roleplay, 'roles'> {
@@ -13,14 +12,14 @@ interface RPDetail extends Omit<Roleplay, 'roles'> {
         characters: any[]
     }[]
     user: {
-        id: number
+        session_id: string
         username: string
     } | null
 }
 
+const currentUser = useState<CurrentUser | undefined>('current-user')
 const supabase = useSupabaseClient<Database>()
 const route = useRoute()
-const currentUser = useCurrentUser()
 const router = useRouter()
 const { t } = useI18n()
 
@@ -39,7 +38,7 @@ const { data: rpData, error } = await supabase
             *,
             characters(count)
         ),
-        user:users(id, username)
+        user:users(session_id, username)
     `)
     .eq('id', params.id)
     .single()
@@ -93,13 +92,13 @@ function getAvailableSlots(max: number, current: number) {
                     <VBtn
                         color="green"
                         variant="outlined"
-                        prepend-icon="mdi-book-plus-outline"
+                        prepend-icon="mdi-login"
                         @click="showRegistrationModale = true"
                     >
                         {{ t('form.register') }}
                     </VBtn>
                     <VBtn
-                        v-if="currentUser.id === roleplay.user?.id"
+                        v-if="currentUser?.id === roleplay?.user?.session_id"
                         color="orange"
                         variant="outlined"
                         prepend-icon="mdi-book-edit-outline"
@@ -113,7 +112,7 @@ function getAvailableSlots(max: number, current: number) {
 
             <VDivider class="my-4" />
 
-            <template v-if="roleplay.message_board !== null && roleplay.message_board !== ''">
+            <template v-if="roleplay.message_board && roleplay.message_board !== ''">
                 <VAlert
                     type="info"
                     title="Information"
@@ -138,7 +137,7 @@ function getAvailableSlots(max: number, current: number) {
                     v-for="(role, i) in roleplay.roles"
                     :key="i"
                     cols="12"
-                    md="6"
+                    md="3"
                 >
                     <VCard
                         class="h-100 d-flex flex-column"
@@ -156,17 +155,17 @@ function getAvailableSlots(max: number, current: number) {
                                 variant="outlined"
                                 color="blue"
                             >
-                                roles disponibles
+                                rôles disponibles
                             </VChip>
                         </VCardActions>
                     </VCard>
                 </VCol>
             </VRow>
         </VContainer>
-        <RpRegisterForm
+        <!-- <RpRegisterForm
             :roleplay="roleplay"
             :show="showRegistrationModale"
             @close="showRegistrationModale = false"
-        />
+        /> -->
     </div>
 </template>

@@ -4,6 +4,7 @@ import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
 
 interface EditForm {
+    id: number
     title: string
     start_date: string | null
     description: string
@@ -18,7 +19,7 @@ const { t } = useI18n()
 const { showSuccess } = useSnackBar()
 const { params } = route
 
-const tabs = ref(2)
+// const tabs = ref(2)
 const loadingRP = ref(false)
 const loadingRoles = ref(false)
 const displayDeleteModale = ref(false)
@@ -26,12 +27,7 @@ const rpValid = ref(false)
 const roles = ref<Role[]>([])
 const roleDeleting = ref<Role>({} as Role)
 const roleplay = ref<EditRoleplay>({} as EditRoleplay)
-const form = ref<EditForm>({
-    title: '',
-    start_date: null,
-    illustration: undefined,
-    description: '',
-})
+const form = ref<EditForm>()
 
 useHead({
     title: () => `${t('form.edit')} ${roleplay.value?.title ?? ''}`,
@@ -82,13 +78,23 @@ async function fetchRP() {
 
     if (data) {
         roleplay.value = data
-        form.value = Object.assign({}, {
+
+        const payload: EditForm = {
+            id: data.id,
             title: data.title,
             start_date: data.start_date,
             description: data.description,
-            public: data.public,
             illustration: undefined,
-        })
+        }
+
+        form.value = payload
+
+        /*         form.value = {
+            title: data.title,
+            start_date: data.start_date,
+            description: data.description,
+            illustration: data.illustration as File | undefined,
+        } as EditForm */
     }
 
     loadingRP.value = false
@@ -108,6 +114,8 @@ async function fetchRoles() {
 }
 
 async function saveRP() {
+    if (!form.value)
+        return
     loadingRP.value = true
 
     const { title, start_date, description, illustration } = form.value
@@ -172,14 +180,14 @@ const links = computed(() => ([
             </VCol>
         </VRow>
         <VRow>
-            <VCol cols="12" md="6">
+            <VCol>
                 <h1 class="text-h3 mb-4">
                     <template v-if="roleplay.title">
                         {{ `${t('form.edit')} "${roleplay.title}"` }}
                     </template>
                 </h1>
             </VCol>
-            <VCol
+            <!-- <VCol
                 cols="12"
                 md="6"
                 class="d-flex justify-end align-center"
@@ -204,7 +212,7 @@ const links = computed(() => ([
                         {{ t('common.see') }}
                     </VTab>
                 </VTabs>
-            </VCol>
+            </VCol> -->
         </VRow>
         <RPMessageBoardForm
             v-model:message="roleplay.message_board"
@@ -213,6 +221,7 @@ const links = computed(() => ([
         <VRow>
             <VCol>
                 <RpForm
+                    v-if="form"
                     v-model:form="form"
                     v-model:valid="rpValid"
                     :loading="loadingRP"
@@ -230,13 +239,6 @@ const links = computed(() => ([
                     :edit="true"
                     @update="updateRoles"
                     @delete="handleRoleDeletion"
-                />
-            </VCol>
-        </VRow>
-        <VRow>
-            <VCol>
-                <RPChannelsForm
-                    :roleplay-id="roleplay.id"
                 />
             </VCol>
         </VRow>
