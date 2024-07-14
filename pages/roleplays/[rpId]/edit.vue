@@ -73,7 +73,7 @@ async function fetchRP() {
     const { data } = await supabase
         .from('roleplays')
         .select('*')
-        .eq('id', params.id)
+        .eq('id', params.rpId)
         .single()
 
     if (data) {

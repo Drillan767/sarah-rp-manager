@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CurrentUser, Roleplay } from '~/types/models'
 import type { Database } from '~/types/supabase'
-import RpRegisterForm from '~/components/rp/RpRegisterForm.vue'
+// import RpRegisterForm from '~/components/rp/RpRegisterForm.vue'
 
 interface RPDetail extends Omit<Roleplay, 'roles'> {
     roles: {
@@ -28,7 +28,6 @@ const { query, params } = route
 const created = ref(false)
 const updated = ref(false)
 const roleplay = ref<RPDetail>({} as RPDetail)
-const showRegistrationModale = ref(false)
 
 const { data: rpData, error } = await supabase
     .from('roleplays')
@@ -40,7 +39,7 @@ const { data: rpData, error } = await supabase
         ),
         user:users(session_id, username)
     `)
-    .eq('id', params.id)
+    .eq('id', params.rpId)
     .single()
 
 if (error || rpData === null)
@@ -89,13 +88,14 @@ function getAvailableSlots(max: number, current: number) {
                     <p>{{ t('common.by') }} @{{ roleplay.user?.username }}</p>
                 </div>
                 <div>
+                    <!-- @click="showRegistrationModale = true" -->
                     <VBtn
+                        :to="`/roleplays/${roleplay.id}/channels`"
                         color="green"
                         variant="outlined"
                         prepend-icon="mdi-login"
-                        @click="showRegistrationModale = true"
                     >
-                        {{ t('form.register') }}
+                        {{ t('pages.roleplays.channel.access') }}
                     </VBtn>
                     <VBtn
                         v-if="currentUser?.id === roleplay?.user?.session_id"
@@ -155,25 +155,13 @@ function getAvailableSlots(max: number, current: number) {
                                 variant="outlined"
                                 color="blue"
                             >
-                                rôles disponibles
+                                {{ t('pages.roles.nb', getAvailableSlots(role.max_users, role.characters[0].count)) }}
                             </VChip>
                         </VCardActions>
                     </VCard>
                 </VCol>
             </VRow>
         </VContainer>
-        <VDialog
-            v-model="showRegistrationModale"
-            width="400"
-        >
-            <VCard
-                title="Ça arrive fort."
-            >
-                <template #text>
-                    Jbosse dessus promis.
-                </template>
-            </VCard>
-        </VDialog>
         <!-- <RpRegisterForm
             :roleplay="roleplay"
             :show="showRegistrationModale"
