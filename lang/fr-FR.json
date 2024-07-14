@@ -42,24 +42,7 @@
         "confirm_password": "Répéter le mot de passe"
     },
     "login": {
-        "action": "Connexion",
-        "noAccount": "Pas de compte ?",
-        "error": "Identifiant / Mot de passe incorrect",
-        "success": "Connexion réussie"
-    },
-    "forgotPwd": {
-        "title": "Mot de passe oublié",
-        "action": "Réinitialiser le mot de passe",
-        "success": "Un email vous permettant de réinitialiser votre mot de passe a été envoyé à l'adresse email indiquée."
-    },
-    "register": {
-        "action": "Inscription",
-        "success": "Inscription effectuée avec succès, veuillez activer votre compte grâce au lien envoyé par email.",
-        "accountExists": "Vous avez un compte ?"
-    },
-    "newPwd": {
-        "title": "Nouveau mot de passe",
-        "success": "Mot de passe enregistré avec succès"
+        "action": "Connexion"
     },
     "account": {
         "self": "Mon compte",
@@ -153,7 +136,8 @@
                 "blocked": "L'utilisateur a été bloqué et tous ses personnages ont été supprimés pour ce roleplay"
             },
             "channel": {
-                "self": "Canaux de discussion"
+                "self": "Canaux de discussion",
+                "access": "Accéder"
             },
             "delete": {
                 "role": "Confirmer la suppression du rôle ?",
@@ -161,6 +145,10 @@
                 "channel": "Confirmer la suppression du canal de discussion ?",
                 "channel_message": "La suppression du canal est irréversible, et entrainera la suppression de tous les messages et médias qui ont pu êre envoyés dans celle-ci. Confirmer ?"
             }
+        },
+        "roles": {
+            "self": "rôle | rôles",
+            "nb": "rôle disponible | rôles disponibles"
         }
     },
     "block": {

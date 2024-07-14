@@ -42,24 +42,7 @@
         "confirm_password": "Repeat the password"
     },
     "login": {
-        "action": "Login",
-        "noAccount": "No account?",
-        "error": "Invalid login credentials",
-        "success": "Authenticated successfully"
-    },
-    "forgotPwd": {
-        "title": "Password",
-        "action": "Forgot password",
-        "success": "A link to reset your password was sent to the indicated email address."
-    },
-    "register": {
-        "action": "Register",
-        "success": "Registration successful, please verify your email address with the link sent to you by email",
-        "accountExists": "Already have an account?"
-    },
-    "newPwd": {
-        "title": "New password",
-        "success": "Password changed successfully"
+        "action": "Login"
     },
     "account": {
         "self": "Account",
@@ -153,7 +136,8 @@
                 "blocked": "The user was blocked and all his characters were deleted for this roleplay"
             },
             "channel": {
-                "self": "Discussion channels"
+                "self": "Discussion channels",
+                "access": "Access"
             },
             "delete": {
                 "role": "Confirm the role's deletion?",

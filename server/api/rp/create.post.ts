@@ -59,6 +59,7 @@ export default defineEventHandler(async (event) => {
                 private: false,
                 allowed_roles: [],
                 internal: true,
+                is_default: true,
             },
             {
                 name: 'Canal secondaire',
@@ -66,6 +67,7 @@ export default defineEventHandler(async (event) => {
                 private: false,
                 allowed_roles: [],
                 internal: true,
+                is_default: true,
             },
         ])
 

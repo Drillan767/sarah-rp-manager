@@ -90,24 +90,27 @@ export interface Database {
             channels: {
                 Row: {
                     allowed_roles: Json | null
-                    id: number
+                    id: string
                     internal: boolean
+                    is_default: boolean
                     name: string
                     private: boolean
                     roleplay_id: string
                 }
                 Insert: {
                     allowed_roles?: Json | null
-                    id?: number
+                    id?: string
                     internal?: boolean
+                    is_default?: boolean
                     name: string
                     private?: boolean
                     roleplay_id: string
                 }
                 Update: {
                     allowed_roles?: Json | null
-                    id?: number
+                    id?: string
                     internal?: boolean
+                    is_default?: boolean
                     name?: string
                     private?: boolean
                     roleplay_id?: string
@@ -124,19 +127,22 @@ export interface Database {
             }
             channels_users: {
                 Row: {
-                    channel_id: number
+                    channel_id: string
                     created_at: string | null
                     id: number
+                    user_id: number
                 }
                 Insert: {
-                    channel_id: number
+                    channel_id: string
                     created_at?: string | null
                     id?: number
+                    user_id: number
                 }
                 Update: {
-                    channel_id?: number
+                    channel_id?: string
                     created_at?: string | null
                     id?: number
+                    user_id?: number
                 }
                 Relationships: [
                     {
@@ -144,6 +150,13 @@ export interface Database {
                         columns: ['channel_id']
                         isOneToOne: false
                         referencedRelation: 'channels'
+                        referencedColumns: ['id']
+                    },
+                    {
+                        foreignKeyName: 'channels_users_user_id_fkey'
+                        columns: ['user_id']
+                        isOneToOne: false
+                        referencedRelation: 'users'
                         referencedColumns: ['id']
                     },
                 ]
@@ -198,7 +211,7 @@ export interface Database {
             }
             messages: {
                 Row: {
-                    channel_id: number
+                    channel_id: string
                     created_at: string | null
                     emojis: Json | null
                     id: number
@@ -207,7 +220,7 @@ export interface Database {
                     read_by: Json | null
                 }
                 Insert: {
-                    channel_id: number
+                    channel_id: string
                     created_at?: string | null
                     emojis?: Json | null
                     id?: number
@@ -216,7 +229,7 @@ export interface Database {
                     read_by?: Json | null
                 }
                 Update: {
-                    channel_id?: number
+                    channel_id?: string
                     created_at?: string | null
                     emojis?: Json | null
                     id?: number
