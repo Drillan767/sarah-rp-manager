@@ -88,7 +88,6 @@ function getAvailableSlots(max: number, current: number) {
                     <p>{{ t('common.by') }} @{{ roleplay.user?.username }}</p>
                 </div>
                 <div>
-                    <!-- @click="showRegistrationModale = true" -->
                     <VBtn
                         :to="`/roleplays/${roleplay.id}/channels`"
                         color="green"
@@ -128,7 +127,7 @@ function getAvailableSlots(max: number, current: number) {
             <VRow>
                 <VCol>
                     <h2 class="text-h4">
-                        {{ t('pages.roleplays.form.role', 2) }}
+                        {{ t('pages.roleplays.nbRoles', 2) }}
                     </h2>
                 </VCol>
             </VRow>
@@ -140,15 +139,11 @@ function getAvailableSlots(max: number, current: number) {
                     md="3"
                 >
                     <VCard
+                        :title="role.name"
+                        :text="role.description"
                         class="h-100 d-flex flex-column"
                     >
-                        <VCardTitle>
-                            {{ role.name }}
-                        </VCardTitle>
-                        <VCardText>
-                            {{ role.description }}
-                        </VCardText>
-                        <VCardActions>
+                        <template #actions>
                             <VSpacer />
                             <VChip
                                 :prepend-icon="getAvailableSlots(role.max_users, role.characters[0].count)"
@@ -157,7 +152,7 @@ function getAvailableSlots(max: number, current: number) {
                             >
                                 {{ t('pages.roles.nb', getAvailableSlots(role.max_users, role.characters[0].count)) }}
                             </VChip>
-                        </VCardActions>
+                        </template>
                     </VCard>
                 </VCol>
             </VRow>

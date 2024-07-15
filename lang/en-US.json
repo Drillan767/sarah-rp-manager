@@ -77,7 +77,6 @@
             },
             "success": {
                 "infos": "Account informations successfully updated",
-                "password": "Password successfully updated",
                 "availabilities": "Availabilities successfully updated"
             },
             "error": {
@@ -91,10 +90,11 @@
         },
         "roleplays": {
             "self": "roleplay|roleplays",
-            "navlink": "My roleplays",
+            "my": "My roleplays",
             "create": "New roleplay",
-            "start_date": "Start date",
             "nbRoles": "No role left | {count} role available | {count} roles available",
+            "delete_title": "Remove \"{thing}\"?",
+            "delete_message": "The RP's removal will also delete related discussion channels, roles, characters, messages and media. Confirm?",
             "form": {
                 "title": "Title",
                 "begin": "Begin date",
@@ -122,29 +122,31 @@
                 "prev": "Previous",
                 "next": "Next",
                 "success": "Registration successful. You will be notified when it will be accepted"
-            },
-            "characters": {
-                "self": "Character|Characters",
-                "available": "Slot available",
-                "waiting_list": "Waiting list",
-                "pending": "Pending",
-                "accepted": "Accepted",
-                "moderator": "Moderator",
-                "date": "Blocked at",
-                "refused": "Character refused successfully",
-                "status": "Character status",
-                "blocked": "The user was blocked and all his characters were deleted for this roleplay"
-            },
-            "channel": {
-                "self": "Discussion channels",
-                "access": "Access"
-            },
-            "delete": {
-                "role": "Confirm the role's deletion?",
-                "role_message": "Deleting the \"{role}\" role cannot be undone, and each linked characters will also be deleted on their own.\n Confirm?",
-                "channel": "Confirme the canal's deletion?",
-                "channel_message": "Deleting the discussion channel cannot be undone, and will also delete every media and message sent through it. Confirm?"
             }
+        },
+        "characters": {
+            "self": "Character|Characters",
+            "available": "Slot available",
+            "waiting_list": "Waiting list",
+            "pending": "Pending",
+            "accepted": "Accepted",
+            "moderator": "Moderator",
+            "date": "Blocked at",
+            "refused": "Character refused successfully",
+            "status": "Character status",
+            "blocked": "The user was blocked and all his characters were deleted for this roleplay"
+        },
+        "channels": {
+            "channel": "Confirm the channel's deletion?",
+            "channel_message": "The channel's deletion cannot be undone and will also delete all related media and message sent up until this point. Confirm?",
+            "self": "Discussion channels",
+            "access": "Access"
+        },
+        "roles": {
+            "self": "role | roles",
+            "nb": "rôle disponible | rôles disponibles",
+            "delete_title": "Confirmer la suppression du rôle ?",
+            "delete_message": "La suppression du rôle {role} est irréversible, et chacun des personnages liés à celui-ci le seront également.\n Confirmer ?"
         }
     },
     "block": {
