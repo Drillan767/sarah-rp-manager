@@ -12,11 +12,13 @@ interface Roleplay {
 const { t } = useI18n()
 const supabase = useSupabaseClient<Database>()
 const currentUser = useState<CurrentUser | undefined>('current-user')
+const selectedRP = ref<Roleplay>()
+const showDeleteModal = ref(false)
 
 const roleplays = ref<Roleplay[]>([])
 
 useHead({
-    title: t('pages.roleplays.navlink'),
+    title: t('pages.roleplays.my'),
 })
 
 async function loadRoleplays() {
@@ -37,25 +39,26 @@ async function loadRoleplays() {
         roleplays.value = data
 }
 
+function showModal(rp: Roleplay) {
+    selectedRP.value = rp
+    showDeleteModal.value = true
+}
+
+async function deleteRP(rpId: string) {
+    await useFetch('/api/rp/remove', {
+        method: 'DELETE',
+        body: {
+            rpId,
+        },
+    })
+
+    selectedRP.value = undefined
+    showDeleteModal.value = false
+
+    await loadRoleplays()
+}
+
 onMounted(loadRoleplays)
-
-/* watch(currentUser, async (value) => {
-    if (value.id && value.id !== 0) {
-        const { data } = await supabase
-            .from('roleplays')
-            .select(`
-                id,
-                title,
-                illustration,
-                public,
-                start_date
-            `)
-            .eq('user_id', value.id)
-
-        if (data)
-            roleplays.value = data
-    }
-}) */
 </script>
 
 <template>
@@ -63,7 +66,7 @@ onMounted(loadRoleplays)
         <VRow>
             <VCol class="d-flex flex-column flex-md-row justify-space-between">
                 <h1 class="mb-2">
-                    {{ t('pages.roleplays.navlink') }}
+                    {{ t('pages.roleplays.my') }}
                 </h1>
                 <VBtn
                     prepend-icon="mdi-plus"
@@ -84,8 +87,8 @@ onMounted(loadRoleplays)
                 <VCard :to="`/roleplays/${rp.id}`">
                     <VImg
                         :src="rp.illustration"
-                        height="250"
                         :cover="true"
+                        height="250"
                     />
                     <VCardTitle>
                         {{ rp.title }}
@@ -95,10 +98,38 @@ onMounted(loadRoleplays)
                             variant="text"
                             color="red"
                             icon="mdi-trash-can-outline"
+                            @click.prevent="showModal(rp)"
                         />
                     </VCardActions>
                 </VCard>
             </VCol>
         </VRow>
     </VContainer>
+    <VDialog
+        v-if="selectedRP"
+        v-model="showDeleteModal"
+        width="600"
+    >
+        <VCard
+            :title="t('pages.roleplays.delete_title', { thing: selectedRP.title })"
+            :text="t('pages.roleplays.delete_message')"
+        >
+            <template #prepend>
+                <VIcon
+                    icon="mdi-trash-can-outline"
+                    color="red"
+                />
+            </template>
+            <template #actions>
+                <VSpacer />
+                <VBtn
+                    variant="flat"
+                    color="red"
+                    @click.prevent="deleteRP(selectedRP.id)"
+                >
+                    Supprimer
+                </VBtn>
+            </template>
+        </VCard>
+    </VDialog>
 </template>

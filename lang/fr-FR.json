@@ -77,7 +77,6 @@
             },
             "success": {
                 "infos": "Informations du compte mises à jour",
-                "password": "Mot de passe mit à jour",
                 "availabilities": "Disponibilités mises à jour"
             },
             "error": {
@@ -91,10 +90,11 @@
         },
         "roleplays": {
             "self": "roleplay|roleplays",
-            "navlink": "Mes roleplays",
+            "my": "Mes roleplays",
             "create": "Nouveau roleplay",
-            "start_date": "Date de début",
             "nbRoles": "Rôles tous pourvus | {count} rôle disponible | {count} rôles disponibles",
+            "delete_title": "Supprimer \"{thing}\" ?",
+            "delete_message": "La suppression du RP supprimera également les canaux de discussions, rôles, personnages, messages et médias liés. Confirmer ?",
             "form": {
                 "title": "Titre",
                 "begin": "Date de début",
@@ -122,33 +122,31 @@
                 "prev": "Précédent",
                 "next": "Suivant",
                 "success": "Inscription réussie. Vous recevrez une notification quand celle ci sera acceptée"
-            },
-            "characters": {
-                "self": "Personnage|Personnages",
-                "available": "Emplacement disponible",
-                "waiting_list": "Liste d'attente",
-                "pending": "En attente",
-                "accepted": "Accepté",
-                "moderator": "Modérateur",
-                "date": "Date de bloquage",
-                "refused": "Personnage refusé avec succès",
-                "status": "Statut du personnage",
-                "blocked": "L'utilisateur a été bloqué et tous ses personnages ont été supprimés pour ce roleplay"
-            },
-            "channel": {
-                "self": "Canaux de discussion",
-                "access": "Accéder"
-            },
-            "delete": {
-                "role": "Confirmer la suppression du rôle ?",
-                "role_message": "La suppression du rôle {role} est irréversible, et chacun des personnages liés à celui-ci le seront également.\n Confirmer ?",
-                "channel": "Confirmer la suppression du canal de discussion ?",
-                "channel_message": "La suppression du canal est irréversible, et entrainera la suppression de tous les messages et médias qui ont pu êre envoyés dans celle-ci. Confirmer ?"
             }
+        },
+        "characters": {
+            "self": "Personnage|Personnages",
+            "available": "Emplacement disponible",
+            "waiting_list": "Liste d'attente",
+            "pending": "En attente",
+            "accepted": "Accepté",
+            "moderator": "Modérateur",
+            "date": "Date de bloquage",
+            "refused": "Personnage refusé avec succès",
+            "status": "Statut du personnage",
+            "blocked": "L'utilisateur a été bloqué et tous ses personnages ont été supprimés pour ce roleplay"
+        },
+        "channels": {
+            "channel": "Confirmer la suppression du canal de discussion ?",
+            "channel_message": "La suppression du canal est irréversible, et entrainera la suppression de tous les messages et médias qui ont pu êre envoyés dans celle-ci. Confirmer ?",
+            "self": "Canaux de discussion",
+            "access": "Accéder"
         },
         "roles": {
             "self": "rôle | rôles",
-            "nb": "rôle disponible | rôles disponibles"
+            "nb": "rôle disponible | rôles disponibles",
+            "delete_title": "Confirmer la suppression du rôle ?",
+            "delete_message": "La suppression du rôle {role} est irréversible, et chacun des personnages liés à celui-ci le seront également.\n Confirmer ?"
         }
     },
     "block": {
