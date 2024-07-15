@@ -125,42 +125,6 @@ export interface Database {
                     },
                 ]
             }
-            channels_users: {
-                Row: {
-                    channel_id: string
-                    created_at: string | null
-                    id: number
-                    user_id: number
-                }
-                Insert: {
-                    channel_id: string
-                    created_at?: string | null
-                    id?: number
-                    user_id: number
-                }
-                Update: {
-                    channel_id?: string
-                    created_at?: string | null
-                    id?: number
-                    user_id?: number
-                }
-                Relationships: [
-                    {
-                        foreignKeyName: 'channels_users_channel_id_fkey'
-                        columns: ['channel_id']
-                        isOneToOne: false
-                        referencedRelation: 'channels'
-                        referencedColumns: ['id']
-                    },
-                    {
-                        foreignKeyName: 'channels_users_user_id_fkey'
-                        columns: ['user_id']
-                        isOneToOne: false
-                        referencedRelation: 'users'
-                        referencedColumns: ['id']
-                    },
-                ]
-            }
             characters: {
                 Row: {
                     created_at: string
@@ -216,6 +180,7 @@ export interface Database {
                     emojis: Json | null
                     id: number
                     image_url: string | null
+                    is_information: boolean
                     message: string
                     read_by: Json | null
                 }
@@ -225,6 +190,7 @@ export interface Database {
                     emojis?: Json | null
                     id?: number
                     image_url?: string | null
+                    is_information?: boolean
                     message: string
                     read_by?: Json | null
                 }
@@ -234,6 +200,7 @@ export interface Database {
                     emojis?: Json | null
                     id?: number
                     image_url?: string | null
+                    is_information?: boolean
                     message?: string
                     read_by?: Json | null
                 }

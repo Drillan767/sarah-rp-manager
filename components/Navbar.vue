@@ -50,72 +50,77 @@ watch(user, (value) => {
 </script>
 
 <template>
-    <VAppBar class="px-6">
-        <RouterLink to="/">
-            <VAvatar :tile="true" image="/sarah.jpg" />
-        </RouterLink>
-        <VToolbarTitle> Le Jardin de Sarah </VToolbarTitle>
-
-        <template v-if="currentUser">
-            <VListItem
-                v-if="!mobile"
-                :title="currentUser.username"
-                :subtitle="`@${currentUser.handle}`"
-                class="text-right"
-            />
-
-            <VMenu anchor="bottom end">
-                <template #activator="{ props }">
-                    <VBtn v-bind="props" icon>
-                        <VAvatar :image="currentUser.avatar" />
-                    </VBtn>
-                </template>
-                <VList>
-                    <VListItem
-                        v-if="mobile"
-                        :title="currentUser.username"
-                        :subtitle="`@${currentUser.handle}`"
-                        class="text"
-                    />
-                    <VDivider v-if="mobile" />
-                    <VListItem
-                        to="/profile"
-                        prepend-icon="mdi-account"
-                        :title="t('account.self')"
-                    />
-                    <VListItem
-                        to="/my-roleplays"
-                        prepend-icon="mdi-book-open-page-variant-outline"
-                        :title="t('pages.roleplays.navlink')"
-                    />
-                    <VDivider />
-                    <VListItem
-                        prepend-icon="mdi-logout"
-                        :title="t('account.logout')"
-                        @click="logout"
-                    />
-                    <VDivider />
-                    <VListItem
-                        :prepend-icon="
-                            theme.current.value.dark
-                                ? 'mdi-white-balance-sunny'
-                                : 'mdi-weather-night'
-                        "
-                        :title="
-                            t(
-                                theme.current.value.dark
-                                    ? 'account.light'
-                                    : 'account.dark',
-                            )
-                        "
-                        @click="switchTheme"
-                    />
-                </VList>
-            </VMenu>
+    <VAppBar
+        title="Le Jardin de Sarah"
+        class="px-6"
+    >
+        <template #prepend>
+            <RouterLink to="/">
+                <VAvatar :tile="true" image="/sarah.jpg" />
+            </RouterLink>
         </template>
+        <template #append>
+            <template v-if="currentUser">
+                <VListItem
+                    v-if="!mobile"
+                    :title="currentUser.username"
+                    :subtitle="`@${currentUser.handle}`"
+                    class="text-right"
+                />
 
-        <VBtn v-else color="primary" @click="login">
-            {{ t("login.action") }}
-        </VBtn>
+                <VMenu anchor="bottom end">
+                    <template #activator="{ props }">
+                        <VBtn v-bind="props" icon>
+                            <VAvatar :image="currentUser.avatar" />
+                        </VBtn>
+                    </template>
+                    <VList>
+                        <VListItem
+                            v-if="mobile"
+                            :title="currentUser.username"
+                            :subtitle="`@${currentUser.handle}`"
+                            class="text"
+                        />
+                        <VDivider v-if="mobile" />
+                        <VListItem
+                            to="/profile"
+                            prepend-icon="mdi-account"
+                            :title="t('account.self')"
+                        />
+                        <VListItem
+                            to="/my-roleplays"
+                            prepend-icon="mdi-book-open-page-variant-outline"
+                            :title="t('pages.roleplays.my')"
+                        />
+                        <VDivider />
+                        <VListItem
+                            prepend-icon="mdi-logout"
+                            :title="t('account.logout')"
+                            @click="logout"
+                        />
+                        <VDivider />
+                        <VListItem
+                            :prepend-icon="
+                                theme.current.value.dark
+                                    ? 'mdi-white-balance-sunny'
+                                    : 'mdi-weather-night'
+                            "
+                            :title="
+                                t(
+                                    theme.current.value.dark
+                                        ? 'account.light'
+                                        : 'account.dark',
+                                )
+                            "
+                            @click="switchTheme"
+                        />
+                    </VList>
+                </VMenu>
+            </template>
+
+            <VBtn v-else color="primary" @click="login">
+                {{ t("login.action") }}
+            </VBtn>
+        </template>
     </VAppBar>
 </template>

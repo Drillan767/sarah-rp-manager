@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import type { Database } from '@/types/supabase'
 import type { Channel, CurrentUser } from '@/types/models'
+import RPLayoutVue from '~/components/rp/RPLayout.vue.vue'
 
 interface OnlineUser {
     presence_ref: string
     user: CurrentUser
     online_at: string
 }
+
+definePageMeta({
+    layout: 'channels',
+})
 
 const supabase = useSupabaseClient<Database>()
 const route = useRoute()
@@ -31,14 +36,14 @@ const channelsActivity = supabase.channel(`channel-${rpId.toString()}`)
                 onlineUsers.value.push(presence[0])
         })
     })
-    .on('presence', { event: 'join' }, ({ newPresences }) => {
+    /* .on('presence', { event: 'join' }, ({ newPresences }) => {
         const found = onlineUsers.value.some(u => u.presence_ref === newPresences[0].presence_ref)
         if (!found)
             onlineUsers.value.push(newPresences[0])
     })
     .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
         onlineUsers.value = onlineUsers.value.filter(user => leftPresences[0].presence_ref !== user.presence_ref)
-    })
+    }) */
     .subscribe()
 
 async function loadChannels() {
@@ -73,25 +78,18 @@ onMounted(() => {
     loadChannels()
 })
 
-onBeforeUnmount(channelsActivity.untrack())
+onBeforeUnmount(() => channelsActivity.untrack())
 </script>
 
 <template>
-    <VContainer>
-        <VRow justify="center">
-            <VCol cols="4">
-                <VList>
-                    <VListSubheader
-                        title="Utilisateurs en ligne"
-                    />
-                    <VListItem
-                        v-for="(user, i) in onlineUsers"
-                        :key="i"
-                        :title="user.user.username"
-                        :prepend-avatar="user.user.avatar"
-                    />
-                </VList>
-            </VCol>
-        </VRow>
-    </VContainer>
+    <RPLayoutVue>
+        <template #channels>
+            <p>Channels</p>
+        </template>
+        <template #characters>
+            <p>Characters</p>
+        </template>
+    </RPLayoutVue>
+
+    <NuxtPage />
 </template>
