@@ -47,6 +47,7 @@ export type Role = CreatedRole & {
 export interface Channel {
     id: string
     name: string
+    internal: boolean
     roleplay_id: string
     private: boolean
     allowed_roles: any

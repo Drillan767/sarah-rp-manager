@@ -1,7 +1,5 @@
-<script setup lang="ts">
-
-</script>
-
 <template>
-    <p>Détail d'un canal de discussion</p>
+    <p>Détail du channel</p>
+    <p>{{ $route.params.rpId }}</p>
+    <p>{{ $route.params.channelId }}</p>
 </template>

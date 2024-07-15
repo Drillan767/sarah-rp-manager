@@ -94,7 +94,7 @@ function getAvailableSlots(max: number, current: number) {
                         variant="outlined"
                         prepend-icon="mdi-login"
                     >
-                        {{ t('pages.roleplays.channel.access') }}
+                        {{ t('pages.channels.access') }}
                     </VBtn>
                     <VBtn
                         v-if="currentUser?.id === roleplay?.user?.session_id"
