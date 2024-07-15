@@ -7,7 +7,7 @@ interface Props {
     loading: boolean
     valid: boolean
     form: {
-        id?: number
+        id?: string
         title: string
         start_date: string | null
         description: string

@@ -4,7 +4,7 @@ import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
 
 interface EditForm {
-    id: number
+    id: string
     title: string
     start_date: string | null
     description: string
@@ -88,13 +88,6 @@ async function fetchRP() {
         }
 
         form.value = payload
-
-        /*         form.value = {
-            title: data.title,
-            start_date: data.start_date,
-            description: data.description,
-            illustration: data.illustration as File | undefined,
-        } as EditForm */
     }
 
     loadingRP.value = false
@@ -105,7 +98,7 @@ async function fetchRoles() {
     const { data } = await supabase
         .from('roles')
         .select('*')
-        .eq('roleplay_id', params.id)
+        .eq('roleplay_id', params.rpId)
 
     if (data)
         roles.value = data
