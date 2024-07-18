@@ -128,7 +128,7 @@ export interface Database {
             characters: {
                 Row: {
                     created_at: string
-                    description: string
+                    description: string | null
                     id: number
                     illustration: string
                     name: string
@@ -138,7 +138,7 @@ export interface Database {
                 }
                 Insert: {
                     created_at?: string
-                    description: string
+                    description?: string | null
                     id?: number
                     illustration: string
                     name: string
@@ -148,7 +148,7 @@ export interface Database {
                 }
                 Update: {
                     created_at?: string
-                    description?: string
+                    description?: string | null
                     id?: number
                     illustration?: string
                     name?: string
