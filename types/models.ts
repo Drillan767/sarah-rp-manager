@@ -57,10 +57,10 @@ export interface Channel {
 export interface Character {
     id: number
     name: string
-    user_id: number
+    user_id: string
     status: number
     illustration: string
-    description: string
+    description: string | null
     user: {
         id: number
         username: string
