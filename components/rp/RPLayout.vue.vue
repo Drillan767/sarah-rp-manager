@@ -2,17 +2,11 @@
 import { useDisplay } from 'vuetify'
 import { useRoute } from 'vue-router'
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import {
-    REALTIME_LISTEN_TYPES,
-    REALTIME_POSTGRES_CHANGES_LISTEN_EVENT,
-    REALTIME_PRESENCE_LISTEN_EVENTS,
-    REALTIME_SUBSCRIBE_STATES,
-} from '@supabase/supabase-js'
 import type { Channel, Character, CurrentUser, Roleplay } from '@/types/models'
 import type { Database } from '~/types/supabase'
 
 interface OnlineUser {
-    presence_ref: string
+    characters: Character[]
     user: CurrentUser
     online_at: string
 }
@@ -128,132 +122,31 @@ async function loadUserCharacters() {
 
 async function setupOnlineUsers() {
     presence.value
-        .on('presence', { event: 'sync' }, () => {
-            const presences = Object.values(presence.value.presenceState())
-            console.log('sync', presences)
-
-            // TODO: Use array.flat() to avoid headaches.
-            // console.log(presences.flat())
-
-            presences.forEach((presence: any[]) => {
-                const found = onlineUsers.value.some(u => u.presence_ref === presence[0].presence_ref)
-                if (!found)
-                    onlineUsers.value.push(presence[0])
-            })
-        })
-        .on('presence', { event: 'join' }, ({ newPresences }) => {
-            const found = onlineUsers.value.some(u => u.presence_ref === newPresences[0].presence_ref)
-            if (!found)
-                onlineUsers.value.push(newPresences[0])
-        })
-        .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-            onlineUsers.value = onlineUsers.value.filter(user => leftPresences[0].presence_ref !== user.presence_ref)
-        })
+        .on('presence', { event: 'sync' }, updateOnlineUsers)
         .subscribe()
-    /* const channelsActivity = supabase.channel(`presence-${rpId.toString()}`)
-        .on('presence', { event: 'sync' }, () => {
-            const presences = Object.values(channelsActivity.presenceState())
-            console.log(presences)
-
-            // TODO: Use array.flat() to avoid headaches.
-            // console.log(presences.flat())
-
-            presences.forEach((presence: any[]) => {
-                const found = onlineUsers.value.some(u => u.presence_ref === presence[0].presence_ref)
-                if (!found)
-                    onlineUsers.value.push(presence[0])
-            })
-        })
-        .on('presence', { event: 'join' }, ({ newPresences }) => {
-            const found = onlineUsers.value.some(u => u.presence_ref === newPresences[0].presence_ref)
-            if (!found)
-                onlineUsers.value.push(newPresences[0])
-        })
-        .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-            onlineUsers.value = onlineUsers.value.filter(user => leftPresences[0].presence_ref !== user.presence_ref)
-        })
-        .subscribe() */
-    /* presence.value = supabase
-        .channel(`presence-${rpId.toString()}`)
-        .on('presence', {
-            event: 'sync',
-        }, () => {
-            const newState = presence.value?.presenceState()
-            console.log('sync', newState)
-        })
-        .on('presence', {
-            event: 'join',
-        }, (event) => {
-            console.log('join', event)
-        })
-        .on('presence', {
-            event: 'leave',
-        }, (event) => {
-            console.log('leave', event)
-        })
-        .subscribe()
-
-    await loadUserCharacters()
-
-    console.log(presence.value.presenceState()) */
 }
 
-/* LOADS LOGGED IN USERS
-const channelsActivity = supabase.channel(`channel-${rpId.toString()}`)
-    .on('presence', { event: 'sync' }, () => {
-        const presences = Object.values(channelsActivity.presenceState())
+function updateOnlineUsers() {
+    const presences = Object.values(presence.value.presenceState())
 
-        // TODO: Use array.flat() to avoid headaches.
-        // console.log(presences.flat())
+    const result: OnlineUser[] = []
 
-        presences.forEach((presence: any[]) => {
-            const found = onlineUsers.value.some(u => u.presence_ref === presence[0].presence_ref)
-            if (!found)
-                onlineUsers.value.push(presence[0])
-        })
-    })
-    .on('presence', { event: 'join' }, ({ newPresences }) => {
-        const found = onlineUsers.value.some(u => u.presence_ref === newPresences[0].presence_ref)
-        if (!found)
-            onlineUsers.value.push(newPresences[0])
-    })
-    .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-        onlineUsers.value = onlineUsers.value.filter(user => leftPresences[0].presence_ref !== user.presence_ref)
-    })
-    .subscribe()
+    for (const presence of presences) {
+        const onlineUser: OnlineUser = presence[0] as any as OnlineUser
 
-async function loadChannels() {
-    loadingChannels.value = true
-
-    try {
-        const { data } = await supabase
-            .from('channels')
-            .select('*')
-            .eq('roleplay_id', rpId.toString())
-
-        if (data)
-            channelsList.value = data
+        if (onlineUser.user.handle !== currentUser.value?.handle)
+            result.push(onlineUser)
     }
-    catch (e: any) {
-        console.warn(e.message)
-    }
-    finally {
-        loadingChannels.value = false
-    }
+
+    onlineUsers.value = result
 }
-
-async function getOnlineUsers() {
-    await channelsActivity.track({
-        user: currentUser.value,
-        online_at: new Date().toISOString(),
-    })
-} */
 
 onMounted(async () => {
     await setupOnlineUsers()
     await loadUserCharacters()
     loadRoleplay()
     channelsActivity()
+    updateOnlineUsers()
     // loadUserCharacters()
 })
 
@@ -262,6 +155,10 @@ onBeforeUnmount(() => {
     presence.value.unsubscribe()
     supabase.removeAllChannels()
 })
+
+watch(currentUser, (value) => {
+    console.log(value)
+}, { immediate: true })
 </script>
 
 <template>
@@ -383,11 +280,14 @@ onBeforeUnmount(() => {
             <VListSubheader
                 title="Utilisateurs connectés"
             />
+            <VListItem
+                v-for="(user, i) in onlineUsers"
+                :key="i"
+                :prepend-avatar="user.user.avatar"
+                :title="user.user.username"
+            />
         </VList>
     </VNavigationDrawer>
 
-    <!-- <VMain>
-
-    </VMain> -->
     <slot name="default" />
 </template>
