@@ -45,20 +45,22 @@ export type Role = CreatedRole & {
 }
 
 export interface Channel {
-    id: number
+    id: string
     name: string
+    internal: boolean
     roleplay_id: string
     private: boolean
     allowed_roles: any
+    is_default: boolean
 }
 
 export interface Character {
     id: number
     name: string
-    user_id: number
+    user_id: string
     status: number
     illustration: string
-    description: string
+    description: string | null
     user: {
         id: number
         username: string

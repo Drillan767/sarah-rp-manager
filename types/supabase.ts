@@ -90,24 +90,27 @@ export interface Database {
             channels: {
                 Row: {
                     allowed_roles: Json | null
-                    id: number
+                    id: string
                     internal: boolean
+                    is_default: boolean
                     name: string
                     private: boolean
                     roleplay_id: string
                 }
                 Insert: {
                     allowed_roles?: Json | null
-                    id?: number
+                    id?: string
                     internal?: boolean
+                    is_default?: boolean
                     name: string
                     private?: boolean
                     roleplay_id: string
                 }
                 Update: {
                     allowed_roles?: Json | null
-                    id?: number
+                    id?: string
                     internal?: boolean
+                    is_default?: boolean
                     name?: string
                     private?: boolean
                     roleplay_id?: string
@@ -122,36 +125,10 @@ export interface Database {
                     },
                 ]
             }
-            channels_users: {
-                Row: {
-                    channel_id: number
-                    created_at: string | null
-                    id: number
-                }
-                Insert: {
-                    channel_id: number
-                    created_at?: string | null
-                    id?: number
-                }
-                Update: {
-                    channel_id?: number
-                    created_at?: string | null
-                    id?: number
-                }
-                Relationships: [
-                    {
-                        foreignKeyName: 'channels_users_channel_id_fkey'
-                        columns: ['channel_id']
-                        isOneToOne: false
-                        referencedRelation: 'channels'
-                        referencedColumns: ['id']
-                    },
-                ]
-            }
             characters: {
                 Row: {
                     created_at: string
-                    description: string
+                    description: string | null
                     id: number
                     illustration: string
                     name: string
@@ -161,7 +138,7 @@ export interface Database {
                 }
                 Insert: {
                     created_at?: string
-                    description: string
+                    description?: string | null
                     id?: number
                     illustration: string
                     name: string
@@ -171,7 +148,7 @@ export interface Database {
                 }
                 Update: {
                     created_at?: string
-                    description?: string
+                    description?: string | null
                     id?: number
                     illustration?: string
                     name?: string
@@ -198,29 +175,32 @@ export interface Database {
             }
             messages: {
                 Row: {
-                    channel_id: number
+                    channel_id: string
                     created_at: string | null
                     emojis: Json | null
                     id: number
                     image_url: string | null
+                    is_information: boolean
                     message: string
                     read_by: Json | null
                 }
                 Insert: {
-                    channel_id: number
+                    channel_id: string
                     created_at?: string | null
                     emojis?: Json | null
                     id?: number
                     image_url?: string | null
+                    is_information?: boolean
                     message: string
                     read_by?: Json | null
                 }
                 Update: {
-                    channel_id?: number
+                    channel_id?: string
                     created_at?: string | null
                     emojis?: Json | null
                     id?: number
                     image_url?: string | null
+                    is_information?: boolean
                     message?: string
                     read_by?: Json | null
                 }

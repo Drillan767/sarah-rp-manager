@@ -47,6 +47,15 @@ watch(user, async () => {
                     },
                 })
         }
+        else {
+            await supabase
+                .from('users')
+                .update({
+                    username: twitter.name,
+                    avatar: twitter.picture,
+                })
+                .eq('handle', twitter.user_name)
+        }
 
         // Redirect to path
         return navigateTo(redirectPath || '/')

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
-
-const regex = /\/(forgot-password|login|register|new-password)(#.*)?/
-const whichLayout = computed(() => regex.test(route.fullPath) ? 'auth' : 'default')
+const whichLayout = computed(() => route.name?.toString().startsWith('roleplays-rpId-channels') ? 'channels' : 'default')
 </script>
 
 <template>
