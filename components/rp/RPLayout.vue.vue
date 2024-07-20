@@ -20,34 +20,15 @@ const { params: { rpId } } = route
 
 const presence = ref<RealtimeChannel>(supabase.channel(`presence-${rpId}`))
 const dbRealTime = ref<RealtimeChannel>(supabase.channel(`db-${rpId}`))
-const rpLoading = ref(false)
-const channelsLoading = ref(false)
 const charactersLoading = ref(false)
 const channelsDrawer = ref(true)
 const charactersDrawer = ref(true)
 const showInfos = ref(false)
 const onlineUsers = ref<OnlineUser[]>([])
 const roleplay = ref<Roleplay>()
+const privateChannels = ref<Channel[]>([])
 const channels = ref<Channel[]>([])
 const characters = ref<Omit<Character, 'user'>[]>([])
-
-useHead({
-    title: () => roleplay.value?.title ?? '',
-})
-
-async function loadRoleplay() {
-    rpLoading.value = true
-    const { data } = await supabase
-        .from('roleplays')
-        .select('*, roles(*)')
-        .eq('id', rpId.toString())
-        .single()
-
-    if (data)
-        roleplay.value = data
-
-    rpLoading.value = false
-}
 
 async function handleChannelInsert(payload: { new: Channel }) {
     if (payload.new.roleplay_id === rpId.toString()) {
@@ -70,18 +51,6 @@ async function handleChannelDeletion(payload: { old: { id: string } }) {
 }
 
 async function channelsActivity() {
-    // Initial fetch for the channels.
-    channelsLoading.value = true
-    const { data } = await supabase
-        .from('channels')
-        .select('*')
-        .eq('roleplay_id', rpId.toString())
-
-    if (data)
-        channels.value = data
-
-    channelsLoading.value = false
-
     // Setting up event listeners
     dbRealTime.value
         .on('postgres_changes', {
@@ -144,9 +113,7 @@ function updateOnlineUsers() {
 onMounted(async () => {
     await setupOnlineUsers()
     await loadUserCharacters()
-    loadRoleplay()
     channelsActivity()
-    updateOnlineUsers()
     // loadUserCharacters()
 })
 
@@ -155,10 +122,6 @@ onBeforeUnmount(() => {
     presence.value.unsubscribe()
     supabase.removeAllChannels()
 })
-
-watch(currentUser, (value) => {
-    console.log(value)
-}, { immediate: true })
 </script>
 
 <template>
@@ -215,23 +178,7 @@ watch(currentUser, (value) => {
         v-model="channelsDrawer"
         :permanent="mdAndUp"
     >
-        <VSkeletonLoader
-            :loading="channelsLoading"
-            type="list-item-avatar-two-line@2"
-        >
-            <VList class="w-100">
-                <VListSubheader
-                    title="Canaux de discussion"
-                />
-                <VListItem
-                    v-for="(channel, i) in channels"
-                    :key="i"
-                    :prepend-icon="channel.internal ? 'mdi-chat-outline' : 'mdi-chat'"
-                    :title="channel.name"
-                    :to="`/roleplays/${rpId}/channels/${channel.id}`"
-                />
-            </VList>
-        </VSkeletonLoader>
+        <slot name="channels" />
 
         <template #append>
             <div class="pa-2">
