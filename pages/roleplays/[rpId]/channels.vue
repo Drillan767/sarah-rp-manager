@@ -3,6 +3,18 @@ import type { Channel, CurrentUser, Roleplay } from '@/types/models'
 import type { Database } from '~/types/supabase'
 import RPLayout from '~/components/rp/RPLayout.vue.vue'
 
+definePageMeta({
+    layout: 'channels',
+})
+
+type PublicChannel = Channel & {
+    internal: true
+}
+
+type PrivateChannel = Channel & {
+    internal: false
+}
+
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 const currentUser = useState<CurrentUser | undefined>()
@@ -10,13 +22,10 @@ const route = useRoute()
 
 const roleplayId = ref('')
 const roleplay = ref<Roleplay>()
-const channels = ref<Channel[]>([])
+const publicChannels = ref<PublicChannel[]>([])
+const privateChannels = ref<PrivateChannel[]>([])
 const roleplayLoading = ref(false)
 const channelsLoading = ref(false)
-
-definePageMeta({
-    layout: 'channels',
-})
 
 useHead({
     title: () => roleplay.value?.title ?? '',
@@ -44,8 +53,10 @@ async function loadChannels() {
         .select('*')
         .eq('roleplay_id', roleplayId.value)
 
-    if (data)
-        channels.value = data
+    if (data) {
+        publicChannels.value = data.filter((d): d is PublicChannel => d.internal === true)
+        privateChannels.value = data.filter((d): d is PrivateChannel => d.internal === false)
+    }
 
     channelsLoading.value = false
 }
@@ -72,28 +83,12 @@ watch(() => route.params, ({ rpId }) => {
 
 <template>
     <RPLayout
+        v-if="roleplay"
+        v-model:public-channels="publicChannels"
+        v-model:private-channels="privateChannels"
         :roleplay="roleplay"
         :loading="roleplayLoading"
     >
-        <template #channels>
-            <VSkeletonLoader
-                :loading="channelsLoading"
-                type="list-item-avatar-two-line@2"
-            >
-                <VList class="w-100">
-                    <VListSubheader
-                        title="Canaux de discussion"
-                    />
-                    <VListItem
-                        v-for="(channel, i) in channels"
-                        :key="i"
-                        :prepend-icon="channel.internal ? 'mdi-chat-outline' : 'mdi-chat'"
-                        :title="channel.name"
-                        :to="`/roleplays/${roleplayId}/channels/${channel.id}`"
-                    />
-                </VList>
-            </VSkeletonLoader>
-        </template>
         <template #characters>
             <p>Characters</p>
         </template>

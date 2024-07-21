@@ -94,7 +94,6 @@ export interface Database {
                     internal: boolean
                     is_default: boolean
                     name: string
-                    private: boolean
                     roleplay_id: string
                 }
                 Insert: {
@@ -103,7 +102,6 @@ export interface Database {
                     internal?: boolean
                     is_default?: boolean
                     name: string
-                    private?: boolean
                     roleplay_id: string
                 }
                 Update: {
@@ -112,7 +110,6 @@ export interface Database {
                     internal?: boolean
                     is_default?: boolean
                     name?: string
-                    private?: boolean
                     roleplay_id?: string
                 }
                 Relationships: [
@@ -121,6 +118,39 @@ export interface Database {
                         columns: ['roleplay_id']
                         isOneToOne: false
                         referencedRelation: 'roleplays'
+                        referencedColumns: ['id']
+                    },
+                ]
+            }
+            channels_users: {
+                Row: {
+                    channel_id: string
+                    id: number
+                    user_id: number
+                }
+                Insert: {
+                    channel_id: string
+                    id?: number
+                    user_id: number
+                }
+                Update: {
+                    channel_id?: string
+                    id?: number
+                    user_id?: number
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: 'channels_users_channel_id_fkey'
+                        columns: ['channel_id']
+                        isOneToOne: false
+                        referencedRelation: 'channels'
+                        referencedColumns: ['id']
+                    },
+                    {
+                        foreignKeyName: 'channels_users_user_id_fkey'
+                        columns: ['user_id']
+                        isOneToOne: false
+                        referencedRelation: 'users'
                         referencedColumns: ['id']
                     },
                 ]

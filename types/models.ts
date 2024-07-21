@@ -49,9 +49,9 @@ export interface Channel {
     name: string
     internal: boolean
     roleplay_id: string
-    private: boolean
     allowed_roles: any
     is_default: boolean
+    // TODO: add allowed users
 }
 
 export interface Character {
