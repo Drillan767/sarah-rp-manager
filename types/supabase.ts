@@ -126,17 +126,17 @@ export interface Database {
                 Row: {
                     channel_id: string
                     id: number
-                    user_id: number
+                    user_id: string
                 }
                 Insert: {
                     channel_id: string
                     id?: number
-                    user_id: number
+                    user_id: string
                 }
                 Update: {
                     channel_id?: string
                     id?: number
-                    user_id?: number
+                    user_id?: string
                 }
                 Relationships: [
                     {
@@ -151,7 +151,7 @@ export interface Database {
                         columns: ['user_id']
                         isOneToOne: false
                         referencedRelation: 'users'
-                        referencedColumns: ['id']
+                        referencedColumns: ['session_id']
                     },
                 ]
             }
