@@ -2,6 +2,7 @@
 import { useDisplay } from 'vuetify'
 import { useVModels } from '@vueuse/core'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import NavBarMenu from '../layout/NavBarMenu.vue'
 import type { Channel, Character, CurrentUser, Roleplay } from '@/types/models'
 import type { Database } from '~/types/supabase'
 
@@ -137,7 +138,7 @@ onBeforeUnmount(() => {
 
 <template>
     <VAppBar
-        title="Le Jardin de Sarah"
+        :title="roleplay.title"
         class="px-6"
     >
         <template #prepend>
@@ -145,43 +146,12 @@ onBeforeUnmount(() => {
                 <VAvatar :tile="true" image="/sarah.jpg" />
             </RouterLink>
         </template>
-        <template #extension>
-            <VContainer fluid>
-                <VRow>
-                    <VDivider />
-                </VRow>
-                <VRow
-                    :justify="mdAndUp ? 'center' : 'space-between'"
-                >
-                    <VCol
-                        v-if="!mdAndUp"
-                        cols="1"
-                    >
-                        <VBtn
-                            icon="mdi-forum"
-                            @click.stop="channelsDrawer = !channelsDrawer"
-                        />
-                    </VCol>
-                    <VCol
-                        :cols="mdAndUp ? 3 : undefined"
-                        class="d-flex align-center justify-center"
-                    >
-                        <h1 class="text-h6">
-                            {{ roleplay?.title }}
-                        </h1>
-                    </VCol>
-                    <VCol
-                        v-if="!mdAndUp"
-                        cols="1"
-                        class="text-right"
-                    >
-                        <VBtn
-                            icon="mdi-account-group"
-                            @click.stop="charactersDrawer = !charactersDrawer"
-                        />
-                    </VCol>
-                </VRow>
-            </VContainer>
+        <template #append>
+            <VBtn
+                color="primary"
+                icon="mdi-information-box-outline"
+            />
+            <NavBarMenu :display-username="false" />
         </template>
     </VAppBar>
 
