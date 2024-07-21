@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify'
-import { useRoute } from 'vue-router'
+import { useVModels } from '@vueuse/core'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import type { Channel, Character, CurrentUser, Roleplay } from '@/types/models'
 import type { Database } from '~/types/supabase'
+
+interface Props {
+    roleplay: Roleplay
+    loading: boolean
+    privateChannels: Channel[]
+    publicChannels: Channel[]
+}
 
 interface OnlineUser {
     characters: Character[]
@@ -11,27 +18,31 @@ interface OnlineUser {
     online_at: string
 }
 
-const route = useRoute()
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+    (e: 'update:public-channels', value: Channel[]): void
+    (e: 'update:private-channels', value: Channel[]): void
+}>()
+
+const { publicChannels, privateChannels } = useVModels(props, emit)
+
 const supabase = useSupabaseClient<Database>()
 const { mdAndUp } = useDisplay()
 const currentUser = useState<CurrentUser | undefined>('current-user')
 
-const { params: { rpId } } = route
-
-const presence = ref<RealtimeChannel>(supabase.channel(`presence-${rpId}`))
-const dbRealTime = ref<RealtimeChannel>(supabase.channel(`db-${rpId}`))
+const presence = ref<RealtimeChannel>(supabase.channel(`presence-${props.roleplay.id}`))
+const dbRealTime = ref<RealtimeChannel>(supabase.channel(`db-${props.roleplay.id}`))
 const charactersLoading = ref(false)
 const channelsDrawer = ref(true)
 const charactersDrawer = ref(true)
 const showInfos = ref(false)
 const onlineUsers = ref<OnlineUser[]>([])
-const roleplay = ref<Roleplay>()
-const privateChannels = ref<Channel[]>([])
 const channels = ref<Channel[]>([])
 const characters = ref<Omit<Character, 'user'>[]>([])
 
 async function handleChannelInsert(payload: { new: Channel }) {
-    if (payload.new.roleplay_id === rpId.toString()) {
+    if (payload.new.roleplay_id === props.roleplay.id) {
         const exists = channels.value.find(c => c.id === payload.new.id)
         if (exists)
             return
@@ -40,7 +51,7 @@ async function handleChannelInsert(payload: { new: Channel }) {
 }
 
 async function handleChannelUpdate(payload: { new: Channel }) {
-    if (payload.new.roleplay_id === rpId.toString()) {
+    if (payload.new.roleplay_id === props.roleplay.id) {
         const index = channels.value.findIndex(c => c.id === payload.new.id)
         channels.value[index] = payload.new
     }
@@ -178,7 +189,30 @@ onBeforeUnmount(() => {
         v-model="channelsDrawer"
         :permanent="mdAndUp"
     >
-        <slot name="channels" />
+        <VList>
+            <VListSubheader
+                title="Canaux principaux"
+            />
+            <VListItem
+                v-for="(channel, i) in publicChannels"
+                :key="i"
+                :to="`/roleplays/${roleplay.id}/channels/${channel.id}`"
+                :title="channel.name"
+                prepend-icon="mdi-chat-outline"
+            />
+
+            <VListSubheader
+                v-if="privateChannels.length > 0"
+                title="Canaux privés"
+            />
+            <VListItem
+                v-for="(channel, i) in privateChannels"
+                :key="i"
+                :to="`/roleplays/${roleplay.id}/channels/${channel.id}`"
+                :title="channel.name"
+                prepend-icon="mdi-chat"
+            />
+        </VList>
 
         <template #append>
             <div class="pa-2">
