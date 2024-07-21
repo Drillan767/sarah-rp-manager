@@ -1,11 +1,8 @@
-import type { Database } from '~/types/supabase'
-import type { CurrentUser } from '~/types/models'
-
 export default defineNuxtRouteMiddleware(async (to) => {
     if (!to.name)
         return
 
-    const currentUser = useState<CurrentUser | undefined>('current-user')
+    const user = useSupabaseUser()
 
     const protectedRoutes = [
         'roleplays-rpId-channels',
@@ -15,6 +12,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
         'profile',
     ]
 
-    if (protectedRoutes.some(r => to.name?.toString().startsWith(r)) && !currentUser.value)
+    if (protectedRoutes.some(r => to.name?.toString().startsWith(r)) && !user.value)
         return navigateTo('/')
 })

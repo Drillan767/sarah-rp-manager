@@ -67,6 +67,12 @@ export interface Character {
     } | null
 }
 
+export interface OnlineUser {
+    characters: Character[]
+    user: CurrentUser
+    online_at: string
+}
+
 export type RoleSettings = Role & {
     characters: Character[]
 }

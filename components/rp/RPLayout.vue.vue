@@ -3,7 +3,8 @@ import { useDisplay } from 'vuetify'
 import { useVModels } from '@vueuse/core'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import NavBarMenu from '../layout/NavBarMenu.vue'
-import type { Channel, Character, CurrentUser, Roleplay } from '@/types/models'
+import CreateChannelDialog from '../channels/CreateChannelDialog.vue'
+import type { Channel, Character, CurrentUser, OnlineUser, Roleplay } from '@/types/models'
 import type { Database } from '~/types/supabase'
 
 interface Props {
@@ -11,12 +12,6 @@ interface Props {
     loading: boolean
     privateChannels: Channel[]
     publicChannels: Channel[]
-}
-
-interface OnlineUser {
-    characters: Character[]
-    user: CurrentUser
-    online_at: string
 }
 
 const props = defineProps<Props>()
@@ -38,28 +33,35 @@ const charactersLoading = ref(false)
 const channelsDrawer = ref(true)
 const charactersDrawer = ref(true)
 const showInfos = ref(false)
+const showChannelCreation = ref(false)
 const onlineUsers = ref<OnlineUser[]>([])
-const channels = ref<Channel[]>([])
 const characters = ref<Omit<Character, 'user'>[]>([])
 
 async function handleChannelInsert(payload: { new: Channel }) {
-    if (payload.new.roleplay_id === props.roleplay.id) {
-        const exists = channels.value.find(c => c.id === payload.new.id)
-        if (exists)
-            return
-        channels.value.push(payload.new)
-    }
+    const isInternal = payload.new.internal
+
+    const exists = (isInternal ? publicChannels.value : privateChannels.value).find(c => c.id === payload.new.id)
+
+    if (exists)
+        return
+
+    (isInternal ? publicChannels.value : privateChannels.value).push(payload.new)
 }
 
 async function handleChannelUpdate(payload: { new: Channel }) {
-    if (payload.new.roleplay_id === props.roleplay.id) {
-        const index = channels.value.findIndex(c => c.id === payload.new.id)
-        channels.value[index] = payload.new
+    if (payload.new.internal) {
+        const index = publicChannels.value.findIndex(c => c.id === payload.new.id)
+        publicChannels.value[index] = payload.new
+    }
+    else {
+        const index = privateChannels.value.findIndex(c => c.id === payload.new.id)
+        privateChannels.value[index] = payload.new
     }
 }
 
 async function handleChannelDeletion(payload: { old: { id: string } }) {
-    channels.value = channels.value.filter(c => c.id !== payload.old.id)
+    publicChannels.value = publicChannels.value.filter(c => c.id !== payload.old.id)
+    privateChannels.value = privateChannels.value.filter(c => c.id !== payload.old.id)
 }
 
 async function channelsActivity() {
@@ -67,15 +69,21 @@ async function channelsActivity() {
     dbRealTime.value
         .on('postgres_changes', {
             event: 'insert',
+            schema: 'public',
             table: 'channels',
+            filter: `roleplay_id=eq.${props.roleplay.id}`,
         }, handleChannelInsert)
         .on('postgres_changes', {
             event: 'update',
+            schema: 'public',
             table: 'channels',
+            filter: `roleplay_id=eq.${props.roleplay.id}`,
         }, handleChannelUpdate)
         .on('postgres_changes', {
             event: 'delete',
+            schema: 'public',
             table: 'channels',
+            filter: `roleplay_id=eq.${props.roleplay.id}`,
         }, handleChannelDeletion)
         .subscribe()
 }
@@ -169,7 +177,9 @@ onBeforeUnmount(() => {
                 :to="`/roleplays/${roleplay.id}/channels/${channel.id}`"
                 :title="channel.name"
                 prepend-icon="mdi-chat-outline"
-            />
+            >
+                <!-- TODO: Handle public channels interaction if user is roleplay's creator -->
+            </VListItem>
 
             <VListSubheader
                 v-if="privateChannels.length > 0"
@@ -192,6 +202,7 @@ onBeforeUnmount(() => {
                     variant="outlined"
                     color="primary"
                     block
+                    @click="showChannelCreation = true"
                 >
                     Nouveau canal
                 </VBtn>
@@ -241,4 +252,11 @@ onBeforeUnmount(() => {
     </VNavigationDrawer>
 
     <slot name="default" />
+
+    <CreateChannelDialog
+        v-model="showChannelCreation"
+        :online-users="onlineUsers"
+        :rp-id="roleplay.id"
+        @close="showChannelCreation = false"
+    />
 </template>
