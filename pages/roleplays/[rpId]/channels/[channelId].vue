@@ -1,25 +1,55 @@
 <script setup lang="ts">
+import type { CurrentUser } from '~/types/models'
 import type { Database, Tables } from '~/types/supabase'
 
+interface Props {
+    roleplay: Tables<'roleplays'>
+}
+
+const props = defineProps<Props>()
+
 const route = useRoute()
+const router = useRouter()
 const supabase = useSupabaseClient<Database>()
+const currentUser = useState<CurrentUser>('current-user')
 
 const channel = ref<Tables<'channels'>>()
+const showDialog = ref(false)
 
-async function loadChannel(channelId: string) {
+const canEditDelete = computed(() => {
+    if (!channel.value?.internal)
+        return true
+
+    return channel.value.internal && props.roleplay.user_id === currentUser.value.id
+})
+
+async function loadChannel() {
     const { data } = await supabase
         .from('channels')
         .select('*')
-        .eq('id', channelId)
+        .eq('id', route.params.channelId.toString())
         .single()
 
     if (data)
         channel.value = data
 }
 
+async function deleteChannel() {
+    await useFetch('/api/channels/remove', {
+        method: 'DELETE',
+        body: {
+            id: route.params.channelId.toString(),
+        },
+    })
+
+    router.push(`/roleplays/${route.params.rpId.toString()}/channels`)
+
+    showDialog.value = false
+}
+
 watch(() => route.params, (value) => {
     if (value.channelId) {
-        loadChannel(value.channelId.toString())
+        loadChannel()
     }
 }, { immediate: true })
 </script>
@@ -42,12 +72,14 @@ watch(() => route.params, (value) => {
                 </template>
                 <VList>
                     <VListItem
+                        v-if="canEditDelete"
                         title="Modifier le nom"
                         prepend-icon="mdi-square-edit-outline"
                     />
                     <VListItem
+                        v-if="canEditDelete"
                         title="Supprimer le canal"
-                        @click="() => console.log('bjr')"
+                        @click="showDialog = true"
                     >
                         <template #prepend>
                             <VIcon
@@ -61,4 +93,29 @@ watch(() => route.params, (value) => {
         </template>
     </VAppBar>
     <p>Détail du channel</p>
+
+    <VDialog
+        v-model="showDialog"
+        width="960"
+    >
+        <VCard
+            :title="`Supprimer ${channel?.name} ?`"
+            text="La suppression du bail entrainera des trucs assez dramatiques"
+        >
+            <template #actions>
+                <VSpacer />
+                <VBtn
+                    @click="showDialog = false"
+                >
+                    Annuler
+                </VBtn>
+                <VBtn
+                    color="red"
+                    @click="deleteChannel"
+                >
+                    Supprimer
+                </VBtn>
+            </template>
+        </VCard>
+    </VDialog>
 </template>

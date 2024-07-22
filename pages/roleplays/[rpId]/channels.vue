@@ -94,5 +94,5 @@ watch(() => route.params, ({ rpId }) => {
         </template>
     </RPLayout>
 
-    <NuxtPage />
+    <NuxtPage :roleplay="roleplay" />
 </template>
