@@ -89,7 +89,6 @@ export interface Database {
             }
             channels: {
                 Row: {
-                    allowed_roles: Json | null
                     id: string
                     internal: boolean
                     is_default: boolean
@@ -97,7 +96,6 @@ export interface Database {
                     roleplay_id: string
                 }
                 Insert: {
-                    allowed_roles?: Json | null
                     id?: string
                     internal?: boolean
                     is_default?: boolean
@@ -105,7 +103,6 @@ export interface Database {
                     roleplay_id: string
                 }
                 Update: {
-                    allowed_roles?: Json | null
                     id?: string
                     internal?: boolean
                     is_default?: boolean

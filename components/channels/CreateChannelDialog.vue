@@ -48,6 +48,7 @@ const submit = handleSubmit(async (form) => {
         body: {
             name: form.name,
             user_id: form.user.user.id,
+            current_user: currentUser.value.id,
             rpId: props.rpId,
         },
     })

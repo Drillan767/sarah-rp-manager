@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import type { Channel, CurrentUser, Roleplay } from '@/types/models'
-import type { Database } from '~/types/supabase'
+import type { CurrentUser, Roleplay } from '@/types/models'
+import type { Database, Tables } from '~/types/supabase'
 import RPLayout from '~/components/rp/RPLayout.vue.vue'
 
 definePageMeta({
     layout: 'channels',
 })
+
+type Channel = Tables<'channels'> & {
+    channels_users: Tables<'channels_users'>[]
+}
 
 type PublicChannel = Channel & {
     internal: true
@@ -50,12 +54,15 @@ async function loadChannels() {
     channelsLoading.value = true
     const { data } = await supabase
         .from('channels')
-        .select('*')
+        .select('*, channels_users(*)')
         .eq('roleplay_id', roleplayId.value)
 
     if (data) {
         publicChannels.value = data.filter((d): d is PublicChannel => d.internal === true)
-        privateChannels.value = data.filter((d): d is PrivateChannel => d.internal === false)
+        privateChannels.value = data.filter((d): d is PrivateChannel => {
+            const authorizedUsers = d.channels_users.map(cu => cu.user_id)
+            return d.internal === false && authorizedUsers.includes(currentUser.value?.id ?? '')
+        })
     }
 
     channelsLoading.value = false
