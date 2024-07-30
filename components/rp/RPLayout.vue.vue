@@ -4,8 +4,14 @@ import { useVModels } from '@vueuse/core'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import NavBarMenu from '../layout/NavBarMenu.vue'
 import CreateChannelDialog from '../channels/CreateChannelDialog.vue'
-import type { Channel, Character, CurrentUser, OnlineUser, Roleplay } from '@/types/models'
-import type { Database } from '~/types/supabase'
+import type { CurrentUser, OnlineUser, Roleplay } from '@/types/models'
+import type { Database, Tables } from '~/types/supabase'
+
+type Channel = Tables<'channels'> & {
+    channels_users: Tables<'channels_users'>[]
+}
+
+type Character = Tables<'characters'>
 
 interface Props {
     roleplay: Roleplay
