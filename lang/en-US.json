@@ -6,8 +6,10 @@
         "accept": "Accept",
         "refuse": "Refuse",
         "edit": "Edit",
+        "edit_thing": "Edit \"{thing}\"",
         "close": "Close",
         "delete": "Delete",
+        "remove_thing": "Remove \"{thing}\"",
         "register": "Register",
         "required": "The field is required",
         "email": "The email must be valid",
@@ -93,7 +95,6 @@
             "my": "My roleplays",
             "create": "New roleplay",
             "nbRoles": "No role left | {count} role available | {count} roles available",
-            "delete_title": "Remove \"{thing}\"?",
             "delete_message": "The RP's removal will also delete related discussion channels, roles, characters, messages and media. Confirm?",
             "form": {
                 "title": "Title",
@@ -137,10 +138,16 @@
             "blocked": "The user was blocked and all his characters were deleted for this roleplay"
         },
         "channels": {
-            "channel": "Confirm the channel's deletion?",
-            "channel_message": "The channel's deletion cannot be undone and will also delete all related media and message sent up until this point. Confirm?",
             "self": "Discussion channels",
-            "access": "Access"
+            "single": "Channel",
+            "access": "Access",
+            "main": "Main channels",
+            "private": "Private channels",
+            "channel": "Delete the channel",
+            "channel_message": "The channel's deletion cannot be undone and will also delete all related media and message sent up until this point. Confirm?"
+        },
+        "chat": {
+            "online_users": "Online users"
         },
         "roles": {
             "self": "role | roles",

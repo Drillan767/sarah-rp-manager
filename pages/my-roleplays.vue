@@ -111,7 +111,7 @@ onMounted(loadRoleplays)
         width="600"
     >
         <VCard
-            :title="t('pages.roleplays.delete_title', { thing: selectedRP.title })"
+            :title="`${t('form.remove_thing', { thing: selectedRP.title })}?`"
             :text="t('pages.roleplays.delete_message')"
         >
             <template #prepend>
@@ -127,7 +127,7 @@ onMounted(loadRoleplays)
                     color="red"
                     @click.prevent="deleteRP(selectedRP.id)"
                 >
-                    Supprimer
+                    {{ t('form.remove') }}
                 </VBtn>
             </template>
         </VCard>
