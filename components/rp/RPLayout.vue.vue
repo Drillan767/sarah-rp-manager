@@ -33,6 +33,7 @@ const { publicChannels, privateChannels } = useVModels(props, emit)
 const supabase = useSupabaseClient<Database>()
 const { mdAndUp } = useDisplay()
 const currentUser = useState<CurrentUser | undefined>('current-user')
+const { t } = useI18n()
 
 const presence = ref<RealtimeChannel>(supabase.channel(`presence-${props.roleplay.id}`))
 const dbRealTime = ref<RealtimeChannel>(supabase.channel(`db-${props.roleplay.id}`))
@@ -196,7 +197,7 @@ onBeforeUnmount(() => {
     >
         <VList>
             <VListSubheader
-                title="Canaux principaux"
+                :title="t('pages.channels.main')"
             />
             <VListItem
                 v-for="(channel, i) in publicChannels"
@@ -210,7 +211,7 @@ onBeforeUnmount(() => {
 
             <VListSubheader
                 v-if="privateChannels.length > 0"
-                title="Canaux privés"
+                :title="t('pages.channels.private')"
             />
             <VListItem
                 v-for="(channel, i) in privateChannels"
@@ -231,7 +232,7 @@ onBeforeUnmount(() => {
                     block
                     @click="showChannelCreation = true"
                 >
-                    Nouveau canal
+                    {{ t('pages.channels.single') }}
                 </VBtn>
             </div>
         </template>
@@ -267,7 +268,7 @@ onBeforeUnmount(() => {
 
         <VList>
             <VListSubheader
-                title="Utilisateurs connectés"
+                :title="t('pages.chat.online_users')"
             />
             <VListItem
                 v-for="(user, i) in onlineUsers"
