@@ -12,6 +12,7 @@ const route = useRoute()
 const router = useRouter()
 const supabase = useSupabaseClient<Database>()
 const currentUser = useState<CurrentUser>('current-user')
+const { t } = useI18n()
 
 const channel = ref<Tables<'channels'>>()
 const showDialog = ref(false)
@@ -73,12 +74,12 @@ watch(() => route.params, (value) => {
                 <VList>
                     <VListItem
                         v-if="canEditDelete"
-                        title="Modifier le nom"
+                        :title="t('form.edit_thing', { thing: t('fields.name') })"
                         prepend-icon="mdi-square-edit-outline"
                     />
                     <VListItem
                         v-if="canEditDelete"
-                        title="Supprimer le canal"
+                        :title="t('pages.channels.delete_title')"
                         @click="showDialog = true"
                     >
                         <template #prepend>
@@ -99,21 +100,21 @@ watch(() => route.params, (value) => {
         width="960"
     >
         <VCard
-            :title="`Supprimer ${channel?.name} ?`"
-            text="La suppression du bail entrainera des trucs assez dramatiques"
+            :title="t('form.remove_thing', { thing: channel?.name })"
+            :text="t('pages.channels.delete_message')"
         >
             <template #actions>
                 <VSpacer />
                 <VBtn
                     @click="showDialog = false"
                 >
-                    Annuler
+                    {{ t('form.cancel') }}
                 </VBtn>
                 <VBtn
                     color="red"
                     @click="deleteChannel"
                 >
-                    Supprimer
+                    {{ t('form.delete') }}
                 </VBtn>
             </template>
         </VCard>

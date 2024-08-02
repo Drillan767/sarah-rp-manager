@@ -6,8 +6,10 @@
         "accept": "Accepter",
         "refuse": "Refuser",
         "edit": "Modifier",
+        "edit_thing": "Editer \"{thing}\"",
         "close": "Fermer",
         "delete": "Supprimer",
+        "remove_thing": "Supprimer \"{thing}\" ",
         "register": "Inscription",
         "required": "Le champ est requis",
         "email": "L'adresse email doit être valide",
@@ -93,7 +95,6 @@
             "my": "Mes roleplays",
             "create": "Nouveau roleplay",
             "nbRoles": "Rôles tous pourvus | {count} rôle disponible | {count} rôles disponibles",
-            "delete_title": "Supprimer \"{thing}\" ?",
             "delete_message": "La suppression du RP supprimera également les canaux de discussions, rôles, personnages, messages et médias liés. Confirmer ?",
             "form": {
                 "title": "Titre",
@@ -137,10 +138,17 @@
             "blocked": "L'utilisateur a été bloqué et tous ses personnages ont été supprimés pour ce roleplay"
         },
         "channels": {
-            "channel": "Confirmer la suppression du canal de discussion ?",
-            "channel_message": "La suppression du canal est irréversible, et entrainera la suppression de tous les messages et médias qui ont pu êre envoyés dans celle-ci. Confirmer ?",
             "self": "Canaux de discussion",
-            "access": "Accéder"
+            "single": "Canal",
+            "access": "Accéder",
+            "main": "Canaux principaux",
+            "private": "Canaux privés",
+            "delete_title": "Supprimer le canal de discussion",
+            "delete_message": "La suppression du canal est irréversible, et entrainera la suppression de tous les messages et médias qui ont pu êre envoyés dans celle-ci. Confirmer ?"
+
+        },
+        "chat": {
+            "online_users": "Utilisateurs connectés"
         },
         "roles": {
             "self": "rôle | rôles",
