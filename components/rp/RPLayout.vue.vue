@@ -2,6 +2,7 @@
 import { useDisplay } from 'vuetify'
 import { useVModels } from '@vueuse/core'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import { da } from 'vuetify/locale'
 import NavBarMenu from '../layout/NavBarMenu.vue'
 import CreateChannelDialog from '../channels/CreateChannelDialog.vue'
 import type { CurrentUser, OnlineUser, Roleplay } from '@/types/models'
@@ -43,15 +44,35 @@ const showChannelCreation = ref(false)
 const onlineUsers = ref<OnlineUser[]>([])
 const characters = ref<Omit<Character, 'user'>[]>([])
 
+const openDiscussions = computed<string[]>(() => {
+    const test = privateChannels.value.reduce((acc, channel) => {
+        const cu = channel.channels_users.find(cu => cu.user_id !== currentUser.value?.id)
+
+        if (cu)
+            acc.push(cu.user_id)
+
+        return acc
+    }, [] as string[])
+
+    return test
+})
+
 async function handleChannelInsert(payload: { new: Channel }) {
-    const isInternal = payload.new.internal
+    const { data } = await supabase
+        .from('channels')
+        .select('*, channels_users(*)')
+        .eq('id', payload.new.id)
+        .single()
 
-    const exists = (isInternal ? publicChannels.value : privateChannels.value).find(c => c.id === payload.new.id)
+    if (data) {
+        const isInternal = data.internal
+        const exists = (isInternal ? publicChannels.value : privateChannels.value).find(c => c.id === data.id)
 
-    if (exists)
-        return
+        if (exists)
+            return
 
-    (isInternal ? publicChannels.value : privateChannels.value).push(payload.new)
+        (isInternal ? publicChannels.value : privateChannels.value).push(data)
+    }
 }
 
 async function handleChannelUpdate(payload: { new: Channel }) {
@@ -263,6 +284,7 @@ onBeforeUnmount(() => {
         v-model="showChannelCreation"
         :online-users="onlineUsers"
         :rp-id="roleplay.id"
+        :open-discussions="openDiscussions"
         @close="showChannelCreation = false"
     />
 </template>

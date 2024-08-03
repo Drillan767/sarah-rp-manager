@@ -3,6 +3,7 @@ import type { CurrentUser, OnlineUser } from '~/types/models'
 
 interface Props {
     modelValue: boolean
+    openDiscussions: string[]
     onlineUsers: OnlineUser[]
     rpId: string
 }
@@ -23,10 +24,9 @@ const currentUser = useState<CurrentUser>('current-user')
 
 const loading = ref(false)
 
-const { defineField, setValues, handleSubmit, resetForm } = useForm<Form>({
+const { defineField, setValues, handleSubmit, setErrors, resetForm } = useForm<Form>({
     validationSchema: {
         name: 'required',
-        user: 'required',
     },
 })
 
@@ -39,6 +39,24 @@ const valueData = computed({
     get: () => props.modelValue,
     set: value => emit('update:model-value', value),
 })
+
+function handleSelection(value?: OnlineUser) {
+    if (value) {
+        if (props.openDiscussions.includes(value.user.id)) {
+            setTimeout(() => setErrors({
+                user: 'Une conversation avec l\'utilisateur existe déjà.',
+            }), 200)
+        }
+        else {
+            setValues({
+                name: `${currentUser.value.username} & ${value.user.username}`,
+            })
+        }
+    }
+    else {
+        setValues({ name: undefined })
+    }
+}
 
 const submit = handleSubmit(async (form) => {
     loading.value = true
@@ -61,17 +79,6 @@ function close() {
     resetForm()
     emit('close')
 }
-
-watch(user, (value) => {
-    if (value) {
-        setValues({
-            name: `${currentUser.value.username} & ${value.user.username}`,
-        })
-    }
-    else {
-        setValues({ name: undefined })
-    }
-})
 </script>
 
 <template>
@@ -106,6 +113,7 @@ watch(user, (value) => {
                                 item-value="user.id"
                                 item-title="user.username"
                                 return-object
+                                @update:model-value="handleSelection"
                             />
                         </VCol>
                     </VRow>

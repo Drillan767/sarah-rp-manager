@@ -143,13 +143,6 @@ export interface Database {
                         referencedRelation: 'channels'
                         referencedColumns: ['id']
                     },
-                    {
-                        foreignKeyName: 'channels_users_user_id_fkey'
-                        columns: ['user_id']
-                        isOneToOne: false
-                        referencedRelation: 'users'
-                        referencedColumns: ['session_id']
-                    },
                 ]
             }
             characters: {
