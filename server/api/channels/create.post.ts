@@ -11,16 +11,13 @@ export default defineEventHandler(async (event) => {
         .insert({
             name: body.name,
             roleplay_id: body.rpId,
-            allowed_roles: [],
             internal: false,
             is_default: false,
         })
         .select('id')
 
-    console.log(data)
-
     if (data) {
-        const { data: cu } = await supabase
+        await supabase
             .from('channels_users')
             .insert([
                 {
@@ -33,8 +30,6 @@ export default defineEventHandler(async (event) => {
                 },
             ])
             .select()
-
-        console.log({ cu })
     }
 
     return body
