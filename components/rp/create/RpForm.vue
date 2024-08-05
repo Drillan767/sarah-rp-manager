@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm, useIsFormValid } from 'vee-validate'
-import Wysiwyg from '~/components/rp/Wysiwyg.vue'
+import Wysiwyg from '~/components/rp/create/Wysiwyg.vue'
 import { vuetifyConfig } from '@/composables/vuetifyConfig'
 
 interface Props {

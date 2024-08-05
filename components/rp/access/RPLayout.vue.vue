@@ -2,10 +2,10 @@
 import { useDisplay } from 'vuetify'
 import { useVModels } from '@vueuse/core'
 import type { RealtimeChannel } from '@supabase/supabase-js'
-import { da } from 'vuetify/locale'
-import NavBarMenu from '../layout/NavBarMenu.vue'
-import CreateChannelDialog from '../channels/CreateChannelDialog.vue'
-import type { CurrentUser, OnlineUser, Roleplay } from '@/types/models'
+import NavBarMenu from '../../layout/NavBarMenu.vue'
+import CreateChannelDialog from '../../channels/CreateChannelDialog.vue'
+import RPInformations from './RPInformations.vue'
+import type { CurrentUser, OnlineUser } from '@/types/models'
 import type { Database, Tables } from '~/types/supabase'
 
 type Channel = Tables<'channels'> & {
@@ -15,7 +15,7 @@ type Channel = Tables<'channels'> & {
 type Character = Tables<'characters'>
 
 interface Props {
-    roleplay: Roleplay
+    roleplay: Tables<'roleplays'>
     loading: boolean
     privateChannels: Channel[]
     publicChannels: Channel[]
@@ -40,7 +40,8 @@ const dbRealTime = ref<RealtimeChannel>(supabase.channel(`db-${props.roleplay.id
 const charactersLoading = ref(false)
 const channelsDrawer = ref(true)
 const charactersDrawer = ref(true)
-const showInfos = ref(false)
+const showOwnInfos = ref(false)
+const showRPInfos = ref(false)
 const showChannelCreation = ref(false)
 const onlineUsers = ref<OnlineUser[]>([])
 const characters = ref<Omit<Character, 'user'>[]>([])
@@ -183,10 +184,28 @@ onBeforeUnmount(() => {
             </RouterLink>
         </template>
         <template #append>
-            <VBtn
-                color="primary"
-                icon="mdi-information-box-outline"
-            />
+            <VMenu>
+                <template #activator="{ props: menu }">
+                    <VBtn
+                        v-bind="menu"
+                        icon="mdi-dots-vertical"
+                    />
+                </template>
+                <VList>
+                    <VListItem
+                        title="Informations sur le roleplay"
+                        prepend-icon="mdi-information-box-outline"
+                        @click="showRPInfos = true"
+                    />
+                    <VListItem
+                        title="Quitter le Roleplay"
+                        prepend-icon="mdi-logout"
+                        color="red"
+                        class="text-error"
+                    />
+                </VList>
+            </VMenu>
+
             <NavBarMenu :display-username="false" />
         </template>
     </VAppBar>
@@ -243,7 +262,7 @@ onBeforeUnmount(() => {
         :permanent="mdAndUp"
         location="right"
         width="300"
-        @click="showInfos = !showInfos"
+        @click="showOwnInfos = !showOwnInfos"
     >
         <!-- TODO: Use VNotification or whatever to state if current character is ready -->
         <VCard
@@ -255,7 +274,7 @@ onBeforeUnmount(() => {
             class="cursor-pointer"
         >
             <VExpandTransition>
-                <div v-show="showInfos">
+                <div v-show="showOwnInfos">
                     <VDivider />
                     <VCardText>
                         I'm a thing. But, like most politicians, he promised more than he could deliver. You won't have time for sleeping, soldier, not with all the bed making you'll be doing. Then we'll go with that data file! Hey, you add a one and two zeros to that or we walk! You're going to do his laundry? I've got to find a way to escape.
@@ -287,5 +306,10 @@ onBeforeUnmount(() => {
         :rp-id="roleplay.id"
         :open-discussions="openDiscussions"
         @close="showChannelCreation = false"
+    />
+
+    <RPInformations
+        v-model="showRPInfos"
+        :roleplay="roleplay"
     />
 </template>

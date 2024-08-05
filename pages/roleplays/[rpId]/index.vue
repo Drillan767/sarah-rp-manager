@@ -127,7 +127,7 @@ function getAvailableSlots(max: number, current: number) {
             <VRow>
                 <VCol>
                     <h2 class="text-h4">
-                        {{ t('pages.roleplays.nbRoles', 2) }}
+                        {{ t('pages.roleplays.nbRoles', roleplay.roles.length) }}
                     </h2>
                 </VCol>
             </VRow>

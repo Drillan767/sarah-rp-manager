@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { CurrentUser, Roleplay } from '@/types/models'
+import type { CurrentUser } from '@/types/models'
 import type { Database, Tables } from '~/types/supabase'
-import RPLayout from '~/components/rp/RPLayout.vue.vue'
+import RPLayout from '~/components/rp/access/RPLayout.vue.vue'
 
 definePageMeta({
     layout: 'channels',
@@ -25,7 +25,7 @@ const currentUser = useState<CurrentUser | undefined>()
 const route = useRoute()
 
 const roleplayId = ref('')
-const roleplay = ref<Roleplay>()
+const roleplay = ref<Tables<'roleplays'>>()
 const publicChannels = ref<PublicChannel[]>([])
 const privateChannels = ref<PrivateChannel[]>([])
 const roleplayLoading = ref(false)
