@@ -83,8 +83,8 @@ function getAvailableSlots(max: number, current: number) {
         </VImg>
 
         <VContainer>
-            <div class="d-flex justify-space-between align-center">
-                <div class="meta">
+            <div class="d-flex flex-column flex-md-row justify-space-between">
+                <div class="meta mb-4 mb-md-0">
                     <p>{{ t('common.by') }} @{{ roleplay.user?.username }}</p>
                 </div>
                 <div>
