@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify'
 import { useVModels } from '@vueuse/core'
-import type { RealtimeChannel } from '@supabase/supabase-js'
+import { REALTIME_POSTGRES_CHANGES_LISTEN_EVENT } from '@supabase/supabase-js'
+import type {
+    RealtimeChannel,
+    RealtimePostgresDeletePayload,
+    RealtimePostgresInsertPayload,
+    RealtimePostgresUpdatePayload,
+} from '@supabase/supabase-js'
 import NavBarMenu from '../../layout/NavBarMenu.vue'
 import CreateChannelDialog from '../../channels/CreateChannelDialog.vue'
 import RPInformations from './RPInformations.vue'
@@ -35,6 +41,8 @@ const { mdAndUp } = useDisplay()
 const currentUser = useState<CurrentUser | undefined>('current-user')
 const { t } = useI18n()
 
+let heartbeatInterval: number | null = null
+
 const presence = ref<RealtimeChannel>(supabase.channel(`presence-${props.roleplay.id}`))
 const dbRealTime = ref<RealtimeChannel>(supabase.channel(`db-${props.roleplay.id}`))
 const charactersLoading = ref(false)
@@ -59,7 +67,7 @@ const openDiscussions = computed<string[]>(() => {
     return test
 })
 
-async function handleChannelInsert(payload: { new: Channel }) {
+async function handleChannelInsert(payload: RealtimePostgresInsertPayload<Tables<'channels'>>) {
     const { data } = await supabase
         .from('channels')
         .select('*, channels_users(*)')
@@ -77,7 +85,7 @@ async function handleChannelInsert(payload: { new: Channel }) {
     }
 }
 
-async function handleChannelUpdate(payload: { new: Channel }) {
+async function handleChannelUpdate(payload: RealtimePostgresUpdatePayload<Channel>) {
     if (payload.new.internal) {
         const index = publicChannels.value.findIndex(c => c.id === payload.new.id)
         publicChannels.value[index] = payload.new
@@ -88,7 +96,7 @@ async function handleChannelUpdate(payload: { new: Channel }) {
     }
 }
 
-async function handleChannelDeletion(payload: { old: { id: string } }) {
+async function handleChannelDeletion(payload: RealtimePostgresDeletePayload<Tables<'channels'>>) {
     publicChannels.value = publicChannels.value.filter(c => c.id !== payload.old.id)
     privateChannels.value = privateChannels.value.filter(c => c.id !== payload.old.id)
 }
@@ -97,21 +105,21 @@ async function channelsActivity() {
     // Setting up event listeners
     dbRealTime.value
         .on('postgres_changes', {
-            event: 'insert',
             schema: 'public',
             table: 'channels',
+            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.INSERT,
             filter: `roleplay_id=eq.${props.roleplay.id}`,
         }, handleChannelInsert)
         .on('postgres_changes', {
-            event: 'update',
             schema: 'public',
             table: 'channels',
+            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.UPDATE,
             filter: `roleplay_id=eq.${props.roleplay.id}`,
         }, handleChannelUpdate)
         .on('postgres_changes', {
-            event: 'delete',
             schema: 'public',
             table: 'channels',
+            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.DELETE,
             filter: `roleplay_id=eq.${props.roleplay.id}`,
         }, handleChannelDeletion)
         .subscribe()
@@ -141,7 +149,15 @@ async function loadUserCharacters() {
 async function setupOnlineUsers() {
     presence.value
         .on('presence', { event: 'sync' }, updateOnlineUsers)
-        .subscribe()
+        .subscribe(async (status) => {
+            if (status === 'SUBSCRIBED') {
+                await presence.value.track({
+                    user: currentUser.value,
+                    online_at: new Date().toISOString(),
+                    characters: characters.value,
+                })
+            }
+        })
 }
 
 function updateOnlineUsers() {
@@ -159,17 +175,42 @@ function updateOnlineUsers() {
     onlineUsers.value = result
 }
 
+function startHeartbeat() {
+    heartbeatInterval = window.setInterval(async () => {
+        await presence.value.track({
+            user: currentUser.value,
+            online_at: new Date().toISOString(),
+        })
+    }, 15000)
+}
+
+function stopHeartbeat() {
+    if (heartbeatInterval) {
+        clearInterval(heartbeatInterval)
+        heartbeatInterval = null
+    }
+}
+
+function disconnect() {
+    dbRealTime.value.unsubscribe()
+    presence.value.unsubscribe()
+    supabase.removeAllChannels()
+}
+
 onMounted(async () => {
     await setupOnlineUsers()
     await loadUserCharacters()
+    startHeartbeat()
     channelsActivity()
+
+    window.addEventListener('beforeunload', disconnect)
     // loadUserCharacters()
 })
 
 onBeforeUnmount(() => {
-    dbRealTime.value.unsubscribe()
-    presence.value.unsubscribe()
-    supabase.removeAllChannels()
+    stopHeartbeat()
+    disconnect()
+    window.removeEventListener('beforeunload', disconnect)
 })
 </script>
 

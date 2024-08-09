@@ -39,7 +39,7 @@ async function loadRoleplay() {
     roleplayLoading.value = true
     const { data } = await supabase
         .from('roleplays')
-        .select('*, roles(*)')
+        .select('*, roles(*)') // load EVERYTHING
         .eq('id', roleplayId.value)
         .single()
 
