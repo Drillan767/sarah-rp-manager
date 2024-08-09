@@ -93,6 +93,7 @@
         "roleplays": {
             "self": "roleplay|roleplays",
             "my": "My roleplays",
+            "browse": "Browse roleplays",
             "create": "New roleplay",
             "nbRoles": "No role left | {count} role available | {count} roles available",
             "delete_message": "The RP's removal will also delete related discussion channels, roles, characters, messages and media. Confirm?",

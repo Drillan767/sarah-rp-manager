@@ -75,19 +75,25 @@ watch(user, (value) => {
                 />
                 <VDivider v-if="mobile" />
                 <VListItem
+                    :title="t('account.self')"
                     to="/profile"
                     prepend-icon="mdi-account"
-                    :title="t('account.self')"
                 />
                 <VListItem
+                    :title="t('pages.roleplays.my')"
                     to="/my-roleplays"
                     prepend-icon="mdi-book-open-page-variant-outline"
-                    :title="t('pages.roleplays.my')"
                 />
                 <VDivider />
                 <VListItem
-                    prepend-icon="mdi-logout"
+                    :title="t('pages.roleplays.browse')"
+                    to="/all-roleplays"
+                    prepend-icon="mdi-bookshelf"
+                />
+                <VListItem
                     :title="t('account.logout')"
+                    prepend-icon="mdi-logout"
+
                     @click="logout"
                 />
                 <VDivider />
