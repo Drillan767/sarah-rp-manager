@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { CurrentUser } from '~/types/models'
+import RpForm from '~/components/rp/create/RpForm.vue'
+import RpRolesForm from '~/components/rp/create/RpRolesForm.vue'
 
 interface FormType {
     title: string
@@ -99,7 +101,7 @@ const links = [
         to: '/',
     },
     {
-        title: t('pages.roleplays.navlink'),
+        title: 'Roleplays',
         to: '/roleplays',
     },
     {

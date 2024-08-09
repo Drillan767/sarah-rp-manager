@@ -2,6 +2,8 @@
 import type { Role, Roleplay } from '~/types/models'
 import type { Database } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
+import RpForm from '~/components/rp/create/RpForm.vue'
+import RpRolesForm from '~/components/rp/create/RpRolesForm.vue'
 
 interface EditForm {
     id: string

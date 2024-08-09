@@ -93,6 +93,7 @@
         "roleplays": {
             "self": "roleplay|roleplays",
             "my": "Mes roleplays",
+            "browse": "Tous les roleplays",
             "create": "Nouveau roleplay",
             "nbRoles": "Rôles tous pourvus | {count} rôle disponible | {count} rôles disponibles",
             "delete_message": "La suppression du RP supprimera également les canaux de discussions, rôles, personnages, messages et médias liés. Confirmer ?",
