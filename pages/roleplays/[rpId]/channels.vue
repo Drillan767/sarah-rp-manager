@@ -1,7 +1,14 @@
 <script setup lang="ts">
+import { REALTIME_POSTGRES_CHANGES_LISTEN_EVENT } from '@supabase/supabase-js'
+import type {
+    RealtimeChannel,
+    RealtimePostgresInsertPayload,
+    RealtimePostgresUpdatePayload,
+} from '@supabase/supabase-js'
 import type { CurrentUser } from '@/types/models'
 import type { Database, Tables } from '~/types/supabase'
 import RPLayout from '~/components/rp/access/RPLayout.vue.vue'
+import channels from '~/layouts/channels.vue'
 
 definePageMeta({
     layout: 'channels',
@@ -28,6 +35,8 @@ const roleplayId = ref('')
 const roleplay = ref<Tables<'roleplays'>>()
 const publicChannels = ref<PublicChannel[]>([])
 const privateChannels = ref<PrivateChannel[]>([])
+const messages = ref<Tables<'messages'>[]>([])
+const channelsId = ref<string[]>([])
 const roleplayLoading = ref(false)
 const channelsLoading = ref(false)
 
@@ -58,6 +67,7 @@ async function loadChannels() {
         .eq('roleplay_id', roleplayId.value)
 
     if (data) {
+        channelsId.value = data.map(d => d.id)
         publicChannels.value = data.filter((d): d is PublicChannel => d.internal === true)
         privateChannels.value = data.filter((d): d is PrivateChannel => {
             const authorizedUsers = d.channels_users.map(cu => cu.user_id)
@@ -66,6 +76,16 @@ async function loadChannels() {
     }
 
     channelsLoading.value = false
+}
+
+async function loadMessages() {
+    const { data } = await supabase
+        .from('messages')
+        .select('*')
+        .in('channel_id', channelsId.value)
+
+    if (data)
+        messages.value = data
 }
 
 watch(user, (value) => {
@@ -81,10 +101,11 @@ watch(user, (value) => {
     }
 }, { immediate: true })
 
-watch(() => route.params, ({ rpId }) => {
+watch(() => route.params, async ({ rpId }) => {
     roleplayId.value = rpId.toString()
     loadRoleplay()
-    loadChannels()
+    await loadChannels()
+    await loadMessages()
 }, { immediate: true })
 </script>
 
@@ -101,5 +122,8 @@ watch(() => route.params, ({ rpId }) => {
         </template>
     </RPLayout>
 
-    <NuxtPage :roleplay="roleplay" />
+    <NuxtPage
+        :roleplay
+        :messages
+    />
 </template>
