@@ -15,21 +15,21 @@ export interface Database {
                     id: number
                     reason: string
                     roleplay_id: string
-                    user_id: number
+                    user_id: string
                 }
                 Insert: {
                     created_at?: string
                     id?: number
                     reason: string
                     roleplay_id: string
-                    user_id: number
+                    user_id: string
                 }
                 Update: {
                     created_at?: string
                     id?: number
                     reason?: string
                     roleplay_id?: string
-                    user_id?: number
+                    user_id?: string
                 }
                 Relationships: [
                     {
@@ -52,23 +52,23 @@ export interface Database {
                 Row: {
                     created_at: string
                     id: number
-                    origin_id: number
+                    origin_id: string
                     reason: string | null
-                    target_id: number
+                    target_id: string
                 }
                 Insert: {
                     created_at?: string
                     id?: number
-                    origin_id: number
+                    origin_id: string
                     reason?: string | null
-                    target_id: number
+                    target_id: string
                 }
                 Update: {
                     created_at?: string
                     id?: number
-                    origin_id?: number
+                    origin_id?: string
                     reason?: string | null
-                    target_id?: number
+                    target_id?: string
                 }
                 Relationships: [
                     {
@@ -143,6 +143,13 @@ export interface Database {
                         referencedRelation: 'channels'
                         referencedColumns: ['id']
                     },
+                    {
+                        foreignKeyName: 'channels_users_user_id_fkey'
+                        columns: ['user_id']
+                        isOneToOne: false
+                        referencedRelation: 'users'
+                        referencedColumns: ['id']
+                    },
                 ]
             }
             characters: {
@@ -189,40 +196,43 @@ export interface Database {
                         columns: ['user_id']
                         isOneToOne: true
                         referencedRelation: 'users'
-                        referencedColumns: ['session_id']
+                        referencedColumns: ['id']
                     },
                 ]
             }
             messages: {
                 Row: {
                     channel_id: string
+                    character_id: number | null
                     created_at: string | null
-                    emojis: Json | null
                     id: number
                     image_url: string | null
                     is_information: boolean
                     message: string
-                    read_by: Json | null
+                    read_by: string[] | null
+                    user_id: string
                 }
                 Insert: {
                     channel_id: string
+                    character_id?: number | null
                     created_at?: string | null
-                    emojis?: Json | null
                     id?: number
                     image_url?: string | null
                     is_information?: boolean
                     message: string
-                    read_by?: Json | null
+                    read_by?: string[] | null
+                    user_id: string
                 }
                 Update: {
                     channel_id?: string
+                    character_id?: number | null
                     created_at?: string | null
-                    emojis?: Json | null
                     id?: number
                     image_url?: string | null
                     is_information?: boolean
                     message?: string
-                    read_by?: Json | null
+                    read_by?: string[] | null
+                    user_id?: string
                 }
                 Relationships: [
                     {
@@ -232,11 +242,24 @@ export interface Database {
                         referencedRelation: 'channels'
                         referencedColumns: ['id']
                     },
+                    {
+                        foreignKeyName: 'messages_character_id_fkey'
+                        columns: ['character_id']
+                        isOneToOne: false
+                        referencedRelation: 'characters'
+                        referencedColumns: ['id']
+                    },
+                    {
+                        foreignKeyName: 'messages_user_id_fkey'
+                        columns: ['user_id']
+                        isOneToOne: false
+                        referencedRelation: 'users'
+                        referencedColumns: ['id']
+                    },
                 ]
             }
             roleplays: {
                 Row: {
-                    cofounders: number[] | null
                     created_at: string
                     description: string
                     id: string
@@ -244,10 +267,9 @@ export interface Database {
                     message_board: string
                     start_date: string | null
                     title: string
-                    user_id: string
+                    user_id: string | null
                 }
                 Insert: {
-                    cofounders?: number[] | null
                     created_at?: string
                     description: string
                     id?: string
@@ -255,10 +277,9 @@ export interface Database {
                     message_board?: string
                     start_date?: string | null
                     title: string
-                    user_id: string
+                    user_id?: string | null
                 }
                 Update: {
-                    cofounders?: number[] | null
                     created_at?: string
                     description?: string
                     id?: string
@@ -266,7 +287,7 @@ export interface Database {
                     message_board?: string
                     start_date?: string | null
                     title?: string
-                    user_id?: string
+                    user_id?: string | null
                 }
                 Relationships: [
                     {
@@ -274,7 +295,7 @@ export interface Database {
                         columns: ['user_id']
                         isOneToOne: false
                         referencedRelation: 'users'
-                        referencedColumns: ['session_id']
+                        referencedColumns: ['id']
                     },
                 ]
             }
@@ -318,33 +339,33 @@ export interface Database {
             }
             users: {
                 Row: {
-                    availability: Json | null
-                    created_at: string | null
+                    availability: Json
+                    avatar: string
+                    created_at: string
                     description: string | null
                     email: string
-                    id: number
-                    session_id: string
-                    superadmin: boolean
+                    handle: string
+                    id: string
                     username: string
                 }
                 Insert: {
-                    availability?: Json | null
-                    created_at?: string | null
+                    availability: Json
+                    avatar: string
+                    created_at?: string
                     description?: string | null
                     email: string
-                    id?: number
-                    session_id: string
-                    superadmin?: boolean
+                    handle: string
+                    id?: string
                     username: string
                 }
                 Update: {
-                    availability?: Json | null
-                    created_at?: string | null
+                    availability?: Json
+                    avatar?: string
+                    created_at?: string
                     description?: string | null
                     email?: string
-                    id?: number
-                    session_id?: string
-                    superadmin?: boolean
+                    handle?: string
+                    id?: string
                     username?: string
                 }
                 Relationships: []

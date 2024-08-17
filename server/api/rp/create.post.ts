@@ -56,16 +56,12 @@ export default defineEventHandler(async (event) => {
             {
                 name: 'Canal principal',
                 roleplay_id: rpId,
-                private: false,
-                allowed_roles: [],
                 internal: true,
                 is_default: true,
             },
             {
                 name: 'Canal secondaire',
                 roleplay_id: rpId,
-                private: false,
-                allowed_roles: [],
                 internal: true,
                 is_default: true,
             },
