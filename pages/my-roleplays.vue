@@ -127,7 +127,7 @@ onMounted(loadRoleplays)
                     color="red"
                     @click.prevent="deleteRP(selectedRP.id)"
                 >
-                    {{ t('form.remove') }}
+                    {{ t('form.delete') }}
                 </VBtn>
             </template>
         </VCard>

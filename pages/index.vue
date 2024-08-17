@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useCurrentUser } from '~/composables/currentUser'
 import messageList from '~/assets/json/landing-messages.json'
 import Message from '~/components/channels/Message.vue'
 
@@ -21,15 +20,11 @@ const { t } = useI18n({
     useScope: 'local',
 })
 
-const currentUser = useCurrentUser()
 const dayjs = useDayjs()
 
 const username = ref('')
 
 const messages = ref<IMessage[]>([])
-const user = useSupabaseUser()
-
-username.value = user.value ? currentUser.value.username : t('me')
 
 useHead({
     title: t('title'),

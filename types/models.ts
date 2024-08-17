@@ -1,3 +1,5 @@
+import type { Tables } from './supabase'
+
 export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
 
 export interface SpecificDate {
@@ -44,49 +46,14 @@ export type Role = CreatedRole & {
     id: number
 }
 
-export interface Channel {
-    id: string
-    name: string
-    internal: boolean
-    roleplay_id: string
-    allowed_roles: any
-    is_default: boolean
-    // TODO: add allowed users
-}
-
-export interface Character {
-    id: number
-    name: string
-    user_id: string
-    status: number
-    illustration: string
-    description: string | null
-    user: {
-        id: number
-        username: string
-    } | null
-}
-
 export interface OnlineUser {
-    characters: Character[]
+    characters: Tables<'characters'>[]
     user: CurrentUser
     online_at: string
 }
 
 export type RoleSettings = Role & {
-    characters: Character[]
-}
-
-export interface Roleplay {
-    id: string
-    title: string
-    description: string
-    message_board: string
-    start_date: string | null
-    illustration: string
-    user_id: string
-    roles: Role[]
-    created_at: string
+    characters: Tables<'characters'>[]
 }
 
 export interface DataTableHeader {

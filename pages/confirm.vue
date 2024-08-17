@@ -36,9 +36,11 @@ watch(user, async () => {
             await supabase
                 .from('users')
                 .insert({
-                    username: twitter.user_name,
+                    id: user.value.id,
+                    username: twitter.name,
+                    handle: twitter.user_name,
+                    avatar: twitter.picture,
                     email: twitter.email,
-                    session_id: user.value.id,
                     availability: {
                         weekends: false,
                         weekdays: false,
