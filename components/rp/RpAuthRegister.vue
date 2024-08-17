@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useForm, useIsFormValid } from 'vee-validate'
 import { vuetifyConfig } from '~/composables/vuetifyConfig'
-import { useCurrentUser } from '~/composables/currentUser'
 import useSnackBar from '~/composables/snackbar'
 
 interface IRegister {
@@ -19,7 +18,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const router = useRouter()
-const currentUser = useCurrentUser()
 const { showSuccess } = useSnackBar()
 
 const { defineField, handleSubmit } = useForm<IRegister>({
@@ -50,9 +48,7 @@ const submit = handleSubmit(async (form) => {
         body: form,
     })
 
-    if (data.value && data.value.length) {
-        currentUser.value = data.value[0]
-
+    if (data.value) {
         showSuccess(t('register.success'))
         emit('register')
     }

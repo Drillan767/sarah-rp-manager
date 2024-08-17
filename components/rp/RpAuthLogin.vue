@@ -2,7 +2,6 @@
 import { useForm, useIsFormValid } from 'vee-validate'
 import type { Database } from '~/types/supabase'
 import { vuetifyConfig } from '~/composables/vuetifyConfig'
-import { useCurrentUser } from '~/composables/currentUser'
 import useSnackBar from '~/composables/snackbar'
 
 interface ILogin {
@@ -16,7 +15,6 @@ const emit = defineEmits<{
     (e: 'login'): void
 }>()
 
-const currentUser = useCurrentUser()
 const { showSuccess } = useSnackBar()
 const { t } = useI18n()
 const router = useRouter()
@@ -57,13 +55,13 @@ const submit = handleSubmit(async (loginForm) => {
 
             if (userData) {
                 showSuccess(t('login.success'))
-                currentUser.value = userData
 
                 emit('login')
             }
         }
     }
     catch (e: any) {
+        console.error(e)
         showError(t('login.error'))
     }
     finally {
