@@ -2,10 +2,8 @@
 import Step1 from './register/Step1.vue'
 import ReuseCharacterForm from './register/ReuseCharacterForm.vue'
 import CreateCharacterForm from './register/CreateCharacterForm.vue'
-import type { Database } from '~/types/supabase'
-import type { Roleplay } from '~/types/models'
+import type { Database, Tables } from '~/types/supabase'
 import useSnackBar from '~/composables/snackbar'
-import { useCurrentUser } from '~/composables/currentUser'
 
 interface RoleDetail {
     id: number
@@ -15,7 +13,7 @@ interface RoleDetail {
     characters: any[]
 }
 
-interface RPDetail extends Omit<Roleplay, 'roles'> {
+interface RPDetail extends Omit<Tables<'roleplays'>, 'roles'> {
     roles: RoleDetail[]
     user: {
         id: number
@@ -46,13 +44,10 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const supabase = useSupabaseClient<Database>()
-const currentUser = useCurrentUser()
 const { showSuccess } = useSnackBar()
 
 const creationDecision = ref<'reuse' | 'create'>('reuse')
 const userCharacters = ref<UserCharacter[]>([])
-const selectedCharacter = ref<UserCharacter>()
 const showAuthModale = ref(false)
 const formValid = ref(false)
 const currentStep = ref(1)
@@ -74,7 +69,7 @@ const steps = [
 ]
 
 async function fetchCharactersList() {
-    const { data } = await supabase
+    /* const { data } = await supabase
         .from('characters')
         .select('*')
         .eq('user_id', currentUser.value.id)
@@ -82,7 +77,7 @@ async function fetchCharactersList() {
     if (data) {
         userCharacters.value = data
         selectedCharacter.value = data[0]
-    }
+    } */
 }
 
 async function submit() {
@@ -91,7 +86,7 @@ async function submit() {
     formData.append('action', creationDecision.value)
     formData.append('name', characterForm.value.name)
     formData.append('description', characterForm.value.description)
-    formData.append('user_id', currentUser.value.id.toString())
+    // formData.append('user_id', currentUser.value.id.toString())
     formData.append('role_id', characterForm.value.role_id.toString())
     formData.append('status', '0')
 
@@ -112,20 +107,20 @@ async function submit() {
     showSuccess(t('pages.roleplays.registration.success'))
 }
 
-onMounted(() => {
+/* onMounted(() => {
     if (currentUser.value.id === 0)
         showAuthModale.value = true
-})
+}) */
 
 watch(() => props.show, async (value) => {
     if (value)
         await fetchCharactersList()
 })
 
-watch(currentUser, async (value) => {
+/* watch(currentUser, async (value) => {
     if (value.id !== 0)
         await fetchCharactersList()
-})
+}) */
 </script>
 
 <template>

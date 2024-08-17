@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { Database } from '~/types/supabase'
-import { useCurrentUser } from '~/composables/currentUser'
 
 interface Roleplay {
     id: string
@@ -9,7 +8,6 @@ interface Roleplay {
     start_date: string | null
 }
 
-const currentUser = useCurrentUser()
 const supabase = useSupabaseClient<Database>()
 
 const rpList = ref<Roleplay[]>([])
@@ -17,14 +15,14 @@ const blacklistedRPs = ref<string[]>([])
 
 onMounted(() => fetch())
 
-watch(currentUser, async () => {
+/* watch(currentUser, async () => {
     const { data: bl } = await supabase
         .from('blacklists')
         .select('roleplay_id')
         .eq('user_id', currentUser.value.id)
 
     blacklistedRPs.value = bl?.map(bl => bl.roleplay_id) ?? []
-})
+}) */
 
 const availableRPs = computed(() => rpList.value.filter(r => !blacklistedRPs.value.includes(r.id)))
 
