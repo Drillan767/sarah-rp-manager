@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import type { CurrentUser, Roleplay } from '~/types/models'
-import type { Database } from '~/types/supabase'
+import useSnackBar from '~/composables/snackbar'
+import type { CurrentUser } from '~/types/models'
+import type { Database, Tables } from '~/types/supabase'
+
 // import RpRegisterForm from '~/components/rp/RpRegisterForm.vue'
 
-interface RPDetail extends Omit<Roleplay, 'roles'> {
-    roles: {
+type RoleCharacter = Tables<'roles'> & {
+    characters: {
         id: number
-        name: string
-        description: string
-        max_users: number
-        characters: any[]
     }[]
+}
+
+type RPDetail = Tables<'roleplays'> & {
+    roles: RoleCharacter[]
     user: {
-        session_id: string
+        id: string
         username: string
     } | null
 }
@@ -22,6 +24,7 @@ const supabase = useSupabaseClient<Database>()
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
+const { showError } = useSnackBar()
 
 const { query, params } = route
 
@@ -35,15 +38,17 @@ const { data: rpData, error } = await supabase
         *,
         roles(
             *,
-            characters(count)
+            characters(id)
         ),
-        user:users(session_id, username)
+        user:users(id, username)
     `)
     .eq('id', params.rpId)
     .single()
 
-if (error || rpData === null)
-    await router.push('/?notfound=1')
+if (error || rpData === null) {
+    router.push('/all-roleplays')
+        .then(() => showError('Roleplay not found'))
+}
 
 if (rpData)
     roleplay.value = rpData
@@ -97,7 +102,7 @@ function getAvailableSlots(max: number, current: number) {
                         {{ t('pages.channels.access') }}
                     </VBtn>
                     <VBtn
-                        v-if="currentUser?.id === roleplay?.user?.session_id"
+                        v-if="currentUser?.id === roleplay?.user?.id"
                         color="orange"
                         variant="outlined"
                         prepend-icon="mdi-book-edit-outline"
@@ -146,11 +151,11 @@ function getAvailableSlots(max: number, current: number) {
                         <template #actions>
                             <VSpacer />
                             <VChip
-                                :prepend-icon="getAvailableSlots(role.max_users, role.characters[0].count)"
+                                :prepend-icon="getAvailableSlots(role.max_users, role.characters.length)"
                                 variant="outlined"
                                 color="blue"
                             >
-                                {{ t('pages.roles.nb', getAvailableSlots(role.max_users, role.characters[0].count)) }}
+                                {{ t('pages.roles.nb', getAvailableSlots(role.max_users, role.characters.length)) }}
                             </VChip>
                         </template>
                     </VCard>
