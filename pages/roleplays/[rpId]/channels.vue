@@ -8,7 +8,6 @@ import type {
 import type { CurrentUser } from '@/types/models'
 import type { Database, Tables } from '~/types/supabase'
 import RPLayout from '~/components/rp/access/RPLayout.vue.vue'
-import channels from '~/layouts/channels.vue'
 
 definePageMeta({
     layout: 'channels',
@@ -35,6 +34,7 @@ const roleplayId = ref('')
 const roleplay = ref<Tables<'roleplays'>>()
 const publicChannels = ref<PublicChannel[]>([])
 const privateChannels = ref<PrivateChannel[]>([])
+const dbRealTime = ref<RealtimeChannel>(supabase.channel(`db-${roleplayId.value}`))
 const messages = ref<Tables<'messages'>[]>([])
 const channelsId = ref<string[]>([])
 const roleplayLoading = ref(false)
@@ -81,11 +81,50 @@ async function loadChannels() {
 async function loadMessages() {
     const { data } = await supabase
         .from('messages')
-        .select('*')
+        .select(`
+            *,
+            user:users(id, username, avatar)
+        `)
         .in('channel_id', channelsId.value)
 
     if (data)
         messages.value = data
+}
+
+async function handleMessageInsert(payload: RealtimePostgresInsertPayload<Tables<'messages'>>) {
+    const found = messages.value.find(m => m.id === payload.new.id)
+
+    if (found)
+        return
+    messages.value.push(payload.new)
+}
+
+function watchMessages() {
+    dbRealTime.value
+        .on('postgres_changes', {
+            schema: 'public',
+            table: 'messages',
+            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.INSERT,
+        }, handleMessageInsert)
+        /* .on('postgres_changes', {
+            schema: 'public',
+            table: 'channels',
+            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.INSERT,
+            filter: `roleplay_id=eq.${props.roleplay.id}`,
+        }, handleChannelInsert)
+        .on('postgres_changes', {
+            schema: 'public',
+            table: 'channels',
+            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.UPDATE,
+            filter: `roleplay_id=eq.${props.roleplay.id}`,
+        }, handleChannelUpdate)
+        .on('postgres_changes', {
+            schema: 'public',
+            table: 'channels',
+            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.DELETE,
+            filter: `roleplay_id=eq.${props.roleplay.id}`,
+        }, handleChannelDeletion) */
+        .subscribe()
 }
 
 watch(user, (value) => {
@@ -106,6 +145,7 @@ watch(() => route.params, async ({ rpId }) => {
     loadRoleplay()
     await loadChannels()
     await loadMessages()
+    watchMessages()
 }, { immediate: true })
 </script>
 

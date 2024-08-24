@@ -1,29 +1,27 @@
 <script setup lang="ts">
-import type { CurrentUser } from '~/types/models'
-import type { Tables } from '~/types/supabase'
+import { mergeProps } from 'vue'
 
 interface Props {
-    message: Tables<'messages'>
-    sender: {
-        character?: Tables<'characters'>
-        user: {
-            id: string
-            username: string
-            avatar: string
-        }
+    message: {
+        id: number
+        message: string
+        created_at: string
+        url?: string
+        media?: string
+        sender: string
+        reactions: {
+            smiley: string
+            users: string[]
+        }[]
     }
+    fromSender?: boolean
     enableInteractions?: boolean
 }
 
 const props = defineProps<Props>()
 
-const currentUser = useState<CurrentUser>('current-user')
-// const { t } = useI18n()
+const { t } = useI18n()
 const dayjs = useDayjs()
-
-const fromSender = computed(() => props.sender.user.id === currentUser.value.id)
-
-const senderName = computed(() => props.sender.character?.name ?? props.sender.user.username)
 
 const creationDate = computed(() => {
     const initialDate = dayjs(props.message.created_at)
@@ -48,6 +46,7 @@ const creationDate = computed(() => {
                 :rounded="true"
                 class="mb-2"
                 max-width="300"
+                :to="message.url ?? undefined"
                 :color="fromSender ? 'blue' : undefined"
             >
                 <template #subtitle>
@@ -56,7 +55,7 @@ const creationDate = computed(() => {
                         :class="{ 'flex-row-reverse': fromSender }"
                     >
                         <span>
-                            {{ senderName }}
+                            {{ message.sender }}
                         </span>
                         <span>
                             {{ creationDate }}
@@ -66,7 +65,7 @@ const creationDate = computed(() => {
                 <template #text>
                     {{ message.message }}
                 </template>
-                <!-- <VCardActions
+                <VCardActions
                     v-if="enableInteractions || message.reactions.length"
                 >
                     <VMenu v-if="enableInteractions">
@@ -97,7 +96,7 @@ const creationDate = computed(() => {
                             </VChip>
                         </template>
                     </VTooltip>
-                </VCardActions> -->
+                </VCardActions>
             </VCard>
         </Transition>
     </VCol>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import messageList from '~/assets/json/landing-messages.json'
-import Message from '~/components/channels/Message.vue'
+import Message from '~/components/channels/LandingMessage.vue'
 
 interface IMessage {
     id: number

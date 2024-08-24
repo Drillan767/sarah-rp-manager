@@ -3,10 +3,22 @@ import type { VTextarea } from 'vuetify/components'
 import { onKeyStroke, onStartTyping } from '@vueuse/core'
 import type { CurrentUser } from '~/types/models'
 import type { Database, Tables } from '~/types/supabase'
+import Message from '~/components/channels/Message.vue'
+
+type MessageType = Tables<'messages'> & {
+    sender: {
+        user: {
+            id: string
+            username: string
+            avatar: string
+        }
+        role?: Tables<'roles'>
+    }
+}
 
 interface Props {
     roleplay: Tables<'roleplays'>
-    messages: Tables<'messages'>[]
+    messages: MessageType[]
 }
 
 const props = defineProps<Props>()
@@ -30,6 +42,8 @@ const canEditDelete = computed(() => {
 
     return channel.value.internal && props.roleplay.user_id === currentUser.value.id
 })
+
+const relatedMessages = computed(() => props.messages.filter(m => m.channel_id === route.params.channelId.toString()))
 
 onKeyStroke('Enter', (e) => {
     e.preventDefault()
@@ -76,17 +90,9 @@ async function sendMessage() {
             message: message.value,
             user_id: currentUser.value.id,
         })
+
+    message.value = undefined
 }
-
-/*
-I have a Supabase question:
-
-I authentify my users through a Twitter SSO. Supabase then creates a user in the "auth" schema if it doesn't exist. This row contains the UUID of the SSO login, that sould theorically be unique. In my auth flow, I also insert a row in a a "users" table, in the "public" schema, with the Twitter SSO's UUID in one of the column.
-
-However, to me, the Twitter's UUID should be the primary key. I store in on my project as the "user_id" but I cannot use it as a foreign key. And now, I feel conflicted because I need to make a RLS rule, but auth.uid() is not equal to users.id, which would help dramatically if it was the case.
-
-My question is: is it a good idea to set the row's id as the Twitter's uuid when creating a new user?
-*/
 
 watch(() => route.params, (value) => {
     if (value.channelId)
@@ -135,7 +141,12 @@ watch(() => route.params, (value) => {
 
     <VRow class="flex-column h-100">
         <VCol class="flex-grow-1 flex-shrink-0">
-            <p>Ici les messages qui arrivent truc de fou</p>
+            <Message
+                v-for="(m, i) in relatedMessages"
+                :key="i"
+                :message="m"
+                :sender="{ user: m.sender.user }"
+            />
         </VCol>
         <VCol class="flex-shrink-1 flex-grow-0">
             <VTextarea
