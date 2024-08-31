@@ -6,13 +6,10 @@ import type { Database, Tables } from '~/types/supabase'
 import Message from '~/components/channels/Message.vue'
 
 type MessageType = Tables<'messages'> & {
-    sender: {
-        user: {
-            id: string
-            username: string
-            avatar: string
-        }
-        role?: Tables<'roles'>
+    user: {
+        id: string
+        username: string
+        avatar: string
     }
 }
 
@@ -141,11 +138,16 @@ watch(() => route.params, (value) => {
 
     <VRow class="flex-column h-100">
         <VCol class="flex-grow-1 flex-shrink-0">
+            <p
+                v-for="(m, i) in relatedMessages"
+                :key="i"
+            >
+                {{ m }}
+            </p>
             <Message
                 v-for="(m, i) in relatedMessages"
                 :key="i"
                 :message="m"
-                :sender="{ user: m.sender.user }"
             />
         </VCol>
         <VCol class="flex-shrink-1 flex-grow-0">

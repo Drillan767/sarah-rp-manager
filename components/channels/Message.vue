@@ -3,15 +3,14 @@ import type { CurrentUser } from '~/types/models'
 import type { Tables } from '~/types/supabase'
 
 interface Props {
-    message: Tables<'messages'>
-    sender: {
-        character?: Tables<'characters'>
+    message: Tables<'messages'> & {
         user: {
             id: string
             username: string
             avatar: string
         }
     }
+
     enableInteractions?: boolean
 }
 
@@ -21,9 +20,9 @@ const currentUser = useState<CurrentUser>('current-user')
 // const { t } = useI18n()
 const dayjs = useDayjs()
 
-const fromSender = computed(() => props.sender.user.id === currentUser.value.id)
+const fromSender = computed(() => props.message.user.id === currentUser.value.id)
 
-const senderName = computed(() => props.sender.character?.name ?? props.sender.user.username)
+// const senderName = computed(() => props.message.character?.name ?? props.sender.user.username)
 
 const creationDate = computed(() => {
     const initialDate = dayjs(props.message.created_at)
@@ -56,7 +55,7 @@ const creationDate = computed(() => {
                         :class="{ 'flex-row-reverse': fromSender }"
                     >
                         <span>
-                            {{ senderName }}
+                            {{ message.user.username }}
                         </span>
                         <span>
                             {{ creationDate }}
