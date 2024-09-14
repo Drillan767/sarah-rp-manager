@@ -136,8 +136,8 @@ watch(() => route.params, (value) => {
         </template>
     </VAppBar>
 
-    <VRow class="flex-column h-100">
-        <VCol class="flex-grow-1 flex-shrink-0">
+    <VRow>
+        <VCol>
             <p
                 v-for="(m, i) in relatedMessages"
                 :key="i"
@@ -150,7 +150,10 @@ watch(() => route.params, (value) => {
                 :message="m"
             />
         </VCol>
-        <VCol class="flex-shrink-1 flex-grow-0">
+    </VRow>
+
+    <VRow class>
+        <VCol>
             <VTextarea
                 ref="textarea"
                 v-model="message"

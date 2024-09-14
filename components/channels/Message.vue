@@ -33,38 +33,40 @@ const creationDate = computed(() => {
 </script>
 
 <template>
-    <VCol
-        cols="12"
-        md="6"
-        class="d-flex py-0"
-        :class="{ 'justify-end': fromSender }"
-    >
-        <Transition
-            :appear="true"
-            :name="fromSender ? 'slideright' : 'slideleft'"
+    <VRow>
+        <VCol
+            cols="12"
+            md="6"
+            :offset-md="6"
+            class="d-flex py-0"
+            :class="{ 'justify-end': fromSender }"
         >
-            <VCard
-                :rounded="true"
-                class="mb-2"
-                max-width="300"
-                :color="fromSender ? 'blue' : undefined"
+            <Transition
+                :appear="true"
+                :name="fromSender ? 'slideright' : 'slideleft'"
             >
-                <template #subtitle>
-                    <div
-                        class="d-flex justify-space-between gap-x-2"
-                        :class="{ 'flex-row-reverse': fromSender }"
-                    >
-                        <span>
-                            {{ message.user.username }}
-                        </span>
-                        <span>
-                            {{ creationDate }}
-                        </span>
-                    </div>
-                </template>
-                <template #text>
-                    {{ message.message }}
-                </template>
+                <VCard
+                    :rounded="true"
+                    class="mb-2"
+                    max-width="300"
+                    :color="fromSender ? 'blue' : undefined"
+                >
+                    <template #subtitle>
+                        <div
+                            class="d-flex justify-space-between gap-x-2"
+                            :class="{ 'flex-row-reverse': fromSender }"
+                        >
+                            <span>
+                                {{ message.user.username }}
+                            </span>
+                            <span>
+                                {{ creationDate }}
+                            </span>
+                        </div>
+                    </template>
+                    <template #text>
+                        {{ message.message }}
+                    </template>
                 <!-- <VCardActions
                     v-if="enableInteractions || message.reactions.length"
                 >
@@ -97,7 +99,8 @@ const creationDate = computed(() => {
                         </template>
                     </VTooltip>
                 </VCardActions> -->
-            </VCard>
-        </Transition>
-    </VCol>
+                </VCard>
+            </Transition>
+        </VCol>
+    </VRow>
 </template>
