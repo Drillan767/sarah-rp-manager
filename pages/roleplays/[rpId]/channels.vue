@@ -1,44 +1,27 @@
 <script setup lang="ts">
-import { REALTIME_POSTGRES_CHANGES_LISTEN_EVENT } from '@supabase/supabase-js'
-import type {
-    RealtimeChannel,
-    RealtimePostgresInsertPayload,
-    RealtimePostgresUpdatePayload,
-} from '@supabase/supabase-js'
-import type { CurrentUser } from '@/types/models'
+import useRealtimeMessages from '~/composables/realtimeMessages'
 import type { Database, Tables } from '~/types/supabase'
-import RPLayout from '~/components/rp/access/RPLayout.vue.vue'
 
 definePageMeta({
     layout: 'channels',
 })
 
-type Channel = Tables<'channels'> & {
-    channels_users: Tables<'channels_users'>[]
-}
-
-type PublicChannel = Channel & {
-    internal: true
-}
-
-type PrivateChannel = Channel & {
-    internal: false
-}
-
-const supabase = useSupabaseClient<Database>()
-const user = useSupabaseUser()
-const currentUser = useState<CurrentUser | undefined>()
 const route = useRoute()
+const supabase = useSupabaseClient<Database>()
+const supabaseUser = useSupabaseUser()
+const { currentUser } = storeToRefs(useCurrentUser())
 
-const roleplayId = ref('')
+const {
+    loadAll,
+    onlineUsers,
+    publicChannels,
+    privateChannels,
+    messages,
+    disconnect,
+} = useRealtimeMessages(route.params.rpId.toString())
+
 const roleplay = ref<Tables<'roleplays'>>()
-const publicChannels = ref<PublicChannel[]>([])
-const privateChannels = ref<PrivateChannel[]>([])
-const dbRealTime = ref<RealtimeChannel>(supabase.channel(`db-${roleplayId.value}`))
-const messages = ref<Tables<'messages'>[]>([])
-const channelsId = ref<string[]>([])
 const roleplayLoading = ref(false)
-const channelsLoading = ref(false)
 
 useHead({
     title: () => roleplay.value?.title ?? '',
@@ -49,119 +32,59 @@ async function loadRoleplay() {
     const { data } = await supabase
         .from('roleplays')
         .select('*, roles(*)') // load EVERYTHING
-        .eq('id', roleplayId.value)
+        .eq('id', route.params.rpId.toString())
         .single()
 
     if (data)
         roleplay.value = data
 
     roleplayLoading.value = false
-}
 
-async function loadChannels() {
-// Initial fetch for the channels.
-    channelsLoading.value = true
-    const { data } = await supabase
-        .from('channels')
-        .select('*, channels_users(*)')
-        .eq('roleplay_id', roleplayId.value)
-
-    if (data) {
-        channelsId.value = data.map(d => d.id)
-        publicChannels.value = data.filter((d): d is PublicChannel => d.internal === true)
-        privateChannels.value = data.filter((d): d is PrivateChannel => {
-            const authorizedUsers = d.channels_users.map(cu => cu.user_id)
-            return d.internal === false && authorizedUsers.includes(currentUser.value?.id ?? '')
-        })
-    }
-
-    channelsLoading.value = false
-}
-
-async function loadMessages() {
-    const { data } = await supabase
-        .from('messages')
-        .select(`
-            *,
-            user:users(id, username, avatar)
-        `)
-        .in('channel_id', channelsId.value)
-
-    if (data)
-        messages.value = data
-}
-
-async function handleMessageInsert(payload: RealtimePostgresInsertPayload<Tables<'messages'>>) {
-    const found = messages.value.find(m => m.id === payload.new.id)
-
-    if (found)
-        return
-    messages.value.push(payload.new)
-}
-
-function watchMessages() {
-    dbRealTime.value
-        .on('postgres_changes', {
-            schema: 'public',
-            table: 'messages',
-            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.INSERT,
-        }, handleMessageInsert)
-        /* .on('postgres_changes', {
-            schema: 'public',
-            table: 'channels',
-            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.INSERT,
-            filter: `roleplay_id=eq.${props.roleplay.id}`,
-        }, handleChannelInsert)
-        .on('postgres_changes', {
-            schema: 'public',
-            table: 'channels',
-            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.UPDATE,
-            filter: `roleplay_id=eq.${props.roleplay.id}`,
-        }, handleChannelUpdate)
-        .on('postgres_changes', {
-            schema: 'public',
-            table: 'channels',
-            event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.DELETE,
-            filter: `roleplay_id=eq.${props.roleplay.id}`,
-        }, handleChannelDeletion) */
-        .subscribe()
-}
-
-watch(user, (value) => {
-    if (value) {
-        const { user_metadata: twitter } = value
-
+    if (supabaseUser.value) {
+        const { user_metadata: twitter } = supabaseUser.value
         currentUser.value = {
-            id: value.id,
+            id: supabaseUser.value.id,
             handle: twitter.user_name,
             username: twitter.name,
             avatar: twitter.picture,
         }
     }
-}, { immediate: true })
+}
 
-watch(() => route.params, async ({ rpId }) => {
-    roleplayId.value = rpId.toString()
-    loadRoleplay()
-    await loadChannels()
-    await loadMessages()
-    watchMessages()
+watch(() => route.params.rpId, async (newRpId, oldRpId) => {
+    // Clean up existing subscriptions
+    if (oldRpId)
+        disconnect()
+
+    // Set up new subscriptions
+    await loadRoleplay()
+    await loadAll()
 }, { immediate: true })
 </script>
 
 <template>
-    <RPLayout
-        v-if="roleplay"
-        v-model:public-channels="publicChannels"
-        v-model:private-channels="privateChannels"
-        :roleplay="roleplay"
-        :loading="roleplayLoading"
-    >
-        <template #characters>
-            <p>Characters</p>
-        </template>
-    </RPLayout>
-
+    <pre>
+        <p>Current user</p>
+        <code>
+            {{ currentUser }}
+        </code>
+        <p>public channels</p>
+        <code>
+            {{ publicChannels }}
+        </code>
+        <p>private channels</p>
+        <code>
+            {{ privateChannels }}
+        </code>
+        <p>online users</p>
+        <code>
+            {{ onlineUsers }}
+        </code>
+        <p>messages</p>
+        <code>
+            {{ messages }}
+        </code>
+    </pre>
     <NuxtPage
         :roleplay
         :messages

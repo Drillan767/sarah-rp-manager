@@ -13,6 +13,8 @@ export default defineNuxtConfig({
         '@vee-validate/nuxt',
         '@nuxtjs/supabase',
         '@nuxtjs/i18n',
+        '@pinia/nuxt',
+        'pinia-plugin-persistedstate/nuxt',
     ],
 
     devtools: { enabled: true },
