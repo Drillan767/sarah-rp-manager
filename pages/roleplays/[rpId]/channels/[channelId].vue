@@ -152,7 +152,7 @@ watch(() => route.params, (value) => {
         </VCol>
     </VRow>
 
-    <VRow class>
+    <VRow>
         <VCol>
             <VTextarea
                 ref="textarea"
