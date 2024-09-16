@@ -136,21 +136,14 @@ watch(() => route.params, (value) => {
         </template>
     </VAppBar>
 
-    <VRow>
-        <VCol>
-            <p
-                v-for="(m, i) in relatedMessages"
-                :key="i"
-            >
-                {{ m }}
-            </p>
-            <Message
-                v-for="(m, i) in relatedMessages"
-                :key="i"
-                :message="m"
-            />
-        </VCol>
-    </VRow>
+    <VVirtualScroll
+        :items="relatedMessages"
+        height="500"
+    >
+        <template #default="{ item }">
+            <Message :message="item" />
+        </template>
+    </VVirtualScroll>
 
     <VRow>
         <VCol>

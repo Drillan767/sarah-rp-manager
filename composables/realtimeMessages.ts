@@ -14,6 +14,10 @@ type Channel = Tables<'channels'> & {
     channels_users: Tables<'channels_users'>[]
 }
 
+type Message = Tables<'messages'> & {
+    user: CurrentUser
+}
+
 export default function useRealtimeMessages(rpId: string) {
     const supabase = useSupabaseClient<Database>()
     const user = useSupabaseUser()
@@ -23,13 +27,21 @@ export default function useRealtimeMessages(rpId: string) {
     const onlineUsers = ref<OnlineUser[]>([])
     const characters = ref<Omit<Character, 'user'>[]>([])
     const allChannels = ref<Channel[]>([])
-    const messages = ref<Tables<'messages'>[]>([])
+    const messages = ref<Message[]>([])
 
     const publicChannels = computed(() => allChannels.value.filter(c => c.internal === true))
     const privateChannels = computed(() => allChannels.value.filter((c) => {
         const authorizedUsers = c.channels_users.map(cu => cu.user_id)
         return c.internal === false && authorizedUsers.includes(currentUser.value?.id ?? '')
     }))
+    const allUsers = computed<CurrentUser[]>(() => {
+        const otherUsers = onlineUsers.value.map(o => o.user)
+
+        if (currentUser.value)
+            otherUsers.push(currentUser.value)
+
+        return otherUsers
+    })
 
     let heartbeatInterval: number | null = null
 
@@ -49,7 +61,10 @@ export default function useRealtimeMessages(rpId: string) {
 
         if (found)
             return
-        messages.value.push(payload.new)
+        messages.value.push({
+            ...payload.new,
+            user: allUsers.value.find(u => u.id === payload.new.user_id)!,
+        })
     }
 
     async function handleChannelInsert(payload: RealtimePostgresInsertPayload<Tables<'channels'>>) {
@@ -160,7 +175,7 @@ export default function useRealtimeMessages(rpId: string) {
             .from('messages')
             .select(`
                 *,
-                user:users(id, username, avatar)
+                user:users!inner(id, handle, username, avatar)
             `)
             .in('channel_id', allChannels.value.map(c => c.id))
 
