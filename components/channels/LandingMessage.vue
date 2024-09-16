@@ -1,28 +1,27 @@
 <script setup lang="ts">
-import type { CurrentUser } from '~/types/models'
-import type { Tables } from '~/types/supabase'
+import { mergeProps } from 'vue'
 
 interface Props {
-    message: Tables<'messages'> & {
-        user: {
-            id: string
-            username: string
-            avatar: string
-        }
+    message: {
+        id: number
+        message: string
+        created_at: string
+        url?: string
+        media?: string
+        sender: string
+        reactions: {
+            smiley: string
+            users: string[]
+        }[]
     }
-
+    fromSender?: boolean
     enableInteractions?: boolean
 }
 
 const props = defineProps<Props>()
 
-const currentUser = useState<CurrentUser>('current-user')
-// const { t } = useI18n()
+const { t } = useI18n()
 const dayjs = useDayjs()
-
-const fromSender = computed(() => props.message.user.id === currentUser.value.id)
-
-// const senderName = computed(() => props.message.character?.name ?? props.sender.user.username)
 
 const creationDate = computed(() => {
     const initialDate = dayjs(props.message.created_at)
@@ -33,18 +32,21 @@ const creationDate = computed(() => {
 </script>
 
 <template>
-    <VRow class="px-0 ma-0">
-        <VCol
-            cols="12"
-            md="8"
-            class="d-flex"
-            :offset-md="2"
-            :class="{ 'justify-end': fromSender }"
+    <VCol
+        cols="12"
+        md="6"
+        class="d-flex py-0"
+        :class="{ 'justify-end': fromSender }"
+    >
+        <Transition
+            :appear="true"
+            :name="fromSender ? 'slideright' : 'slideleft'"
         >
             <VCard
                 :rounded="true"
                 class="mb-2"
                 max-width="300"
+                :to="message.url ?? undefined"
                 :color="fromSender ? 'blue' : undefined"
             >
                 <template #subtitle>
@@ -53,7 +55,7 @@ const creationDate = computed(() => {
                         :class="{ 'flex-row-reverse': fromSender }"
                     >
                         <span>
-                            {{ message.user.username }}
+                            {{ message.sender }}
                         </span>
                         <span>
                             {{ creationDate }}
@@ -63,11 +65,7 @@ const creationDate = computed(() => {
                 <template #text>
                     {{ message.message }}
                 </template>
-            </VCard>
-        </VCol>
-    </VRow>
-
-    <!-- <VCardActions
+                <VCardActions
                     v-if="enableInteractions || message.reactions.length"
                 >
                     <VMenu v-if="enableInteractions">
@@ -98,21 +96,8 @@ const creationDate = computed(() => {
                             </VChip>
                         </template>
                     </VTooltip>
-                </VCardActions> -->
-    <!-- <VRow>
-        <VCol
-            cols="12"
-            md="8"
-            :offset-md="2"
-            class="d-flex py-0"
-            :class="{ 'justify-end': fromSender }"
-        >
-            <Transition
-                :appear="true"
-                :name="fromSender ? 'slideright' : 'slideleft'"
-            >
-
-            </Transition>
-        </VCol>
-    </VRow> -->
+                </VCardActions>
+            </VCard>
+        </Transition>
+    </VCol>
 </template>

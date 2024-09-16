@@ -1,9 +1,21 @@
 <script setup lang="ts">
+import type { VTextarea } from 'vuetify/components'
+import { onKeyStroke, onStartTyping } from '@vueuse/core'
 import type { CurrentUser } from '~/types/models'
 import type { Database, Tables } from '~/types/supabase'
+import Message from '~/components/channels/Message.vue'
+
+type MessageType = Tables<'messages'> & {
+    user: {
+        id: string
+        username: string
+        avatar: string
+    }
+}
 
 interface Props {
     roleplay: Tables<'roleplays'>
+    messages: MessageType[]
 }
 
 const props = defineProps<Props>()
@@ -16,12 +28,28 @@ const { t } = useI18n()
 
 const channel = ref<Tables<'channels'>>()
 const showDialog = ref(false)
+const message = ref<string>()
+const textarea = ref<VTextarea>()
+// const messages = ref<Tables<'messages'>[]>([])
+// const dbRealTime = ref<RealtimeChannel>(supabase.channel(`messages-${route.params.rpId.toString()}`))
 
 const canEditDelete = computed(() => {
     if (!channel.value?.internal)
         return true
 
     return channel.value.internal && props.roleplay.user_id === currentUser.value.id
+})
+
+const relatedMessages = computed(() => props.messages.filter(m => m.channel_id === route.params.channelId.toString()))
+
+onKeyStroke('Enter', (e) => {
+    e.preventDefault()
+    sendMessage()
+})
+
+onStartTyping(() => {
+    if (!textarea.value?.active)
+        textarea.value?.focus()
 })
 
 async function loadChannel() {
@@ -48,10 +76,24 @@ async function deleteChannel() {
     showDialog.value = false
 }
 
+async function sendMessage() {
+    if (!message.value)
+        return
+
+    await supabase
+        .from('messages')
+        .insert({
+            channel_id: route.params.channelId.toString(),
+            message: message.value,
+            user_id: currentUser.value.id,
+        })
+
+    message.value = undefined
+}
+
 watch(() => route.params, (value) => {
-    if (value.channelId) {
+    if (value.channelId)
         loadChannel()
-    }
 }, { immediate: true })
 </script>
 
@@ -93,7 +135,27 @@ watch(() => route.params, (value) => {
             </VMenu>
         </template>
     </VAppBar>
-    <p>Détail du channel</p>
+
+    <VVirtualScroll
+        :items="relatedMessages"
+        height="500"
+    >
+        <template #default="{ item }">
+            <Message :message="item" />
+        </template>
+    </VVirtualScroll>
+
+    <VRow>
+        <VCol>
+            <VTextarea
+                ref="textarea"
+                v-model="message"
+                placeholder="Ecrivez votre message..."
+                label="Message"
+                counter
+            />
+        </VCol>
+    </VRow>
 
     <VDialog
         v-model="showDialog"
