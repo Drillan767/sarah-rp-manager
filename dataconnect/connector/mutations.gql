@@ -1,0 +1,189 @@
+mutation CreateUser(
+    $username: String!,
+    $handle: String!,
+    $email: String!,
+    $avatar: String!,
+    $description: String!,
+    $availability: String!
+) @auth(level: PUBLIC) {
+    user_insert(data: {
+        username: $username,
+        handle: $handle,
+        email: $email,
+        avatar: $avatar,
+        description: $description,
+        availability: $availability
+    })
+}
+
+mutation UpdateUser(
+    $id: String!,
+    $username: String!,
+    $handle: String!,
+    $email: String!,
+    $avatar: String!,
+    $description: String!,
+    $availability: String!
+) @auth(level: USER) {
+    user_update(
+        key: { id: $id },
+        data: {
+            username: $username,
+            email: $email,
+            handle: $handle,
+            avatar: $avatar,
+            description: $description,
+            availability: $availability
+        }
+    )
+}
+
+mutation DeleteUser($id: String!) @auth(level: USER) {
+    user_delete(key: { id: $id })
+}
+
+mutation CreateRoleplay(
+    $title: String!,
+    $description: String!,
+    $illustration: String!,
+    $messageBoard: String,
+    $startDate: Date,
+    $user: String!
+) @auth(level: USER) {
+    roleplay_insert(
+        data: {
+            title: $title,
+            description: $description,
+            illustration: $illustration,
+            messageBoard: $messageBoard,
+            startDate: $startDate,
+            user: { id: $user }
+        }
+    )
+}
+
+mutation EditRoleplay(
+    $id: UUID!,
+    $title: String!,
+    $description: String!,
+    $illustration: String!,
+    $startDate: Date,
+) @auth(level: USER) {
+    roleplay_update(
+        key: { id: $id },
+        data: {
+            title: $title,
+            description: $description,
+            illustration: $illustration,
+            startDate: $startDate
+        }
+    )
+}
+
+mutation EditRolepplayMessageBoard(
+    $id: UUID!,
+    $messageBoard: String!
+) @auth(level: USER) {
+    roleplay_update(key: { id: $id }, data: { messageBoard: $messageBoard })
+}
+
+mutation DeleteRoleplay($id: UUID!) @auth(level: USER) {
+    roleplay_delete(key: { id: $id })
+}
+
+mutation CreateChannel(
+    $name: String!,
+    $roleplay: UUID!,
+    $isInternal: Boolean!,
+    $isDefault: Boolean!
+) @auth(level: USER) {
+    channel_insert(data: {
+        name: $name,
+        roleplay: { id: $roleplay },
+        isInternal: $isInternal,
+        isDefault: $isDefault
+    })
+}
+
+mutation EditChannel(
+    $id: UUID!,
+    $name: String!,
+) @auth(level: USER) {
+    channel_update(key: { id: $id }, data: { name: $name })
+}
+
+mutation DeleteChannel($id: UUID!) @auth(level: USER) {
+    channel_delete(key: { id: $id })
+}
+
+mutation CreateRole(
+    $name: String!,
+    $maxUsers: Int!,
+    $description: String!,
+    $isFree: Boolean!,
+    $roleplay: UUID!
+) @auth(level: USER) {
+    role_insert(data: {
+        name: $name,
+        maxUsers: $maxUsers,
+        description: $description,
+        isFree: $isFree,
+        roleplay: { id: $roleplay }
+    })
+}
+
+mutation EditRole(
+    $id: UUID!,
+    $name: String!,
+    $maxUsers: Int!,
+    $description: String!,
+    $isFree: Boolean!
+) @auth(level: USER insecureReason: "Handled by code") {
+    role_update(
+        key: { id: $id },
+        data: {
+            name: $name,
+            maxUsers: $maxUsers,
+            description: $description,
+            isFree: $isFree
+        }
+    )
+}
+
+mutation DeleteRole($id: UUID!) @auth(level: USER) {
+    role_delete(key: { id: $id })
+}
+
+mutation CreateCharacter(
+    $name: String!,
+    $description: String!,
+    $illustration: String!,
+    $roleplay: UUID!,
+    $user: String!
+) @auth(level: USER, insecureReason: "Handled by code") {
+    character_insert(data: {
+        name: $name,
+        description: $description,
+        illustration: $illustration,
+        roleplay: { id: $roleplay },
+        user: { id: $user }
+    })
+}
+
+mutation EditCharacter(
+    $id: UUID!,
+    $name: String!,
+    $description: String!,
+    $illustration: String!
+) @auth(level: USER) {
+    character_update(key: { id: $id },
+    data: {
+        name: $name,
+        description: $description,
+        illustration: $illustration
+    })
+}
+
+mutation DeleteCharacter($id: UUID!) @auth(level: USER) {
+    character_delete(key: { id: $id })
+}

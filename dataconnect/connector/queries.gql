@@ -1,0 +1,47 @@
+query ListUsers @auth(level: USER) {
+  users {
+    id
+    username
+    email
+    avatar
+    description
+    availability
+  }
+}
+
+query GetUser($id: String!) @auth(level: USER) {
+  user(key: { id: $id }) {
+    id
+    username
+    email
+    avatar
+    description
+    availability
+  }
+}
+
+query ListRoleplays @auth(level: USER) {
+  roleplays {
+    id
+    title
+    description
+    illustration
+  }
+}
+
+query GetRoleplay($id: UUID!) @auth(level: USER) {
+  roleplay(key: { id: $id }) {
+    id
+    title
+    description
+    illustration
+    messageBoard
+    startDate
+    roles_on_roleplay {
+      name
+      maxUsers
+      description
+      isFree
+    }
+  }
+}

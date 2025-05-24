@@ -1,0 +1,54 @@
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+type User @table(name: "users", singular: "user", plural: "users") {
+  id: String! @default(expr: "auth.uid")
+  username: String! @col(dataType: "varchar(50)")
+  handle: String! @col(dataType: "varchar(50)")
+  email: String! @col(dataType: "varchar(255)")
+  avatar: String! @col(dataType: "varchar(255)")
+  description: String!
+  availability: String!
+  createdAt: Date! @default(expr: "request.time")
+  updatedAt: Date! @default(expr: "request.time")
+  role: UserRole! @default(expr: "USER")
+}
+
+type Roleplay @table(name: "roleplays", singular: "roleplay", plural: "roleplays") {
+  title: String!
+  description: String!
+  illustration: String!
+  messageBoard: String
+  startDate: Date
+  createdAt: Date! @default(expr: "request.time")
+  updatedAt: Date! @default(expr: "request.time")
+  user: User!
+}
+
+type Channel @table(name: "channels", singular: "channel", plural: "channels") {
+    name: String!
+    roleplay: Roleplay!
+    isInternal: Boolean!
+    isDefault: Boolean!
+}
+
+type Role @table(name: "roles", singular: "role", plural: "roles") {
+    name: String!
+    maxUsers: Int!
+    roleplay: Roleplay!
+    description: String!
+    createdAt: Date! @default(expr: "request.time")
+    isFree: Boolean!
+}
+
+type Character @table(name: "characters", singular: "character", plural: "characters") {
+    name: String!
+    description: String!
+    illustration: String!
+    roleplay: Roleplay!
+    user: User!
+    createdAt: Date! @default(expr: "request.time")
+}
