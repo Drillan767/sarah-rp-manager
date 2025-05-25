@@ -7,11 +7,16 @@ const props = defineProps<{
         message: string
         createdAt: string
         url?: string
+        reactions: {
+            smiley: string
+            users: string[]
+        }[]
         user: {
             username: string
         }
     }
     fromSender: boolean
+
 }>()
 
 const dayjs = useDayjs()

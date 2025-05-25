@@ -9,15 +9,26 @@ import useUsersStore from '@/stores/users'
 interface IMessage {
     id: number
     message: string
-    created_at: string
+    createdAt: string
     url?: string
     media?: string
     sender: string
     from_sender: boolean
+    user: {
+        username: string
+    }
     reactions: {
         smiley: string
         users: string[]
     }[]
+}
+
+type MessageKey = 'message1' | 'message2' | 'message3' | 'message4' | 'message5'
+type SenderKey = 'sender' | 'sarah'
+
+interface Messages {
+    sender: Record<MessageKey, string>
+    sarah: Partial<Record<MessageKey, string>>
 }
 
 const dayjs = useDayjs()
@@ -26,7 +37,7 @@ const { user } = storeToRefs(useUsersStore())
 
 const username = computed(() => user.value?.username ?? 'Vous')
 
-const messages = {
+const messages: Messages = {
     sender: {
         message1: 'On fait quoi ce soir ?',
         message2: 'Merci !',
@@ -43,15 +54,21 @@ const messages = {
 
 function displayMessage() {
     landingMessages.forEach((message, i) => {
-        const [sender, messageKey] = message.message.split('.')
+        const [sender, messageKey] = message.message.split('.') as [SenderKey, MessageKey]
+        const messageContent = messages[sender][messageKey]
+
+        if (!messageContent)
+            return
+
         setTimeout(() => {
             displayedMessages.value.push({
                 id: message.id,
-                message: messages[sender][messageKey],
-                created_at: dayjs().toISOString(),
+                message: messageContent,
+                createdAt: dayjs().toISOString(),
                 url: message.url ?? undefined,
                 reactions: [],
                 from_sender: message.from_sender,
+                sender,
                 user: {
                     username: message.from_sender ? username.value : 'Sarah',
                 },
@@ -94,7 +111,7 @@ onMounted(displayMessage)
             justify="center"
         >
             <Message
-                :message="message"
+                :message
                 :enable-interactions="false"
                 :from-sender="message.from_sender"
             />

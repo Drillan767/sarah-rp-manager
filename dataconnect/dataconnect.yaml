@@ -1,12 +1,12 @@
-specVersion: "v1"
-serviceId: "sarah-rp-manager-service"
-location: "europe-west9"
+specVersion: v1
+serviceId: sarah-rp-manager-service
+location: europe-west9
 schema:
-  source: "./schema"
-  datasource:
-    postgresql:
-      database: "sarah-rp-manager-database"
-      cloudSql:
-        instanceId: "sarah-rp-manager-instance"
-      # schemaValidation: "COMPATIBLE"
-connectorDirs: ["./connector"]
+    source: ./schema
+    datasource:
+        postgresql:
+            database: sarah-rp-manager-database
+            cloudSql:
+                instanceId: sarah-rp-manager-instance
+# schemaValidation: "COMPATIBLE"
+connectorDirs: [./connector]

@@ -48,6 +48,7 @@ function switchTheme() {
                 />
                 <VDivider v-if="mobile" />
                 <VListItem
+                    :to="{ name: 'user-profile' }"
                     title="Profil"
                     prepend-icon="mdi-account"
                 />

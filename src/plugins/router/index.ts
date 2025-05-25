@@ -3,7 +3,14 @@ import IndexView from '@/views/Index.vue'
 import users from './users'
 
 const routes = [
-    { path: '/', component: IndexView },
+    {
+        path: '/',
+        component: IndexView,
+        name: 'home',
+        meta: {
+            title: 'Accueil',
+        },
+    },
     ...users,
 ]
 
