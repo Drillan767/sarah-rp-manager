@@ -1,7 +1,7 @@
 import type { User } from 'firebase/auth'
 import { onAuthStateChanged, signInWithPopup, TwitterAuthProvider } from 'firebase/auth'
 import { storeToRefs } from 'pinia'
-import { useUsersStore } from '@/stores/users'
+import useUsersStore from '@/stores/users'
 import useFirebase from './firebase'
 import useUser from './user'
 
@@ -40,7 +40,7 @@ export default function useAuth() {
             if (user) {
                 await createUserIfNotExists({
                     uid: user.uid,
-                    username: user.reloadUserInfo?.screenName || '',
+                    username: user.displayName || '',
                     handle: `@${user.reloadUserInfo?.screenName}`,
                     email: user.email || '',
                     avatar: user.photoURL || '',
@@ -50,7 +50,7 @@ export default function useAuth() {
                 storeUser.value = {
                     id: user.uid,
                     handle: `@${user.reloadUserInfo?.screenName}`,
-                    username: user.reloadUserInfo?.screenName || '',
+                    username: user.displayName || '',
                     avatar: user.photoURL || '',
                 }
             }

@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
+import Pegi18Warning from './components/Pegi18Warning.vue'
 import useAuth from './composables/auth'
 
 const { initAuth } = useAuth()
@@ -20,6 +21,7 @@ const showNavbar = computed(() => !route?.name?.toString().startsWith('roleplays
             <VMain>
                 <RouterView />
             </VMain>
+            <Pegi18Warning />
         </VLayout>
     </VApp>
 </template>

@@ -9,7 +9,7 @@ interface User {
     avatar: string
 }
 
-export const useUsersStore = defineStore('users', () => {
+const useUsersStore = defineStore('users', () => {
     const { signIn, signOut } = useAuth()
     const user = ref<User>()
 
@@ -24,3 +24,5 @@ export const useUsersStore = defineStore('users', () => {
 }, {
     persist: true,
 })
+
+export default useUsersStore

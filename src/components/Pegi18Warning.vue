@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { useStorage } from '@vueuse/core'
 
-const { t } = useI18n({
-    useScope: 'local',
-})
-
 const display = useStorage('sarah-rp-first-visit', true)
 </script>
 
@@ -51,7 +47,7 @@ const display = useStorage('sarah-rp-first-visit', true)
             </template>
         </VCard> -->
         <VImg
-            src="https://images7.alphacoders.com/689/689877.jpg"
+            src="/garden.jpg"
             :cover="true"
         >
             <div class="d-flex h-100 justify-center align-center ">
@@ -78,9 +74,15 @@ const display = useStorage('sarah-rp-first-visit', true)
                             </VRow>
                             <VRow>
                                 <VCol class="text-center">
-                                    <p>{{ t('p1') }}</p>
-                                    <p>{{ t('p2') }}</p>
-                                    <p>{{ t('p3') }}</p>
+                                    <p>
+                                        Le Jardin de Sarah est un site présentant de nombreux roleplays, et de nombreux contenus à caractère érotique.
+                                    </p>
+                                    <p>
+                                        Ce site ne convient pas à un public mineur.
+                                    </p>
+                                    <p>
+                                        En entrant, vous déclarez être en âge légal de visionner ce type de contenu.
+                                    </p>
                                 </VCol>
                             </VRow>
                             <VRow>
@@ -89,7 +91,7 @@ const display = useStorage('sarah-rp-first-visit', true)
                                     color="primary"
                                     @click="display = false"
                                 >
-                                    {{ t('ok') }}
+                                    Entrer
                                 </VBtn>
                             </VRow>
                         </VContainer>
@@ -99,20 +101,3 @@ const display = useStorage('sarah-rp-first-visit', true)
         </VImg>
     </VDialog>
 </template>
-
-<i18n lang="json">
-{
-    "fr": {
-        "p1": "Le Jardin de Sarah est un site présentant de nombreux roleplays, et de nombreux contenus à caractère érotique.",
-        "p2": "Ce site ne convient pas à un public mineur",
-        "p3": "En entrant, vous déclarez être en âge légal de visionner ce type ce contenu",
-        "ok": "Entrer"
-    },
-    "en": {
-        "p1": "Le Jardin de Sarah is a website containing several roleplays, and several erotic content.",
-        "p2": "This website does not suit an underage public.",
-        "p3": "By entering, you declare being in the legal age to watch this type of content.",
-        "ok": "Enter"
-    }
-}
-</i18n>
