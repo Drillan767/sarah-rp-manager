@@ -1,6 +1,6 @@
-import { Link } from '#build/components';
-
 <script setup lang="ts">
+import { computed } from 'vue'
+
 interface Props {
     links: {
         title: string

@@ -1,4 +1,4 @@
-import { createUser, getUser } from '@sarah-rp-manager/default-connector'
+import { createUser, deleteUser, getUser, updateUser } from '@sarah-rp-manager/default-connector'
 
 interface UserPayload {
     uid: string
@@ -7,6 +7,14 @@ interface UserPayload {
     email: string
     avatar: string
     role: 'USER' | 'ADMIN'
+}
+
+interface UpdateUserPayload {
+    username: string
+    handle: string
+    email: string
+    avatar: string
+    description: string
 }
 
 export default function useUser() {
@@ -28,7 +36,7 @@ export default function useUser() {
                 })
             }
 
-            // return existingUser.user
+            return data.user
         }
         catch (error) {
             console.error('Error checking/creating user:', error)
@@ -36,7 +44,38 @@ export default function useUser() {
         }
     }
 
+    const getUserInfo = async (userId: string) => {
+        const { data } = await getUser({ id: userId })
+        return data.user
+    }
+
+    const updateUserInfo = async (userId: string, updates: UpdateUserPayload) => {
+        try {
+            await updateUser({
+                id: userId,
+                ...updates,
+            })
+        }
+        catch (error) {
+            console.error('Error updating user:', error)
+            throw error
+        }
+    }
+
+    const deleteUserAccount = async (userId: string) => {
+        try {
+            await deleteUser({ id: userId })
+        }
+        catch (error) {
+            console.error('Error deleting user:', error)
+            throw error
+        }
+    }
+
     return {
         createUserIfNotExists,
+        getUserInfo,
+        updateUserInfo,
+        deleteUserAccount,
     }
 }
