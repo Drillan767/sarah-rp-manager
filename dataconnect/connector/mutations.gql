@@ -1,17 +1,21 @@
 mutation CreateUser(
+    $id: String!,
     $username: String!,
     $handle: String!,
     $email: String!,
     $avatar: String!,
     $description: String!,
-    $availability: String!
-) @auth(level: PUBLIC) {
+    $isAdmin: Boolean!,
+    $availability: Any
+) @auth(level: PUBLIC insecureReason: "Handled by code") {
     user_insert(data: {
+        id: $id,
         username: $username,
         handle: $handle,
         email: $email,
         avatar: $avatar,
         description: $description,
+        isAdmin: $isAdmin,
         availability: $availability
     })
 }
@@ -23,8 +27,7 @@ mutation UpdateUser(
     $email: String!,
     $avatar: String!,
     $description: String!,
-    $availability: String!
-) @auth(level: USER) {
+) @auth(level: USER insecureReason: "Handled by code") {
     user_update(
         key: { id: $id },
         data: {
@@ -33,12 +36,18 @@ mutation UpdateUser(
             handle: $handle,
             avatar: $avatar,
             description: $description,
-            availability: $availability
         }
     )
 }
 
-mutation DeleteUser($id: String!) @auth(level: USER) {
+mutation UpdateUserRole(
+    $id: String!,
+    $isAdmin: Boolean!
+) @auth(level: USER insecureReason: "Handled by code") {
+    user_update(key: { id: $id }, data: { isAdmin: $isAdmin })
+}
+
+mutation DeleteUser($id: String!) @auth(level: USER insecureReason: "Handled by code") {
     user_delete(key: { id: $id })
 }
 
@@ -49,7 +58,7 @@ mutation CreateRoleplay(
     $messageBoard: String,
     $startDate: Date,
     $user: String!
-) @auth(level: USER) {
+) @auth(level: USER insecureReason: "Handled by code") {
     roleplay_insert(
         data: {
             title: $title,
@@ -68,7 +77,7 @@ mutation EditRoleplay(
     $description: String!,
     $illustration: String!,
     $startDate: Date,
-) @auth(level: USER) {
+) @auth(level: USER insecureReason: "Handled by code") {
     roleplay_update(
         key: { id: $id },
         data: {
@@ -83,11 +92,11 @@ mutation EditRoleplay(
 mutation EditRolepplayMessageBoard(
     $id: UUID!,
     $messageBoard: String!
-) @auth(level: USER) {
+) @auth(level: USER insecureReason: "Handled by code") {
     roleplay_update(key: { id: $id }, data: { messageBoard: $messageBoard })
 }
 
-mutation DeleteRoleplay($id: UUID!) @auth(level: USER) {
+mutation DeleteRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
     roleplay_delete(key: { id: $id })
 }
 
@@ -96,7 +105,7 @@ mutation CreateChannel(
     $roleplay: UUID!,
     $isInternal: Boolean!,
     $isDefault: Boolean!
-) @auth(level: USER) {
+) @auth(level: USER insecureReason: "Handled by code") {
     channel_insert(data: {
         name: $name,
         roleplay: { id: $roleplay },
@@ -108,11 +117,11 @@ mutation CreateChannel(
 mutation EditChannel(
     $id: UUID!,
     $name: String!,
-) @auth(level: USER) {
+) @auth(level: USER insecureReason: "Handled by code") {
     channel_update(key: { id: $id }, data: { name: $name })
 }
 
-mutation DeleteChannel($id: UUID!) @auth(level: USER) {
+mutation DeleteChannel($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
     channel_delete(key: { id: $id })
 }
 
@@ -122,7 +131,7 @@ mutation CreateRole(
     $description: String!,
     $isFree: Boolean!,
     $roleplay: UUID!
-) @auth(level: USER) {
+) @auth(level: USER insecureReason: "Handled by code") {
     role_insert(data: {
         name: $name,
         maxUsers: $maxUsers,
@@ -150,7 +159,7 @@ mutation EditRole(
     )
 }
 
-mutation DeleteRole($id: UUID!) @auth(level: USER) {
+mutation DeleteRole($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
     role_delete(key: { id: $id })
 }
 
@@ -175,7 +184,7 @@ mutation EditCharacter(
     $name: String!,
     $description: String!,
     $illustration: String!
-) @auth(level: USER) {
+) @auth(level: USER insecureReason: "Handled by code") {
     character_update(key: { id: $id },
     data: {
         name: $name,
@@ -184,6 +193,6 @@ mutation EditCharacter(
     })
 }
 
-mutation DeleteCharacter($id: UUID!) @auth(level: USER) {
+mutation DeleteCharacter($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
     character_delete(key: { id: $id })
 }

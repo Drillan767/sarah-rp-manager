@@ -1,7 +1,8 @@
-query ListUsers @auth(level: USER) {
+query ListUsers @auth(level: USER insecureReason: "Handled by code") {
   users {
     id
     username
+    handle
     email
     avatar
     description
@@ -9,18 +10,19 @@ query ListUsers @auth(level: USER) {
   }
 }
 
-query GetUser($id: String!) @auth(level: USER) {
+query GetUser($id: String!) @auth(level: USER insecureReason: "Handled by code") {
   user(key: { id: $id }) {
     id
     username
     email
+    handle
     avatar
     description
     availability
   }
 }
 
-query ListRoleplays @auth(level: USER) {
+query ListRoleplays @auth(level: USER insecureReason: "Handled by code") {
   roleplays {
     id
     title
@@ -29,7 +31,7 @@ query ListRoleplays @auth(level: USER) {
   }
 }
 
-query GetRoleplay($id: UUID!) @auth(level: USER) {
+query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
   roleplay(key: { id: $id }) {
     id
     title
