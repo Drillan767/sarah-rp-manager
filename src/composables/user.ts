@@ -15,8 +15,6 @@ export default function useUser() {
             // First check if user exists
             const { data } = await getUser({ id: firebaseUser.uid })
 
-            console.log({ data, firebaseUser })
-
             if (!data.user) {
                 // User doesn't exist, create new user
                 await createUser({
