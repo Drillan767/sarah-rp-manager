@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useHead } from '@vueuse/head'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import Pegi18Warning from './components/Pegi18Warning.vue'
@@ -11,12 +11,18 @@ const route = useRoute()
 
 onMounted(() => initAuth())
 
+const title = ref('')
+
 useHead({
     titleTemplate: '%s | Sarah RP Manager',
-    title: route.meta.title as string,
+    title: () => title.value,
 })
 
 const showNavbar = computed(() => !route?.name?.toString().startsWith('roleplays-rpId-channels'))
+
+watch(route, () => {
+    title.value = route.meta.title as string
+})
 </script>
 
 <template>

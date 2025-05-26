@@ -263,3 +263,7 @@ mutation CreateSpecificUnavailability(
         endDate: $endDate
     })
 }
+
+mutation DeleteAvailability($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    availability_delete(key: { id: $id })
+}
