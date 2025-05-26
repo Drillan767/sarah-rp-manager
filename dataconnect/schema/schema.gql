@@ -1,8 +1,3 @@
-enum UserRole {
-    ADMIN
-    USER
-}
-
 type User @table(name: "users", singular: "user", plural: "users") {
     id: String! @default(expr: "auth.uid")
     username: String! @col(dataType: "varchar(50)")
@@ -10,7 +5,6 @@ type User @table(name: "users", singular: "user", plural: "users") {
     email: String! @col(dataType: "varchar(255)")
     avatar: String! @col(dataType: "varchar(255)")
     description: String!
-    availability: Any @default(expr: "{}")
     createdAt: Date! @default(expr: "request.time")
     updatedAt: Date! @default(expr: "request.time")
     isAdmin: Boolean! @default(expr: "false")
@@ -50,4 +44,17 @@ type Character @table(name: "characters", singular: "character", plural: "charac
     roleplay: Roleplay!
     user: User!
     createdAt: Date! @default(expr: "request.time")
+}
+
+type Availability @table(name: "availabilities", singular: "availability", plural: "availabilities") {
+    user: User!
+    type: String!
+    kind: String!
+    startTime: String!
+    endTime: String!
+    createdAt: Date! @default(expr: "request.time")
+    pattern: String
+    daysOfWeek: [String]
+    startDate: Date
+    endDate: Date
 }

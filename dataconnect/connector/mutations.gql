@@ -6,7 +6,6 @@ mutation CreateUser(
     $avatar: String!,
     $description: String!,
     $isAdmin: Boolean!,
-    $availability: Any
 ) @auth(level: PUBLIC insecureReason: "Handled by code") {
     user_insert(data: {
         id: $id,
@@ -15,8 +14,7 @@ mutation CreateUser(
         email: $email,
         avatar: $avatar,
         description: $description,
-        isAdmin: $isAdmin,
-        availability: $availability
+        isAdmin: $isAdmin
     })
 }
 
@@ -195,4 +193,73 @@ mutation EditCharacter(
 
 mutation DeleteCharacter($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
     character_delete(key: { id: $id })
+}
+
+
+mutation CreateGeneralAvailability(
+    $user: String!,
+    $startTime: String!,
+    $endTime: String!,
+    $pattern: String!
+    $daysOfWeek: [String!]!
+) @auth(level: USER insecureReason: "Handled by code") {
+    availability_insert(data: {
+        type: "available",
+        kind: "general"
+        startTime: $startTime
+        endTime: $endTime
+        pattern: $pattern
+        daysOfWeek: $daysOfWeek
+    })
+}
+
+mutation CreateGeneralUnavailability(
+    $user: String!,
+    $startTime: String!,
+    $endTime: String!,
+    $pattern: String!
+    $daysOfWeek: [String!]!
+) @auth(level: USER insecureReason: "Handled by code") {
+    availability_insert(data: {
+        type: "unavailable",
+        kind: "general"
+        startTime: $startTime
+        endTime: $endTime
+        pattern: $pattern
+        daysOfWeek: $daysOfWeek
+    })
+}
+
+mutation CreateSpecificAvailability(
+    $user: String!,
+    $startTime: String!,
+    $endTime: String!,
+    $startDate: Date!,
+    $endDate: Date!
+) @auth(level: USER insecureReason: "Handled by code") {
+    availability_insert(data: {
+        type: "available",
+        kind: "specific"
+        startTime: $startTime
+        endTime: $endTime
+        startDate: $startDate
+        endDate: $endDate
+    })
+}
+
+mutation CreateSpecificUnavailability(
+    $user: String!,
+    $startTime: String!,
+    $endTime: String!,
+    $startDate: Date!,
+    $endDate: Date!
+) @auth(level: USER insecureReason: "Handled by code") {
+    availability_insert(data: {
+        type: "unavailable",
+        kind: "specific"
+        startTime: $startTime
+        endTime: $endTime
+        startDate: $startDate
+        endDate: $endDate
+    })
 }

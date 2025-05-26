@@ -13,7 +13,7 @@ onMounted(() => initAuth())
 
 useHead({
     titleTemplate: '%s | Sarah RP Manager',
-    title: () => route.meta.title,
+    title: route.meta.title as string,
 })
 
 const showNavbar = computed(() => !route?.name?.toString().startsWith('roleplays-rpId-channels'))

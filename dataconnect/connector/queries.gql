@@ -6,7 +6,6 @@ query ListUsers @auth(level: USER insecureReason: "Handled by code") {
     email
     avatar
     description
-    availability
   }
 }
 
@@ -18,7 +17,6 @@ query GetUser($id: String!) @auth(level: USER insecureReason: "Handled by code")
     handle
     avatar
     description
-    availability
   }
 }
 
@@ -46,4 +44,42 @@ query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code
       isFree
     }
   }
+}
+
+query ListAvailabilities @auth(level: USER insecureReason: "Handled by code") {
+    availabilities {
+        id
+        pattern
+        daysOfWeek
+        startDate
+        endDate
+        type
+        kind
+        startTime
+        endTime
+        user {
+            id
+            username
+            handle
+        }
+    }
+}
+
+query GetAvailabilityForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+    availabilities(where: { user: { id: { eq: $userId } } }) {
+        id
+        pattern
+        daysOfWeek
+        startDate
+        endDate
+        type
+        kind
+        startTime
+        endTime
+        user {
+            id
+            username
+            handle
+        }
+    }
 }
