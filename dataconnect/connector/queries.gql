@@ -29,6 +29,15 @@ query ListRoleplays @auth(level: USER insecureReason: "Handled by code") {
   }
 }
 
+query ListRoleplaysForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+  roleplays(where: { user: { id: { eq: $userId } } }) {
+    id
+    title
+    description
+    illustration
+  }
+}
+
 query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
   roleplay(key: { id: $id }) {
     id

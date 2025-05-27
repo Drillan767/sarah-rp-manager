@@ -53,7 +53,6 @@ mutation CreateRoleplay(
     $title: String!,
     $description: String!,
     $illustration: String!,
-    $messageBoard: String,
     $startDate: Date,
     $user: String!
 ) @auth(level: USER insecureReason: "Handled by code") {
@@ -62,14 +61,13 @@ mutation CreateRoleplay(
             title: $title,
             description: $description,
             illustration: $illustration,
-            messageBoard: $messageBoard,
             startDate: $startDate,
             user: { id: $user }
         }
     )
 }
 
-mutation EditRoleplay(
+mutation UpdateRoleplay(
     $id: UUID!,
     $title: String!,
     $description: String!,
@@ -87,7 +85,7 @@ mutation EditRoleplay(
     )
 }
 
-mutation EditRolepplayMessageBoard(
+mutation EditRoleplayMessageBoard(
     $id: UUID!,
     $messageBoard: String!
 ) @auth(level: USER insecureReason: "Handled by code") {
