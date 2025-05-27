@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    User roleplays
+    <RouterView />
 </template>

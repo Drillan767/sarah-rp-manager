@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router'
+
 import { computed } from 'vue'
 
 interface Props {
     links: {
         title: string
-        to?: string
+        to?: RouteLocationRaw
     }[]
 }
 

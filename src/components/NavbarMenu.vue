@@ -54,8 +54,8 @@ function switchTheme() {
                 />
                 <VDivider />
                 <VListItem
+                    :to="{ name: 'user-roleplays' }"
                     title="Mes roleplays"
-                    to="/mes-roleplays"
                     prepend-icon="mdi-book-open-page-variant-outline"
                 />
                 <VListItem
