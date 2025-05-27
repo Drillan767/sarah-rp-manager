@@ -28,7 +28,8 @@
         "vue": "^3.5.13",
         "vue-router": "4",
         "vue3-toastify": "^0.2.8",
-        "vuetify": "^3.8.6"
+        "vuetify": "^3.8.6",
+        "vuetify-pro-tiptap": "^2.6.0"
     },
     "devDependencies": {
         "@antfu/eslint-config": "^4.13.2",
