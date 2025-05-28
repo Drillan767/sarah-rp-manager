@@ -67,6 +67,13 @@ mutation CreateRoleplay(
     )
 }
 
+mutation updateRoleplayIllustration(
+    $id: UUID!,
+    $illustration: String!
+) @auth(level: USER insecureReason: "Handled by code") {
+    roleplay_update(key: { id: $id }, data: { illustration: $illustration })
+}
+
 mutation UpdateRoleplay(
     $id: UUID!,
     $title: String!,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { CreateRoleplayVariables, CreateRoleVariables } from '@sarah-rp-manager/default-connector'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
 import RolesForm from '@/components/roleplays/RolesForm.vue'
@@ -10,7 +10,7 @@ type RoleplayFormType = Omit<CreateRoleplayVariables, 'illustration'> & {
     illustration: File
 }
 
-const { createRoleplay } = useRoleplays()
+const { createRP } = useRoleplays()
 
 const roleplay = ref<RoleplayFormType>({
     title: '',
@@ -19,15 +19,50 @@ const roleplay = ref<RoleplayFormType>({
     user: '',
 })
 
-const roles = ref<CreateRoleVariables[]>([])
+const roles = ref<CreateRoleVariables[]>([{
+    name: '',
+    maxUsers: 0,
+    description: '',
+    isFree: false,
+    roleplay: '',
+}])
 
 const roleplayValid = ref(false)
+const loading = ref(false)
 
 const rolesForms = ref<InstanceType<typeof RolesForm>[]>([])
 const rolesValid = ref<boolean[]>([])
 
+const freeRoleUsed = computed(() => roles.value.some(role => role.isFree))
+const canSubmit = computed(() => roleplayValid.value && rolesValid.value.every(valid => valid))
+
 function assignRoleRef(el: InstanceType<typeof RolesForm>, index: number) {
     rolesForms.value[index] = el
+}
+
+async function handleSubmit() {
+    loading.value = true
+    try {
+        await createRP(roleplay.value, roles.value)
+    } catch (error) {
+        console.error(error)
+    } finally {
+        loading.value = false
+    }
+}
+
+function addRole(free: boolean) {
+    roles.value.push({
+        name: free ? 'Rôle libre' : '',
+        maxUsers: 0,
+        description: free ? 'Les utilisateurs qui choisiront ce rôle utiliseront leur propre profil comme personnage' : '',
+        isFree: free,
+        roleplay: '',
+    })
+}
+
+function removeRole(index: number) {
+    roles.value.splice(index, 1)
 }
 
 const links = [
@@ -70,13 +105,59 @@ const links = [
             </VRow>
             <VRow>
                 <VCol>
-                    <template v-for="i in roles.length" :key="i">
-                        <RolesForm
-                            :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RolesForm>, i)"
-                            v-model:form="roles[i]"
-                            @update:valid="(v) => rolesValid[i] = v"
-                        />
-                    </template>
+                    <VCard title="Rôles">
+                        <template #append>
+                            <VBtn
+                                :disabled="freeRoleUsed"
+                                prepend-icon="mdi-plus"
+                                color="primary"
+                                variant="flat"
+                                class="mr-2"
+                                @click="addRole(true)"
+                            >
+                                Ajouter un rôle libre
+                            </VBtn>
+                            <VBtn
+                                prepend-icon="mdi-plus"
+                                color="primary"
+                                variant="outlined"
+                                @click="addRole(false)"
+                            >
+                                Ajouter un rôle
+                            </VBtn>
+                        </template>
+                        <template #text>
+                            <VContainer>
+                                <VRow>
+                                    <VCol
+                                        v-for="(_, i) in roles.length"
+                                        :key="i"
+                                        cols="12"
+                                        md="4"
+                                    >
+                                    <RolesForm
+                                        :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RolesForm>, i)"
+                                        v-model:form="roles[i]"
+                                        @update:valid="(v) => rolesValid[i] = v"
+                                        @delete="removeRole(i)"
+                                    />
+                                    </VCol>
+                                </VRow>
+                            </VContainer>
+                        </template>
+                    </VCard>
+                </VCol>
+            </VRow>
+            <VRow>
+                <VCol class="d-flex justify-end">
+                    <VBtn
+                        color="primary"
+                        type="submit"
+                        :disabled="loading || !canSubmit"
+                        @click="handleSubmit"
+                    >
+                        Enregistrer
+                    </VBtn>
                 </VCol>
             </VRow>
         </VForm>

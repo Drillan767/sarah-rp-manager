@@ -2,6 +2,7 @@ import { connectorConfig } from '@sarah-rp-manager/default-connector'
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { connectDataConnectEmulator, getDataConnect } from 'firebase/data-connect'
+import { getStorage } from 'firebase/storage'
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -17,6 +18,8 @@ const app = initializeApp(firebaseConfig)
 
 const dc = getDataConnect(app, connectorConfig)
 
+const storage = getStorage(app)
+
 if (import.meta.env.VITE_ENV === 'local') {
     connectDataConnectEmulator(dc, 'localhost', 9399)
 }
@@ -27,5 +30,6 @@ export default function useFirebase() {
     return {
         auth,
         dc,
+        storage,
     }
 }

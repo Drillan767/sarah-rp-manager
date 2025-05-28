@@ -73,7 +73,7 @@ watch(controlledValues, (newValues) => {
     form.value = newValues
 })
 
-watch(valid, (newValues) => {
+watch(formValid, (newValues) => {
     valid.value = newValues
 })
 </script>
