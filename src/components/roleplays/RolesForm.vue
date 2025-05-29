@@ -35,6 +35,7 @@ watch(form, value => setValues(value))
 <template>
     <VCard
         prepend-icon="mdi-badge-account"
+        title="Nouveau rôle"
     >
         <template #append>
             <VBtn
@@ -63,15 +64,15 @@ watch(form, value => setValues(value))
                     />
                 </VCol>
                 <VCol cols="12">
-                <VTextarea
-                    v-bind="descriptionProps"
-                    v-model="description"
-                    :disabled="form.isFree"
-                    label="Description"
-                    rows="2"
-                    :auto-grow="true"
-                />
-            </VCol>
+                    <VTextarea
+                        v-bind="descriptionProps"
+                        v-model="description"
+                        :disabled="form.isFree"
+                        label="Description"
+                        rows="2"
+                        :auto-grow="true"
+                    />
+                </VCol>
             </VRow>
         </template>
     </VCard>

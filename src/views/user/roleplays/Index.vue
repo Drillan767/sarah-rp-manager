@@ -57,27 +57,50 @@ const links = [
             </VCol>
         </VRow>
         <VRow>
-            <VCol
-                v-for="(rp, i) in roleplays"
-                :key="i"
-                cols="12"
-                md="3"
-            >
-                <VCard
-                    :to="{ name: 'user-roleplays-edit', params: { rpId: rp.id } }"
+            <VCol>
+                <VDataIterator
+                    :items="roleplays"
+                    :loading="loading"
                 >
-                    <VImg
-                        :src="rp.illustration"
-                        :cover="true"
-                        height="250"
-                    />
-                    <VCardTitle>
-                        {{ rp.title }}
-                    </VCardTitle>
-                    <VCardText>
-                        {{ rp.id }}
-                    </VCardText>
-                </VCard>
+                    <template #default="{ items: rpList }">
+                        <VRow>
+                            <template v-if="loading">
+                                <VCol
+                                    v-for="i in 4"
+                                    :key="i"
+                                    cols="12"
+                                    md="3"
+                                >
+                                    <VSkeletonLoader
+                                        height="240"
+                                        type="image, list-item-two-line"
+                                    />
+                                </VCol>
+                            </template>
+                            <template v-else>
+                                <VCol
+                                    v-for="(rp, i) in rpList"
+                                    :key="i"
+                                    cols="12"
+                                    md="3"
+                                >
+                                    <VCard
+                                        :to="{ name: 'user-roleplays-edit', params: { rpId: rp.raw.id } }"
+                                    >
+                                        <VImg
+                                            :src="rp.raw.illustration"
+                                            :cover="true"
+                                            height="250"
+                                        />
+                                        <VCardTitle>
+                                            {{ rp.raw.title }}
+                                        </VCardTitle>
+                                    </VCard>
+                                </VCol>
+                            </template>
+                        </VRow>
+                    </template>
+                </VDataIterator>
             </VCol>
         </VRow>
     </VContainer>

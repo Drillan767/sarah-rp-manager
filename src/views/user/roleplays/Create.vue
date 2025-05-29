@@ -109,6 +109,7 @@ const links = [
                     <RoleplayForm
                         v-model:form="roleplay"
                         v-model:valid="roleplayValid"
+                        :loading="loading"
                     />
                 </VCol>
             </VRow>
