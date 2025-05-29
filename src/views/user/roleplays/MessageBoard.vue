@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import type { Toast } from '@/types'
 import { useForm } from 'vee-validate'
-import vuetifyConfig from '@/composables/vuetifyConfig'
+import { inject, ref } from 'vue'
 import useRoleplays from '@/composables/roleplays'
-import { ref } from 'vue'
+import vuetifyConfig from '@/composables/vuetifyConfig'
 
 interface Props {
     messageBoard: string | null | undefined
@@ -12,29 +13,28 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const { updateMessageBoard } = useRoleplays()
-
 const emit = defineEmits<{
     (e: 'saved'): void
 }>()
 
+const { updateMessageBoard } = useRoleplays()
+const toast = inject<Toast>('toast')
+
 const mbLoading = ref(false)
 
-const { handleSubmit, defineField } = useForm<{ messageBoard: string | null | undefined }>({
+const { handleSubmit, defineField } = useForm<{ messageBoard: string }>({
     initialValues: {
-        messageBoard: props.messageBoard,
+        messageBoard: props.messageBoard ?? undefined,
     },
 })
 
 const [messageBoard, messageBoardProps] = defineField('messageBoard', vuetifyConfig)
 
-const onSubmit = handleSubmit(async(values) => {
-    if (!values.messageBoard) {
-        return
-    }
+const onSubmit = handleSubmit(async (values) => {
     mbLoading.value = true
     await updateMessageBoard(props.roleplayId, values.messageBoard)
     emit('saved')
+    toast?.showSuccess('Message board mis à jour')
     mbLoading.value = false
 })
 </script>

@@ -94,7 +94,7 @@ mutation UpdateRoleplay(
 
 mutation UpdateMessageBoard(
     $id: UUID!,
-    $messageBoard: String!
+    $messageBoard: String
 ) @auth(level: USER insecureReason: "Handled by code") {
     roleplay_update(key: { id: $id }, data: { messageBoard: $messageBoard })
 }
