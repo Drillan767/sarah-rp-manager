@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import landingMessages from '@/assets/json/landing-messages.json'
 import Message from '@/components/channels/Message.vue'
 import useDayjs from '@/composables/dayjs'
+import useToast from '@/composables/toast'
 import useUsersStore from '@/stores/users'
 
 interface IMessage {
@@ -34,6 +36,8 @@ interface Messages {
 const dayjs = useDayjs()
 const displayedMessages = ref<IMessage[]>([])
 const { user } = storeToRefs(useUsersStore())
+const route = useRoute()
+const { showError } = useToast()
 
 const username = computed(() => user.value?.username ?? 'Vous')
 
@@ -84,6 +88,18 @@ function displayMessage() {
             }, (i * 2000) + 750)
         }
     })
+}
+
+// Show error message if present in query parameters
+if (route.query.error) {
+    switch (route.query.error) {
+        case 'auth-required':
+            showError('Vous devez être connecté pour accéder à cette page')
+            break
+        default:
+            showError('Une erreur est survenue')
+            break
+    }
 }
 
 onMounted(displayMessage)

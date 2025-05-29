@@ -20,12 +20,40 @@ query GetUser($id: String!) @auth(level: USER insecureReason: "Handled by code")
   }
 }
 
-query ListRoleplays @auth(level: USER insecureReason: "Handled by code") {
-  roleplays {
+query ListRoleplays(
+    $limit: Int = 12
+    $offset: Int = 0
+    $search: String
+) @auth(level: PUBLIC insecureReason: "Handled by code") {
+  roleplays(
+    limit: $limit,
+    offset: $offset,
+    where: {
+        _or: [
+            {
+                title: { contains: $search }
+            },
+            {
+                description: { contains: $search }
+            },
+            {
+                user: { handle: { contains: $search } }
+            }
+        ]
+    }
+  ) {
     id
     title
     description
     illustration
+    startDate
+    nbCharacters: characters_on_roleplay {
+        _count
+    }
+    user {
+      id
+      handle
+    }
   }
 }
 

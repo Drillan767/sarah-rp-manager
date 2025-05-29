@@ -59,8 +59,8 @@ function switchTheme() {
                     prepend-icon="mdi-book-open-page-variant-outline"
                 />
                 <VListItem
+                    :to="{ name: 'roleplays' }"
                     title="Tous les roleplays"
-                    to="/all-roleplays"
                     prepend-icon="mdi-bookshelf"
                 />
                 <VDivider />
