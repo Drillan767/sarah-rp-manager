@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CreateRoleplayVariables, CreateRoleVariables } from '@sarah-rp-manager/default-connector'
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
 import RolesForm from '@/components/roleplays/RolesForm.vue'
@@ -11,6 +12,7 @@ type RoleplayFormType = Omit<CreateRoleplayVariables, 'illustration'> & {
 }
 
 const { createRP } = useRoleplays()
+const router = useRouter()
 
 const roleplay = ref<RoleplayFormType>({
     title: '',
@@ -43,7 +45,8 @@ function assignRoleRef(el: InstanceType<typeof RolesForm>, index: number) {
 async function handleSubmit() {
     loading.value = true
     try {
-        await createRP(roleplay.value, roles.value)
+        const id = await createRP(roleplay.value, roles.value)
+        router.push({ name: 'user-roleplays-edit', params: { rpId: id } })
     } catch (error) {
         console.error(error)
     } finally {
@@ -111,7 +114,7 @@ const links = [
                                 :disabled="freeRoleUsed"
                                 prepend-icon="mdi-plus"
                                 color="primary"
-                                variant="flat"
+                                variant="outlined"
                                 class="mr-2"
                                 @click="addRole(true)"
                             >
@@ -120,7 +123,7 @@ const links = [
                             <VBtn
                                 prepend-icon="mdi-plus"
                                 color="primary"
-                                variant="outlined"
+                                variant="flat"
                                 @click="addRole(false)"
                             >
                                 Ajouter un rôle

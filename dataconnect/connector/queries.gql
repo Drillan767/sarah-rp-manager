@@ -46,7 +46,7 @@ query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code
     illustration
     messageBoard
     startDate
-    roles_on_roleplay {
+    roles: roles_on_roleplay  {
       name
       maxUsers
       description

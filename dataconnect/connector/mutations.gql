@@ -92,7 +92,7 @@ mutation UpdateRoleplay(
     )
 }
 
-mutation EditRoleplayMessageBoard(
+mutation UpdateMessageBoard(
     $id: UUID!,
     $messageBoard: String!
 ) @auth(level: USER insecureReason: "Handled by code") {

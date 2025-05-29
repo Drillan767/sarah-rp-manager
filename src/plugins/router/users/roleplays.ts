@@ -21,7 +21,14 @@ const routes: RouteRecordRaw[] = [
                     title: 'Nouveau roleplay',
                 },
             },
-
+            {
+                path: ':rpId/modifier',
+                name: 'user-roleplays-edit',
+                component: () => import('@/views/user/roleplays/Edit.vue'),
+                meta: {
+                    title: 'Modifier un roleplay',
+                },
+            },
         ],
     },
 ]

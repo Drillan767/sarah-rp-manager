@@ -1,18 +1,26 @@
 <script setup lang="ts">
-import type { CreateRoleplayVariables } from '@sarah-rp-manager/default-connector'
+import type { CreateRoleplayVariables, UpdateRoleplayVariables } from '@sarah-rp-manager/default-connector'
 import { useForm, useIsFormValid } from 'vee-validate'
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import Wysiwyg from '@/components/Wysiwyg.vue'
 import useDayjs from '@/composables/dayjs'
 import vuetifyConfig from '@/composables/vuetifyConfig'
 
-type RoleplayFormType = Omit<CreateRoleplayVariables, 'illustration'> & {
-    illustration: File
+interface Props {
+    edit?: boolean
+    loading?: boolean
+    currentPreview?: string
+}
+
+type RoleplayFormType = Omit<CreateRoleplayVariables | UpdateRoleplayVariables, 'illustration'> & {
+    illustration: File | string
 }
 
 const {
     edit = false,
-} = defineProps<{ edit?: boolean }>()
+    loading = false,
+    currentPreview,
+} = defineProps<Props>()
 
 const emit = defineEmits<{
     (e: 'submit'): void
@@ -29,6 +37,7 @@ const { defineField, controlledValues, setValues } = useForm<RoleplayFormType>({
     validationSchema: {
         title: 'required',
         description: 'required',
+        illustration: 'required',
     },
     initialValues: form.value,
 })
@@ -37,18 +46,25 @@ const formValid = useIsFormValid()
 
 const preview = ref('')
 const showImage = ref(false)
+const fileInput = ref<File | null>(null)
+
+onMounted(() => {
+    if (edit && currentPreview) {
+        preview.value = currentPreview
+    }
+})
 
 const [title, titleProps] = defineField('title', vuetifyConfig)
 const [description] = defineField('description', vuetifyConfig)
 const [startDate, startDateProps] = defineField('startDate', vuetifyConfig)
-
-const illustrationFile = ref<File>()
+const [illustration, illustrationProps] = defineField('illustration', vuetifyConfig)
 
 function handleImage(e: Event) {
     const files = (e.target as HTMLInputElement).files
 
     if (files) {
         preview.value = URL.createObjectURL(files[0])
+        fileInput.value = files[0]
         setValues({
             illustration: files[0] as File,
         })
@@ -56,12 +72,12 @@ function handleImage(e: Event) {
 }
 
 const illustrationRules = [
-    (value: File) => {
+    (value: File | string) => {
         if (!edit && !value) {
             return 'Champ requis'
         }
 
-        if (value.size > 4 * 1024 * 1024) {
+        if (value instanceof File && value.size > 4 * 1024 * 1024) {
             return 'Taille maximale de 4 mo'
         }
 
@@ -76,6 +92,14 @@ watch(controlledValues, (newValues) => {
 watch(formValid, (newValues) => {
     valid.value = newValues
 })
+
+watch(fileInput, (newValue) => {
+    if (newValue) {
+        setValues({
+            illustration: newValue,
+        })
+    }
+})
 </script>
 
 <template>
@@ -87,19 +111,20 @@ watch(formValid, (newValues) => {
                         <VTextField
                             v-bind="titleProps"
                             v-model="title"
+                            :loading="loading"
                             label="Titre"
                         />
                     </VCol>
                     <VCol cols="12" md="5">
                         <VFileInput
-                            v-model="illustrationFile"
+                            v-bind="illustrationProps"
+                            v-model="fileInput"
+                            :loading="loading"
                             :clearable="true"
                             :rules="illustrationRules"
                             accept="image/*"
-
                             label="Illustration"
                             hint="max: 4 mo"
-
                             @change="handleImage"
                         >
                             <template
@@ -120,6 +145,7 @@ watch(formValid, (newValues) => {
                             v-model="startDate"
                             type="date"
                             :min="minDate"
+                            :loading="loading"
                             label="Date de début"
                             :clearable="true"
                         />
@@ -127,6 +153,7 @@ watch(formValid, (newValues) => {
                 </VRow>
                 <Wysiwyg
                     v-model:content="description"
+                    :loading="loading"
                     title="Description"
                 />
                 <VDialog
@@ -146,9 +173,11 @@ watch(formValid, (newValues) => {
             v-if="edit"
             #actions
         >
+            <VSpacer />
             <VBtn
                 color="primary"
                 :disabled="!formValid"
+                variant="flat"
                 @click="emit('submit')"
             >
                 Enregistrer

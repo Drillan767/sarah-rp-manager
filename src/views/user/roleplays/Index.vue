@@ -18,7 +18,7 @@ async function getRoleplays() {
         return
     loading.value = true
     const { data } = await listRoleplaysForUser({ userId: user.value.id })
-    roleplays.value = data.roleplays ?? []
+    roleplays.value = data.roleplays
     loading.value = false
 }
 
@@ -54,6 +54,30 @@ const links = [
                 >
                     Nouveau roleplay
                 </VBtn>
+            </VCol>
+        </VRow>
+        <VRow>
+            <VCol
+                v-for="(rp, i) in roleplays"
+                :key="i"
+                cols="12"
+                md="3"
+            >
+                <VCard
+                    :to="{ name: 'user-roleplays-edit', params: { rpId: rp.id } }"
+                >
+                    <VImg
+                        :src="rp.illustration"
+                        :cover="true"
+                        height="250"
+                    />
+                    <VCardTitle>
+                        {{ rp.title }}
+                    </VCardTitle>
+                    <VCardText>
+                        {{ rp.id }}
+                    </VCardText>
+                </VCard>
             </VCol>
         </VRow>
     </VContainer>
