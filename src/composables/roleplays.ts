@@ -1,26 +1,25 @@
 import type {
     CreateChannelVariables,
-    CreateRoleplayVariables,
     CreateRoleVariables,
-    UpdateRoleplayVariables,
 } from '@sarah-rp-manager/default-connector'
+import type { CreateRoleplayFormType, UpdateRoleplayFormType } from '@/types/forms'
 import {
     createChannel,
     createRole,
     createRoleplay,
+    deleteChannelsForSpecificRoleplay as deleteChannels,
+    deleteRole,
+    deleteRoleplay,
+    deleteRolesForSpecificRoleplay as deleteRoles,
     getRoleplay as getRoleplayQuery,
     updateMessageBoard as updateMessageBoardQuery,
     updateRoleplayIllustration,
     updateRoleplay as updateRoleplayQuery,
 } from '@sarah-rp-manager/default-connector'
-import { deleteObject, getDownloadURL, ref as s3Ref, uploadBytes } from 'firebase/storage'
+import { deleteObject, getDownloadURL, listAll, ref as s3Ref, uploadBytes } from 'firebase/storage'
 import { storeToRefs } from 'pinia'
 import useUsersStore from '@/stores/users'
 import useFirebase from './firebase'
-
-type RoleplayFormType = Omit<CreateRoleplayVariables, 'illustration'> & {
-    illustration: File
-}
 
 export default function useRoleplays() {
     const usersStore = useUsersStore()
@@ -28,7 +27,7 @@ export default function useRoleplays() {
     const { storage } = useFirebase()
 
     const createRP = async (
-        roleplay: RoleplayFormType,
+        roleplay: CreateRoleplayFormType,
         roles: CreateRoleVariables[],
     ) => {
         if (!user.value) {
@@ -91,25 +90,24 @@ export default function useRoleplays() {
         return data.roleplay
     }
 
-    const updateMessageBoard = async (rpId: string, messageBoard: string) => {
+    const updateMessageBoard = async (rpId: string, messageBoard: string | undefined) => {
         await updateMessageBoardQuery({
             id: rpId,
             messageBoard,
         })
     }
 
-    const updateRP = async (rp: UpdateRoleplayVariables, illustration?: File) => {
-        if (illustration) {
+    const updateRP = async (rp: UpdateRoleplayFormType) => {
+        if (rp.illustration) {
             // Delete old illustration
-            const oldIllustration = rp.illustration.split(`${import.meta.env.VITE_S3_BUCKET_URL}/o`)[1]
-            if (oldIllustration) {
-                const storageRef = s3Ref(storage, oldIllustration)
-                await deleteObject(storageRef)
-            }
+            const list = await listAll(s3Ref(storage, `roleplays/${rp.id}`))
+            await Promise.all(list.items.map(async (item) => {
+                await deleteObject(item)
+            }))
 
-            const storageRef = s3Ref(storage, `roleplays/${rp.id}/${illustration.name}`)
-            const uploadTask = await uploadBytes(storageRef, illustration, {
-                contentType: illustration.type,
+            const storageRef = s3Ref(storage, `roleplays/${rp.id}/${rp.illustration.name}`)
+            const uploadTask = await uploadBytes(storageRef, rp.illustration, {
+                contentType: rp.illustration.type,
             })
             const downloadURL = await getDownloadURL(uploadTask.ref)
 
@@ -124,10 +122,29 @@ export default function useRoleplays() {
         }
     }
 
+    const deleteRP = async (rpId: string) => {
+        // Delete illustration
+        const list = await listAll(s3Ref(storage, `roleplays/${rpId}`))
+        await Promise.all(list.items.map(async (item) => {
+            await deleteObject(item)
+        }))
+
+        // Delete channels
+        await deleteChannels({ roleplayId: rpId })
+
+        // Delete roles
+        await deleteRoles({ roleplayId: rpId })
+
+        // Delete roleplay
+        await deleteRoleplay({ id: rpId })
+        // await deleteRoleplayQuery({ id: rpId })
+    }
+
     return {
         createRP,
         getRP,
         updateMessageBoard,
         updateRP,
+        deleteRP,
     }
 }

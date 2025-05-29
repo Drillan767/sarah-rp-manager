@@ -128,6 +128,10 @@ mutation DeleteChannel($id: UUID!) @auth(level: USER insecureReason: "Handled by
     channel_delete(key: { id: $id })
 }
 
+mutation DeleteChannelsForSpecificRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+  channel_deleteMany(where: { roleplayId: { eq: $roleplayId } })
+}
+
 mutation CreateRole(
     $name: String!,
     $maxUsers: Int!,
@@ -165,6 +169,11 @@ mutation EditRole(
 mutation DeleteRole($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
     role_delete(key: { id: $id })
 }
+
+mutation DeleteRolesForSpecificRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+  role_deleteMany(where: { roleplayId: { eq: $roleplayId } })
+}
+
 
 mutation CreateCharacter(
     $name: String!,

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CreateRoleplayVariables, CreateRoleVariables } from '@sarah-rp-manager/default-connector'
-import { computed, ref } from 'vue'
+import type { Toast } from '@/types'
+import { computed, inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
@@ -13,6 +14,7 @@ type RoleplayFormType = Omit<CreateRoleplayVariables, 'illustration'> & {
 
 const { createRP } = useRoleplays()
 const router = useRouter()
+const toast = inject<Toast>('toast')
 
 const roleplay = ref<RoleplayFormType>({
     title: '',
@@ -46,10 +48,14 @@ async function handleSubmit() {
     loading.value = true
     try {
         const id = await createRP(roleplay.value, roles.value)
+        toast?.showSuccess('Roleplay créé avec succès')
         router.push({ name: 'user-roleplays-edit', params: { rpId: id } })
-    } catch (error) {
+    }
+    catch (error) {
         console.error(error)
-    } finally {
+        toast?.showError('Une erreur est survenue lors de la création du roleplay')
+    }
+    finally {
         loading.value = false
     }
 }
@@ -138,12 +144,12 @@ const links = [
                                         cols="12"
                                         md="4"
                                     >
-                                    <RolesForm
-                                        :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RolesForm>, i)"
-                                        v-model:form="roles[i]"
-                                        @update:valid="(v) => rolesValid[i] = v"
-                                        @delete="removeRole(i)"
-                                    />
+                                        <RolesForm
+                                            :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RolesForm>, i)"
+                                            v-model:form="roles[i]"
+                                            @update:valid="(v) => rolesValid[i] = v"
+                                            @delete="removeRole(i)"
+                                        />
                                     </VCol>
                                 </VRow>
                             </VContainer>

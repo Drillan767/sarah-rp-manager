@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CreateRoleplayVariables, UpdateRoleplayVariables } from '@sarah-rp-manager/default-connector'
+import type { CreateRoleplayFormType, UpdateRoleplayFormType } from '@/types/forms'
 import { useForm, useIsFormValid } from 'vee-validate'
 import { onMounted, ref, watch } from 'vue'
 import Wysiwyg from '@/components/Wysiwyg.vue'
@@ -10,10 +10,6 @@ interface Props {
     edit?: boolean
     loading?: boolean
     currentPreview?: string
-}
-
-type RoleplayFormType = Omit<CreateRoleplayVariables | UpdateRoleplayVariables, 'illustration'> & {
-    illustration: File | string
 }
 
 const {
@@ -30,10 +26,10 @@ const dayjs = useDayjs()
 
 const minDate = dayjs().format('YYYY-MM-DDT00:00')
 
-const form = defineModel<RoleplayFormType>('form', { required: true })
+const form = defineModel<CreateRoleplayFormType | UpdateRoleplayFormType>('form', { required: true })
 const valid = defineModel<boolean>('valid', { required: true })
 
-const { defineField, controlledValues, setValues } = useForm<RoleplayFormType>({
+const { defineField, controlledValues, setValues } = useForm<CreateRoleplayFormType | UpdateRoleplayFormType>({
     validationSchema: {
         title: 'required',
         description: 'required',
@@ -46,7 +42,6 @@ const formValid = useIsFormValid()
 
 const preview = ref('')
 const showImage = ref(false)
-const fileInput = ref<File | null>(null)
 
 onMounted(() => {
     if (edit && currentPreview) {
@@ -54,17 +49,17 @@ onMounted(() => {
     }
 })
 
+defineField('id')
 const [title, titleProps] = defineField('title', vuetifyConfig)
 const [description] = defineField('description', vuetifyConfig)
 const [startDate, startDateProps] = defineField('startDate', vuetifyConfig)
-const [illustration, illustrationProps] = defineField('illustration', vuetifyConfig)
+const [Illustration, illustrationProps] = defineField('illustration', vuetifyConfig)
 
 function handleImage(e: Event) {
     const files = (e.target as HTMLInputElement).files
 
     if (files) {
         preview.value = URL.createObjectURL(files[0])
-        fileInput.value = files[0]
         setValues({
             illustration: files[0] as File,
         })
@@ -92,14 +87,6 @@ watch(controlledValues, (newValues) => {
 watch(formValid, (newValues) => {
     valid.value = newValues
 })
-
-watch(fileInput, (newValue) => {
-    if (newValue) {
-        setValues({
-            illustration: newValue,
-        })
-    }
-})
 </script>
 
 <template>
@@ -118,7 +105,7 @@ watch(fileInput, (newValue) => {
                     <VCol cols="12" md="5">
                         <VFileInput
                             v-bind="illustrationProps"
-                            v-model="fileInput"
+                            v-model="Illustration"
                             :loading="loading"
                             :clearable="true"
                             :rules="illustrationRules"
