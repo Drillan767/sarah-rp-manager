@@ -20,6 +20,11 @@ const routes: RouteRecordRaw[] = [
             },
         ],
     },
+    {
+        path: '/user/:id',
+        name: 'user-show',
+        component: () => import('@/views/user/Show.vue'),
+    },
     ...roleplays,
 ]
 

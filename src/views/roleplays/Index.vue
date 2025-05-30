@@ -4,13 +4,15 @@ import { listRoleplays } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import Breadcrumb from '@/components/Breadcrumb.vue'
+import useDayjs from '@/composables/dayjs'
 import useUsersStore from '@/stores/users'
 
-const roleplays = ref<ListRoleplaysData['roleplays']>([])
 const { user } = storeToRefs(useUsersStore())
+const dayjs = useDayjs()
 
 const search = ref<string>()
 const itemsPerPage = ref(12)
+const roleplays = ref<ListRoleplaysData['roleplays']>([])
 
 async function getRoleplays() {
     const { data } = await listRoleplays({
@@ -102,10 +104,11 @@ const links = [
                                         v-if="item.raw.startDate"
                                         cols="12"
                                         md="6"
+                                        class="d-flex justify-end"
                                     >
                                         <VChip
-                                            prepend-icon="mdi-clock"
-                                            :text="`${item.raw.startDate}`"
+                                            prepend-icon="mdi-calendar"
+                                            :text="`${dayjs(item.raw.startDate).format('DD/MM/YYYY')}`"
                                         />
                                     </VCol>
                                 </VRow>
@@ -119,13 +122,13 @@ const links = [
                                 />
                                 <VSpacer />
                                 <VBtn
+                                    :to="{ name: 'roleplay-details', params: { id: item.raw.id } }"
                                     color="primary"
                                     variant="flat"
                                 >
                                     Voir
                                 </VBtn>
                             </VCardActions>
-                            <!-- :to="{ name: 'roleplay', params: { id: item.raw.id } }" -->
                         </VCard>
                     </VCol>
                 </VRow>
