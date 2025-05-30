@@ -3,12 +3,14 @@ import type { ListRoleplaysForUserData } from '@sarah-rp-manager/default-connect
 import { listRoleplaysForUser } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import useUsersStore from '@/stores/users'
 
 type RoleplayList = NonNullable<ListRoleplaysForUserData['roleplays']>
 
 const { user } = storeToRefs(useUsersStore())
+const router = useRouter()
 
 const roleplays = ref<RoleplayList>([])
 const loading = ref(false)
@@ -20,6 +22,10 @@ async function getRoleplays() {
     const { data } = await listRoleplaysForUser({ userId: user.value.id })
     roleplays.value = data.roleplays
     loading.value = false
+}
+
+function createRoleplay() {
+    router.push({ name: 'user-roleplays-create' })
 }
 
 onMounted(getRoleplays)
@@ -99,6 +105,17 @@ const links = [
                                 </VCol>
                             </template>
                         </VRow>
+                    </template>
+                    <template #no-data>
+                        <VEmptyState
+                            headline="Aucun roleplay"
+                            title="Vous n'avez pas de roleplay"
+                            text="Créez votre premier roleplay pour commencer"
+                            icon="mdi-book-open-blank-variant-outline"
+                            action-text="Créer mon premier roleplay"
+                            color="primary"
+                            @click:action="createRoleplay"
+                        />
                     </template>
                 </VDataIterator>
             </VCol>

@@ -85,8 +85,12 @@ export default function useRoleplays() {
         return data.roleplay_insert.id
     }
 
-    const getRP = async (rpId: string) => {
+    const getRP = async (rpId: string, authId: string) => {
         const { data } = await getRoleplayQuery({ id: rpId })
+
+        if (data.roleplay && data.roleplay.user.id !== authId) {
+            throw new Error('You are not allowed to access this roleplay')
+        }
         return data.roleplay
     }
 
