@@ -42,6 +42,7 @@ type Character @table(name: "characters", singular: "character", plural: "charac
     description: String!
     illustration: String!
     roleplay: Roleplay!
+    role: Role!
     user: User!
     createdAt: Date! @default(expr: "request.time")
 }

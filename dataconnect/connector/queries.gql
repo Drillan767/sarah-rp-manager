@@ -74,11 +74,21 @@ query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code
     illustration
     messageBoard
     startDate
+    createdAt
     roles: roles_on_roleplay  {
       name
       maxUsers
       description
       isFree
+      nbCharacters: characters_on_role {
+        _count
+      }
+    }
+    user {
+      id
+      avatar
+      username
+      handle
     }
   }
 }
