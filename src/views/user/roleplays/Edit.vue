@@ -9,10 +9,14 @@ import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
 import useRoleplays from '@/composables/roleplays'
 import MessageBoard from './MessageBoard.vue'
+import RolesForm from '@/components/roleplays/RolesForm.vue'
+import useUsersStore from '@/stores/users'
+import { storeToRefs } from 'pinia'
 
 const route = useRoute()
 const router = useRouter()
 const toast = inject<Toast>('toast')
+const { user } = storeToRefs(useUsersStore())
 
 const rpId = route.params.rpId.toString()
 
@@ -26,9 +30,16 @@ const preview = ref<string>()
 const newIllustration = ref<File>()
 const form = ref<UpdateRoleplayFormType>()
 
+const freeRoleUsed = computed(() => roles.value.some(role => role.isFree))
+
+
 async function getRoleplay() {
+    if (!user.value) {
+        return
+    }
+
     loading.value = true
-    roleplay.value = await getRP(rpId)
+    roleplay.value = await getRP(rpId, user.value?.id)
 
     if (!roleplay.value) {
         router.push({ name: 'user-roleplays' })
@@ -117,6 +128,7 @@ const links = computed(() => ([
                             <VBtn
                                 v-bind="props"
                                 append-icon="mdi-chevron-down"
+                                variant="flat"
                             >
                                 Actions
                             </VBtn>
@@ -124,6 +136,8 @@ const links = computed(() => ([
                         <VList>
                             <VListItem
                                 title="Accéder au roleplay"
+                                append-icon="mdi-arrow-right-circle-outline"
+                                @click="router.push({ name: 'roleplay-details', params: { id: roleplay?.id } })"
                             />
 
                             <VListItem
@@ -155,6 +169,60 @@ const links = computed(() => ([
                         :edit="true"
                         @submit="updateRoleplay"
                     />
+                </VCol>
+            </VRow>
+            <VRow v-if="roleplay">
+                <VCol>
+                    <VCard title="Rôles">
+                        <template #append>
+                            <VBtn
+                                :disabled="freeRoleUsed"
+                                prepend-icon="mdi-plus"
+                                color="primary"
+                                variant="outlined"
+                                class="mr-2"
+                                @click="addRole(true)"
+                            >
+                                Ajouter un rôle libre
+                            </VBtn>
+                            <VBtn
+                                prepend-icon="mdi-plus"
+                                color="primary"
+                                variant="flat"
+                                @click="addRole(false)"
+                            >
+                                Ajouter un rôle
+                            </VBtn>
+                        </template>
+                        <template #text>
+                            <VContainer>
+                                <VRow>
+                                    <VCol
+                                        v-for="(_, i) in roles.length"
+                                        :key="i"
+                                        cols="12"
+                                        md="4"
+                                    >
+                                        <RolesForm
+                                            :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RolesForm>, i)"
+                                            v-model:form="roles[i]"
+                                            @update:valid="(v) => rolesValid[i] = v"
+                                            @delete="removeRole(i)"
+                                        />
+                                    </VCol>
+                                </VRow>
+                            </VContainer>
+                        </template>
+                        <template #actions>
+                            <VSpacer />
+                            <VBtn
+                                prepend-icon="mdi-plus"
+                                color="primary"
+                                variant="flat"
+                                @click="addRole(false)"
+                            ></VBtn>
+                        </template>
+                    </VCard>
                 </VCol>
             </VRow>
         </VForm>
