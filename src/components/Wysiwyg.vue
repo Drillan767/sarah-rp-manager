@@ -6,6 +6,7 @@ import {
     BulletList,
     Fullscreen,
     History,
+    Heading,
     Italic,
     OrderedList,
     Strike,
@@ -26,6 +27,10 @@ const extensions = [
     }),
     Blockquote,
     Bold,
+    Heading.configure({
+        levels: [1, 2, 3, 4],
+        divider: true,
+    }),
     Italic,
     Underline,
     Strike,
@@ -48,9 +53,6 @@ const extensions = [
                 :max-width="900"
                 :extensions="extensions"
             />
-            <!--
-            <VuetifyViewer :value="content" />
-            -->
         </VContainer>
     </VApp>
 </template>
