@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CreateRoleplayFormType, UpdateRoleplayFormType } from '@/types/forms'
 import { useForm, useIsFormValid } from 'vee-validate'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import Wysiwyg from '@/components/Wysiwyg.vue'
 import useDayjs from '@/composables/dayjs'
 import vuetifyConfig from '@/composables/vuetifyConfig'
@@ -30,11 +30,11 @@ const form = defineModel<CreateRoleplayFormType | UpdateRoleplayFormType>('form'
 const valid = defineModel<boolean>('valid', { required: true })
 
 const { defineField, controlledValues, setValues } = useForm<CreateRoleplayFormType | UpdateRoleplayFormType>({
-    validationSchema: {
+    validationSchema: computed(() => ({
         title: 'required',
         description: 'required',
-        illustration: 'required',
-    },
+        illustration: edit ? '' : 'required',
+    })),
     initialValues: form.value,
 })
 

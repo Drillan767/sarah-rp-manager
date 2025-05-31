@@ -71,7 +71,7 @@ async function getRoleplay() {
         title: roleplay.value.title,
         description: roleplay.value.description,
         startDate: roleplay.value.startDate,
-        illustration: new File([], 'illustration.png'),
+        illustration: undefined,
     }
 
     roles.value = roleplay.value.roles.map(role => ({

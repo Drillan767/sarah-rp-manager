@@ -78,7 +78,7 @@ mutation UpdateRoleplay(
     $id: UUID!,
     $title: String!,
     $description: String!,
-    $illustration: String!,
+    $illustration: String,
     $startDate: Date,
 ) @auth(level: USER insecureReason: "Handled by code") {
     roleplay_update(

@@ -1,6 +1,7 @@
 import type {
     CreateChannelVariables,
     CreateRoleVariables,
+    UpdateRoleplayVariables,
 } from '@sarah-rp-manager/default-connector'
 import type { CreateRoleplayFormType, UpdateRoleplayFormType } from '@/types/forms'
 import {
@@ -101,6 +102,13 @@ export default function useRoleplays() {
     }
 
     const updateRP = async (rp: UpdateRoleplayFormType) => {
+        const payload: UpdateRoleplayVariables = {
+            id: rp.id,
+            title: rp.title,
+            description: rp.description,
+            startDate: rp.startDate,
+        }
+
         if (rp.illustration) {
             // Delete old illustration
             const list = await listAll(s3Ref(storage, `roleplays/${rp.id}`))
@@ -112,17 +120,10 @@ export default function useRoleplays() {
             const uploadTask = await uploadBytes(storageRef, rp.illustration, {
                 contentType: rp.illustration.type,
             })
-            const downloadURL = await getDownloadURL(uploadTask.ref)
-
-            // Update roleplay with new illustration
-            await updateRoleplayQuery({
-                id: rp.id,
-                title: rp.title,
-                description: rp.description,
-                startDate: rp.startDate,
-                illustration: downloadURL,
-            })
+            payload.illustration = await getDownloadURL(uploadTask.ref)
         }
+
+        await updateRoleplayQuery(payload)
     }
 
     const deleteRP = async (rpId: string) => {
