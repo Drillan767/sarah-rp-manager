@@ -92,7 +92,7 @@ watch(formValid, (newValues) => {
 <template>
     <VCard>
         <template #text>
-            <VContainer>
+            <VContainer class="pb-0">
                 <VRow>
                     <VCol cols="12" md="5">
                         <VTextField
@@ -138,23 +138,23 @@ watch(formValid, (newValues) => {
                         />
                     </VCol>
                 </VRow>
-                <Wysiwyg
-                    v-model:content="description"
-                    :loading="loading"
-                    title="Description"
-                />
-                <VDialog
-                    v-model="showImage"
-                    max-width="600"
-                >
-                    <VImg
-                        :src="preview"
-                        :width="600"
-                        aspect-ratio="16/9"
-                        :cover="true"
-                    />
-                </VDialog>
             </VContainer>
+            <Wysiwyg
+                v-model:content="description"
+                :loading="loading"
+                title="Description"
+            />
+            <VDialog
+                v-model="showImage"
+                max-width="600"
+            >
+                <VImg
+                    :src="preview"
+                    :width="600"
+                    aspect-ratio="16/9"
+                    :cover="true"
+                />
+            </VDialog>
         </template>
         <template
             v-if="edit"
