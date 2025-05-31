@@ -3,15 +3,17 @@ import type { GetRoleplayData } from '@sarah-rp-manager/default-connector'
 import type { Toast } from '@/types'
 import type { UpdateRoleplayFormType } from '@/types/forms'
 import { useHead } from '@vueuse/head'
+import { storeToRefs } from 'pinia'
 import { computed, inject, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
-import useRoleplays from '@/composables/roleplays'
-import MessageBoard from './MessageBoard.vue'
 import RolesForm from '@/components/roleplays/RolesForm.vue'
+import useRoleplays from '@/composables/roleplays'
 import useUsersStore from '@/stores/users'
-import { storeToRefs } from 'pinia'
+import MessageBoard from './MessageBoard.vue'
+
+// NOTE : Display roles only, no edition available HERE. Link to the roleplay's chat instead
 
 const route = useRoute()
 const router = useRouter()
@@ -31,7 +33,6 @@ const newIllustration = ref<File>()
 const form = ref<UpdateRoleplayFormType>()
 
 const freeRoleUsed = computed(() => roles.value.some(role => role.isFree))
-
 
 async function getRoleplay() {
     if (!user.value) {
@@ -220,7 +221,7 @@ const links = computed(() => ([
                                 color="primary"
                                 variant="flat"
                                 @click="addRole(false)"
-                            ></VBtn>
+                            />
                         </template>
                     </VCard>
                 </VCol>
