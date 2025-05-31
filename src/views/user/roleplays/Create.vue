@@ -138,7 +138,7 @@ const links = [
                         </template>
                         <template #text>
                             <VContainer>
-                                <VRow>
+                                <VRow v-if="roles.length > 0">
                                     <VCol
                                         v-for="(_, i) in roles.length"
                                         :key="i"
@@ -153,6 +153,29 @@ const links = [
                                             @update:valid="(v) => rolesValid[i] = v"
                                             @delete="removeRole(i)"
                                         />
+                                    </VCol>
+                                </VRow>
+                                <VRow v-else>
+                                    <VCol
+                                        cols="12"
+                                        md="4"
+                                    >
+                                        <VEmptyState
+                                            icon="mdi-badge-account-alert"
+                                            title="Aucun rôle"
+                                            text="Vous n'avez pas encore ajouté de rôle. Ajoutez un rôle pour commencer."
+                                        >
+                                            <template #actions>
+                                                <VBtn
+                                                    prepend-icon="mdi-plus"
+                                                    color="primary"
+                                                    variant="flat"
+                                                    @click="addRole(false)"
+                                                >
+                                                    Ajouter un rôle
+                                                </vbtn>
+                                            </template>
+                                        </VEmptyState>
                                     </VCol>
                                 </VRow>
                             </VContainer>
