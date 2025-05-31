@@ -46,14 +46,21 @@ watch(role, value => setValues(value))
         :title="mode === 'create' ? 'Nouveau rôle' : 'Modifier le rôle'"
     >
         <template #append>
-            <VBtn
-                v-tooltip:top="roleUsed ? 'Ce rôle est utilisé par un personnage' : ''"
-                icon="mdi-trash-can-outline"
-                color="error"
-                variant="text"
-                :disabled="roleUsed"
-                @click="emit('delete')"
-            />
+            <VTooltip
+                :disabled="!roleUsed"
+                location="top"
+            >
+                <template #activator="{ props: tooltip }">
+                    <VBtn
+                        v-bind="tooltip"
+                        icon="mdi-trash-can-outline"
+                        color="error"
+                        variant="text"
+                        :disabled="roleUsed"
+                        @click="emit('delete')"
+                    />
+                </template>
+            </VTooltip>
         </template>
         <template #text>
             <VRow>
