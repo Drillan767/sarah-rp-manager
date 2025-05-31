@@ -8,7 +8,6 @@ import {
     createRole,
     createRoleplay,
     deleteChannelsForSpecificRoleplay as deleteChannels,
-    deleteRole,
     deleteRoleplay,
     deleteRolesForSpecificRoleplay as deleteRoles,
     getRoleplay as getRoleplayQuery,

@@ -4,8 +4,8 @@ import type { Toast } from '@/types'
 import { computed, inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
+import RoleForm from '@/components/roleplays/RoleForm.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
-import RolesForm from '@/components/roleplays/RolesForm.vue'
 import useRoleplays from '@/composables/roleplays'
 
 type RoleplayFormType = Omit<CreateRoleplayVariables, 'illustration'> & {
@@ -34,13 +34,13 @@ const roles = ref<CreateRoleVariables[]>([{
 const roleplayValid = ref(false)
 const loading = ref(false)
 
-const rolesForms = ref<InstanceType<typeof RolesForm>[]>([])
+const rolesForms = ref<InstanceType<typeof RoleForm>[]>([])
 const rolesValid = ref<boolean[]>([])
 
 const freeRoleUsed = computed(() => roles.value.some(role => role.isFree))
 const canSubmit = computed(() => roleplayValid.value && rolesValid.value.every(valid => valid))
 
-function assignRoleRef(el: InstanceType<typeof RolesForm>, index: number) {
+function assignRoleRef(el: InstanceType<typeof RoleForm>, index: number) {
     rolesForms.value[index] = el
 }
 
@@ -145,9 +145,11 @@ const links = [
                                         cols="12"
                                         md="4"
                                     >
-                                        <RolesForm
-                                            :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RolesForm>, i)"
-                                            v-model:form="roles[i]"
+                                        <RoleForm
+                                            :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RoleForm>, i)"
+                                            v-model:role="roles[i]"
+                                            mode="create"
+                                            :role-used="false"
                                             @update:valid="(v) => rolesValid[i] = v"
                                             @delete="removeRole(i)"
                                         />

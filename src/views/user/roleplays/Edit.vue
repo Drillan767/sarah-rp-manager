@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import type { GetRoleplayData } from '@sarah-rp-manager/default-connector'
+import type { EditRoleVariables, GetRoleplayData } from '@sarah-rp-manager/default-connector'
 import type { Toast } from '@/types'
 import type { UpdateRoleplayFormType } from '@/types/forms'
+import { deleteRole as deleteRoleQuery } from '@sarah-rp-manager/default-connector'
 import { useHead } from '@vueuse/head'
 import { storeToRefs } from 'pinia'
 import { computed, inject, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
+import RoleForm from '@/components/roleplays/RoleForm.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
-import RolesForm from '@/components/roleplays/RolesForm.vue'
 import useRoleplays from '@/composables/roleplays'
 import useUsersStore from '@/stores/users'
 import MessageBoard from './MessageBoard.vue'
@@ -29,8 +30,13 @@ const loading = ref(false)
 const valid = ref(false)
 const showDeleteDialog = ref(false)
 const preview = ref<string>()
+const deleteRoleDialog = ref(false)
+const deleteRoleId = ref<string>()
 const newIllustration = ref<File>()
 const form = ref<UpdateRoleplayFormType>()
+const roles = ref<EditRoleVariables[]>([])
+const rolesValid = ref<boolean[]>([])
+const rolesForms = ref<InstanceType<typeof RoleForm>[]>([])
 
 const freeRoleUsed = computed(() => roles.value.some(role => role.isFree))
 
@@ -58,6 +64,15 @@ async function getRoleplay() {
         startDate: roleplay.value.startDate,
         illustration: new File([], 'illustration.png'),
     }
+
+    roles.value = roleplay.value.roles.map(role => ({
+        id: role.id,
+        name: role.name,
+        maxUsers: role.maxUsers,
+        description: role.description,
+        isFree: role.isFree,
+        roleplay: roleplay.value?.id ?? '',
+    }))
 
     preview.value = roleplay.value.illustration
 
@@ -97,6 +112,68 @@ async function deleteRoleplay() {
     finally {
         loading.value = false
     }
+}
+
+function assignRoleRef(el: InstanceType<typeof RoleForm>, index: number) {
+    rolesForms.value[index] = el
+}
+
+function addRole(free: boolean) {
+    roles.value.push({
+        id: '',
+        name: free ? 'Rôle libre' : '',
+        maxUsers: 0,
+        description: free ? 'Les utilisateurs qui choisiront ce rôle utiliseront leur propre profil comme personnage' : '',
+        isFree: free,
+    })
+}
+
+function removeRole(index: number) {
+    const roleExists = roles.value.find(role => role.id !== '' && role.id === roles.value[index].id)
+    console.log(roleExists, roles.value[index])
+
+    if (!roleExists) {
+        roles.value.splice(index, 1)
+    }
+
+    deleteRoleId.value = roles.value[index].id
+    deleteRoleDialog.value = true
+}
+
+async function deleteRole() {
+    console.log(deleteRoleId.value)
+    if (!deleteRoleId.value) {
+        return
+    }
+
+    loading.value = true
+
+    try {
+        await deleteRoleQuery({ id: deleteRoleId.value })
+        toast?.showSuccess('Rôle supprimé avec succès')
+        getRoleplay()
+    }
+    catch {
+        toast?.showError('Une erreur est survenue lors de la suppression du rôle')
+    }
+    finally {
+        loading.value = false
+    }
+}
+
+async function saveRoles() {
+    // TODO: loop through roles
+    // If no ID, save them
+    // Otherwise, update them
+}
+
+function isUsed(roleId: string) {
+    const role = roleplay.value?.roles.find(role => role.id === roleId)
+    if (!role) {
+        return false
+    }
+
+    return role.nbCharacters[0]._count > 0
 }
 
 onMounted(getRoleplay)
@@ -204,24 +281,17 @@ const links = computed(() => ([
                                         cols="12"
                                         md="4"
                                     >
-                                        <RolesForm
-                                            :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RolesForm>, i)"
-                                            v-model:form="roles[i]"
+                                        <RoleForm
+                                            :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RoleForm>, i)"
+                                            v-model:role="roles[i]"
+                                            mode="update"
+                                            :role-used="isUsed(roles[i].id)"
                                             @update:valid="(v) => rolesValid[i] = v"
                                             @delete="removeRole(i)"
                                         />
                                     </VCol>
                                 </VRow>
                             </VContainer>
-                        </template>
-                        <template #actions>
-                            <VSpacer />
-                            <VBtn
-                                prepend-icon="mdi-plus"
-                                color="primary"
-                                variant="flat"
-                                @click="addRole(false)"
-                            />
                         </template>
                     </VCard>
                 </VCol>
@@ -251,6 +321,36 @@ const links = computed(() => ([
                 <VBtn
                     color="error"
                     @click="deleteRoleplay"
+                >
+                    Supprimer
+                </VBtn>
+            </template>
+        </VCard>
+    </VDialog>
+    <VDialog
+        v-model="deleteRoleDialog"
+        width="500"
+    >
+        <VCard
+            title="Supprimer le rôle ?"
+            prepend-icon="mdi-delete"
+        >
+            <template #text>
+                La suppression du rôle est irréversible. <br>
+                Confirmer ?
+            </template>
+            <template #actions>
+                <VSpacer />
+                <VBtn
+                    :color="undefined"
+                    @click="deleteRoleDialog = false"
+                >
+                    Annuler
+                </VBtn>
+                <VBtn
+                    color="error"
+                    variant="flat"
+                    @click="deleteRole"
                 >
                     Supprimer
                 </VBtn>
