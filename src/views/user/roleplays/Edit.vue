@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import type { EditRoleVariables, GetRoleplayData } from '@sarah-rp-manager/default-connector'
+import type { CreateRoleVariables, EditRoleVariables, GetRoleplayData } from '@sarah-rp-manager/default-connector'
 import type { Toast } from '@/types'
 import type { UpdateRoleplayFormType } from '@/types/forms'
-import { deleteRole as deleteRoleQuery } from '@sarah-rp-manager/default-connector'
+import {
+    createRole as createRoleQuery,
+    deleteRole as deleteRoleQuery,
+    editRole as editRoleQuery,
+} from '@sarah-rp-manager/default-connector'
 import { useHead } from '@vueuse/head'
 import { storeToRefs } from 'pinia'
 import { computed, inject, onMounted, ref } from 'vue'
@@ -13,8 +17,6 @@ import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
 import useRoleplays from '@/composables/roleplays'
 import useUsersStore from '@/stores/users'
 import MessageBoard from './MessageBoard.vue'
-
-// NOTE : Display roles only, no edition available HERE. Link to the roleplay's chat instead
 
 const route = useRoute()
 const router = useRouter()
@@ -34,11 +36,18 @@ const deleteRoleDialog = ref(false)
 const deleteRoleId = ref<string>()
 const newIllustration = ref<File>()
 const form = ref<UpdateRoleplayFormType>()
-const roles = ref<EditRoleVariables[]>([])
+const roles = ref<(CreateRoleVariables | EditRoleVariables)[]>([])
 const rolesValid = ref<boolean[]>([])
 const rolesForms = ref<InstanceType<typeof RoleForm>[]>([])
 
 const freeRoleUsed = computed(() => roles.value.some(role => role.isFree))
+const allRolesValid = computed(() => {
+    if (roles.value.length === 0) {
+        return false
+    }
+
+    return rolesValid.value.every(valid => valid)
+})
 
 async function getRoleplay() {
     if (!user.value) {
@@ -119,29 +128,28 @@ function assignRoleRef(el: InstanceType<typeof RoleForm>, index: number) {
 }
 
 function addRole(free: boolean) {
-    roles.value.push({
-        id: '',
+    const newRole: CreateRoleVariables = {
         name: free ? 'Rôle libre' : '',
         maxUsers: 0,
         description: free ? 'Les utilisateurs qui choisiront ce rôle utiliseront leur propre profil comme personnage' : '',
         isFree: free,
-    })
-}
-
-function removeRole(index: number) {
-    const roleExists = roles.value.find(role => role.id !== '' && role.id === roles.value[index].id)
-    console.log(roleExists, roles.value[index])
-
-    if (!roleExists) {
-        roles.value.splice(index, 1)
+        roleplay: roleplay.value?.id ?? '',
     }
 
-    deleteRoleId.value = roles.value[index].id
-    deleteRoleDialog.value = true
+    roles.value.push(newRole)
+}
+
+function removeRole(role: CreateRoleVariables | EditRoleVariables) {
+    if ('id' in role) {
+        deleteRoleId.value = role.id
+        deleteRoleDialog.value = true
+    }
+    else {
+        roles.value.splice(roles.value.indexOf(role), 1)
+    }
 }
 
 async function deleteRole() {
-    console.log(deleteRoleId.value)
     if (!deleteRoleId.value) {
         return
     }
@@ -152,6 +160,8 @@ async function deleteRole() {
         await deleteRoleQuery({ id: deleteRoleId.value })
         toast?.showSuccess('Rôle supprimé avec succès')
         getRoleplay()
+        deleteRoleId.value = undefined
+        deleteRoleDialog.value = false
     }
     catch {
         toast?.showError('Une erreur est survenue lors de la suppression du rôle')
@@ -162,18 +172,38 @@ async function deleteRole() {
 }
 
 async function saveRoles() {
-    // TODO: loop through roles
-    // If no ID, save them
-    // Otherwise, update them
+    if (!roleplay.value) {
+        return
+    }
+
+    for (const role of roles.value) {
+        if ('id' in role && !!role.id) {
+            await editRoleQuery(role)
+        }
+        else {
+            await createRoleQuery({
+                ...role,
+                roleplay: roleplay.value.id,
+            })
+        }
+    }
+
+    toast?.showSuccess('Rôles mis à jour avec succès')
+    getRoleplay()
 }
 
-function isUsed(roleId: string) {
-    const role = roleplay.value?.roles.find(role => role.id === roleId)
-    if (!role) {
+function isUsed(role: CreateRoleVariables | EditRoleVariables) {
+    if (!('id' in role)) {
         return false
     }
 
-    return role.nbCharacters[0]._count > 0
+    const foundRole = roleplay.value?.roles.find(r => r.id === role.id)
+
+    if (!foundRole) {
+        return false
+    }
+
+    return foundRole.nbCharacters[0]._count > 0
 }
 
 onMounted(getRoleplay)
@@ -274,9 +304,9 @@ const links = computed(() => ([
                         </template>
                         <template #text>
                             <VContainer>
-                                <VRow>
+                                <VRow v-if="roles.length > 0">
                                     <VCol
-                                        v-for="(_, i) in roles.length"
+                                        v-for="(role, i) in roles"
                                         :key="i"
                                         cols="12"
                                         md="4"
@@ -285,13 +315,49 @@ const links = computed(() => ([
                                             :ref="(el) => el && assignRoleRef(el as InstanceType<typeof RoleForm>, i)"
                                             v-model:role="roles[i]"
                                             mode="update"
-                                            :role-used="isUsed(roles[i].id)"
+                                            :role-used="isUsed(role)"
                                             @update:valid="(v) => rolesValid[i] = v"
-                                            @delete="removeRole(i)"
+                                            @delete="removeRole(role)"
                                         />
                                     </VCol>
                                 </VRow>
+                                <VRow v-else>
+                                    <VCol
+                                        cols="12"
+                                        md="4"
+                                    >
+                                        <VCard>
+                                            <VEmptyState
+                                                icon="mdi-badge-account-alert"
+                                                title="Aucun rôle"
+                                                text="Vous n'avez pas encore ajouté de rôle. Ajoutez un rôle pour commencer."
+                                            >
+                                                <template #actions>
+                                                    <VBtn
+                                                        prepend-icon="mdi-plus"
+                                                        color="primary"
+                                                        variant="flat"
+                                                        @click="addRole(false)"
+                                                    >
+                                                        Ajouter un rôle
+                                                    </vbtn>
+                                                </template>
+                                            </VEmptyState>
+                                        </VCard>
+                                    </VCol>
+                                </VRow>
                             </VContainer>
+                        </template>
+                        <template #actions>
+                            <VSpacer />
+                            <VBtn
+                                :disabled="!allRolesValid"
+                                color="primary"
+                                variant="flat"
+                                @click="saveRoles"
+                            >
+                                Enregistrer
+                            </VBtn>
                         </template>
                     </VCard>
                 </VCol>
