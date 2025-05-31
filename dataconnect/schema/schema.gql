@@ -29,6 +29,7 @@ type Channel @table(name: "channels", singular: "channel", plural: "channels") {
 }
 
 type Role @table(name: "roles", singular: "role", plural: "roles") {
+    id: UUID! @default(expr: "uuidV4()")
     name: String!
     maxUsers: Int!
     roleplay: Roleplay!
