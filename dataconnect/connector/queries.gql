@@ -131,3 +131,12 @@ query GetAvailabilityForUser($userId: String!) @auth(level: USER insecureReason:
         }
     }
 }
+
+query ListCharactersForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+    characters(where: { user: { id: { eq: $userId } } }) {
+        id
+        name
+        description
+        illustration
+    }
+}
