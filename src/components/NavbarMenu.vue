@@ -47,17 +47,37 @@ function switchTheme() {
                     class="text"
                 />
                 <VDivider v-if="mobile" />
-                <VListItem
-                    :to="{ name: 'user-profile' }"
-                    title="Profil"
-                    prepend-icon="mdi-account"
-                />
+                <VMenu
+                    location="start"
+                    open-on-hover
+                >
+                    <template #activator="{ props: menu }">
+                        <VListItem
+                            v-bind="menu"
+                            title="Profil"
+                            prepend-icon="mdi-account"
+                        />
+                    </template>
+                    <VList>
+                        <VListItem
+                            :to="{ name: 'user-profile-informations' }"
+                            title="Informations personnelles"
+                            prepend-icon="mdi-account-edit"
+                        />
+                        <VListItem
+                            :to="{ name: 'user-roleplays' }"
+                            title="Mes roleplays"
+                            prepend-icon="mdi-book-open-page-variant-outline"
+                        />
+                        <VListItem
+                            :to="{ name: 'user-characters' }"
+                            title="Mes personnages"
+                            prepend-icon="mdi-account-box-multiple"
+                        />
+                    </VList>
+                </VMenu>
+
                 <VDivider />
-                <VListItem
-                    :to="{ name: 'user-roleplays' }"
-                    title="Mes roleplays"
-                    prepend-icon="mdi-book-open-page-variant-outline"
-                />
                 <VListItem
                     :to="{ name: 'roleplays' }"
                     title="Tous les roleplays"

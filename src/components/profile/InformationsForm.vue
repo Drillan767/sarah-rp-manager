@@ -71,6 +71,7 @@ onMounted(loadCurrentUserInfos)
         :loading="loading"
         prepend-icon="mdi-account"
         title="Profil"
+        variant="flat"
         class="mb-4"
     >
         <template #text>

@@ -4,7 +4,6 @@ import { listRoleplaysForUser } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import Breadcrumb from '@/components/Breadcrumb.vue'
 import useUsersStore from '@/stores/users'
 
 type RoleplayList = NonNullable<ListRoleplaysForUserData['roleplays']>
@@ -29,28 +28,11 @@ function createRoleplay() {
 }
 
 onMounted(getRoleplays)
-
-const links = [
-    {
-        title: 'Accueil',
-        to: '/',
-    },
-    {
-        title: 'Mes roleplays',
-    },
-]
 </script>
 
 <template>
     <VContainer>
-        <Breadcrumb :links />
         <VRow>
-            <VCol>
-                <h1 class="text-h3">
-                    Mes roleplays
-                </h1>
-            </VCol>
-            <VSpacer />
             <VCol class="d-flex justify-end">
                 <VBtn
                     :to="{ name: 'user-roleplays-create' }"

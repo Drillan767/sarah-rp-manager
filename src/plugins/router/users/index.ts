@@ -5,11 +5,20 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/profil',
         name: 'user-profile',
-        component: () => import('@/views/user/Profile.vue'),
+        component: () => import('@/views/user/UserNav.vue'),
+        redirect: { name: 'user-profile-informations' },
         meta: {
             title: 'Profil',
         },
         children: [
+            {
+                path: 'informations-personnelles',
+                name: 'user-profile-informations',
+                component: () => import('@/views/user/Profile.vue'),
+                meta: {
+                    title: 'Informations personnelles',
+                },
+            },
             {
                 path: 'mes-personnages',
                 name: 'user-characters',
@@ -18,6 +27,7 @@ const routes: RouteRecordRaw[] = [
                     title: 'Mes personnages',
                 },
             },
+            ...roleplays,
         ],
     },
     {
@@ -25,7 +35,6 @@ const routes: RouteRecordRaw[] = [
         name: 'user-show',
         component: () => import('@/views/user/Show.vue'),
     },
-    ...roleplays,
 ]
 
 export default routes
