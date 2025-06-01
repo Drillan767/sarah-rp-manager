@@ -16,7 +16,7 @@ const links = [
 </script>
 
 <template>
-    <VContainer>
+    <VContainer fluid>
         <Breadcrumb :links />
         <VCol>
             <h1 class="text-h3 mb-4">

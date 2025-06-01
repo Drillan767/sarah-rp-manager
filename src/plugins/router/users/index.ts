@@ -22,7 +22,7 @@ const routes: RouteRecordRaw[] = [
             {
                 path: 'mes-personnages',
                 name: 'user-characters',
-                component: () => import('@/views/user/Characters.vue'),
+                component: () => import('@/views/user/CharacterTemplates.vue'),
                 meta: {
                     title: 'Mes personnages',
                 },

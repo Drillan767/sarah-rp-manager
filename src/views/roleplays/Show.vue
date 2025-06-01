@@ -5,8 +5,8 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
-import useUsersStore from '@/stores/users'
 import useDayjs from '@/composables/dayjs'
+import useUsersStore from '@/stores/users'
 
 type Roleplay = NonNullable<GetRoleplayData['roleplay']>
 
@@ -40,10 +40,6 @@ async function getRoleplayData() {
         return
     }
     roleplay.value = data.data.roleplay
-}
-
-function getPicked(max: number, current: number) {
-    
 }
 
 onMounted(getRoleplayData)
@@ -158,7 +154,9 @@ const links = computed(() => ([
                     <template #title>
                         <h2>Description</h2>
                     </template>
-                    <VCardText v-html="roleplay.description" />
+                    <VCardText>
+                        <div v-html="roleplay.description" />
+                    </VCardText>
                 </VCard>
             </VCol>
             <VCol>

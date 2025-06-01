@@ -31,7 +31,7 @@ onMounted(getRoleplays)
 </script>
 
 <template>
-    <VContainer>
+    <VContainer fluid>
         <VRow>
             <VCol class="d-flex justify-end">
                 <VBtn
