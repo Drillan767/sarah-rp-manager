@@ -47,7 +47,7 @@ query ListRoleplays(
     description
     illustration
     startDate
-    nbCharacters: characters_on_roleplay {
+    nbCharacters: participations_on_roleplay {
         _count
     }
     user {
@@ -81,7 +81,7 @@ query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code
       maxUsers
       description
       isFree
-      nbCharacters: characters_on_role {
+      nbCharacters: participations_on_role {
         _count
       }
     }
@@ -91,6 +91,39 @@ query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code
       username
       handle
     }
+  }
+}
+
+query ListTemplatesForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+  character_templates(where: { user: { id: { eq: $userId } } }) {
+    id
+    name
+    description
+    illustration
+    participations: participations_on_characterTemplate {
+      id
+      characterName
+      characterIllustration
+      characterDescription
+      roleplay {
+        id
+        title
+        illustration
+        roles: roles_on_roleplay {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+query ListPublicTemplatesForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+  character_templates(where: { user: { id: { eq: $userId } }, isPublic: { eq: true } }) {
+    id
+    name
+    description
+    illustration
   }
 }
 
@@ -129,14 +162,5 @@ query GetAvailabilityForUser($userId: String!) @auth(level: USER insecureReason:
             username
             handle
         }
-    }
-}
-
-query ListCharactersForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
-    characters(where: { user: { id: { eq: $userId } } }) {
-        id
-        name
-        description
-        illustration
     }
 }

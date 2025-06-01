@@ -174,41 +174,38 @@ mutation DeleteRolesForSpecificRoleplay($roleplayId: UUID!) @auth(level: USER in
   role_deleteMany(where: { roleplayId: { eq: $roleplayId } })
 }
 
-
-mutation CreateCharacter(
+mutation CreateCharacterTemplate(
     $name: String!,
     $description: String!,
     $illustration: String!,
-    $roleplay: UUID!,
+    $isPublic: Boolean!,
     $user: String!
-) @auth(level: USER, insecureReason: "Handled by code") {
-    character_insert(data: {
+) @auth(level: USER insecureReason: "Handled by code") {
+    character_template_insert(data: {
         name: $name,
         description: $description,
         illustration: $illustration,
-        roleplay: { id: $roleplay },
+        isPublic: $isPublic,
         user: { id: $user }
     })
 }
 
-mutation EditCharacter(
+mutation UpdateCharacterTemplate(
     $id: UUID!,
     $name: String!,
     $description: String!,
-    $illustration: String!
+    $illustration: String
 ) @auth(level: USER insecureReason: "Handled by code") {
-    character_update(key: { id: $id },
-    data: {
+    character_template_update(key: { id: $id }, data: {
         name: $name,
         description: $description,
         illustration: $illustration
     })
 }
 
-mutation DeleteCharacter($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
-    character_delete(key: { id: $id })
+mutation DeleteCharacterTemplate($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    character_template_delete(key: { id: $id })
 }
-
 
 mutation CreateGeneralAvailability(
     $user: String!,
@@ -225,6 +222,43 @@ mutation CreateGeneralAvailability(
         pattern: $pattern
         daysOfWeek: $daysOfWeek
     })
+}
+
+mutation CreateParticipation(
+    $user: String!,
+    $roleplay: UUID!,
+    $role: UUID!,
+    $characterTemplate: UUID!,
+    $characterName: String,
+    $characterIllustration: String,
+    $characterDescription: String
+) @auth(level: USER insecureReason: "Handled by code") {
+    participation_insert(data: {
+        user: { id: $user },
+        roleplay: { id: $roleplay },
+        role: { id: $role },
+        characterTemplate: { id: $characterTemplate },
+        characterName: $characterName,
+        characterIllustration: $characterIllustration,
+        characterDescription: $characterDescription
+    })
+}
+
+mutation UpdateParticipation(
+    $id: UUID!,
+    $characterName: String,
+    $characterIllustration: String,
+    $characterDescription: String
+) @auth(level: USER insecureReason: "Handled by code") {
+    participation_update(key: { id: $id }, data: {
+        characterName: $characterName,
+        characterIllustration: $characterIllustration,
+        characterDescription: $characterDescription
+    })
+}
+
+mutation DeleteParticipation($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    participation_delete(key: { id: $id })
 }
 
 mutation CreateGeneralUnavailability(

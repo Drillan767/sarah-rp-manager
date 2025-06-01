@@ -38,14 +38,27 @@ type Role @table(name: "roles", singular: "role", plural: "roles") {
     isFree: Boolean!
 }
 
-type Character @table(name: "characters", singular: "character", plural: "characters") {
+type CharacterTemplate @table(name: "character_templates", singular: "character_template", plural: "character_templates") {
+    id: UUID! @default(expr: "uuidV4()")
     name: String!
     description: String!
     illustration: String!
-    roleplay: Roleplay!
-    role: Role!
     user: User!
     createdAt: Date! @default(expr: "request.time")
+    isPublic: Boolean!
+}
+
+type Participation @table(name: "participations", singular: "participation", plural: "participations") {
+    id: UUID! @default(expr: "uuidV4()")
+    user: User!
+    roleplay: Roleplay!
+    role: Role!
+    characterTemplate: CharacterTemplate!
+    characterName: String
+    characterIllustration: String
+    characterDescription: String
+    joinedAt: Date! @default(expr: "request.time")
+    status: String! @default(expr: "'active'")
 }
 
 type Availability @table(name: "availabilities", singular: "availability", plural: "availabilities") {
