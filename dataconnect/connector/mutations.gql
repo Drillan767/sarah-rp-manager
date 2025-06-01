@@ -203,6 +203,13 @@ mutation UpdateCharacterTemplate(
     })
 }
 
+mutation UpdateTemplateIllustration(
+    $id: UUID!,
+    $illustration: String!
+) @auth(level: USER insecureReason: "Handled by code") {
+    character_template_update(key: { id: $id }, data: { illustration: $illustration })
+}
+
 mutation DeleteCharacterTemplate($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
     character_template_delete(key: { id: $id })
 }

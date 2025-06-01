@@ -2,6 +2,7 @@
 import type { CreateTemplateFormType } from '@/types/forms'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
+import useCharacter from '@/composables/character'
 import useUsersStore from '@/stores/users'
 import TemplateForm from './TemplateForm.vue'
 
@@ -10,6 +11,7 @@ const emit = defineEmits<{
 }>()
 
 const { user } = storeToRefs(useUsersStore())
+const { createTemplate } = useCharacter()
 
 const open = defineModel<boolean>({ required: true })
 
@@ -24,9 +26,9 @@ const template = ref<CreateTemplateFormType>({
 const loading = ref(false)
 const valid = ref(false)
 
-async function createTemplate() {
+async function storeTemplate() {
     loading.value = true
-    // await createCharacterTemplate(character.value)
+    await createTemplate(template.value)
     loading.value = false
     emit('saved')
     open.value = false
@@ -54,8 +56,16 @@ async function createTemplate() {
             <template #actions>
                 <VSpacer />
                 <VBtn
+                    @click="open = false"
+                >
+                    Annuler
+                </VBtn>
+                <VBtn
                     color="primary"
-                    @click="createTemplate"
+                    :loading="loading"
+                    :disabled="!valid || loading"
+                    variant="flat"
+                    @click="storeTemplate"
                 >
                     Créer
                 </VBtn>
