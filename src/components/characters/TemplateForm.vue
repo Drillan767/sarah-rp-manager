@@ -66,7 +66,7 @@ function handleImage(e: Event) {
 
 watch(formValid, (newVal) => {
     valid.value = newVal
-})
+}, { immediate: true })
 
 watch(template, newVal => setValues(newVal))
 watch(controlledValues, (newVal) => {

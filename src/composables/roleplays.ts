@@ -42,7 +42,7 @@ export default function useRoleplays() {
         })
 
         // Upload illustration
-        const storageRef = s3Ref(storage, `roleplays/${data.roleplay_insert.id}/${roleplay.illustration.name}`)
+        const storageRef = s3Ref(storage, `users/${user.value?.id}/roleplays/${data.roleplay_insert.id}/${roleplay.illustration.name}`)
         const uploadTask = await uploadBytes(storageRef, roleplay.illustration, {
             contentType: roleplay.illustration.type,
         })
@@ -111,12 +111,12 @@ export default function useRoleplays() {
 
         if (rp.illustration) {
             // Delete old illustration
-            const list = await listAll(s3Ref(storage, `roleplays/${rp.id}`))
+            const list = await listAll(s3Ref(storage, `users/${user.value?.id}/roleplays/${rp.id}`))
             await Promise.all(list.items.map(async (item) => {
                 await deleteObject(item)
             }))
 
-            const storageRef = s3Ref(storage, `roleplays/${rp.id}/${rp.illustration.name}`)
+            const storageRef = s3Ref(storage, `users/${user.value?.id}/roleplays/${rp.id}/${rp.illustration.name}`)
             const uploadTask = await uploadBytes(storageRef, rp.illustration, {
                 contentType: rp.illustration.type,
             })
@@ -128,7 +128,7 @@ export default function useRoleplays() {
 
     const deleteRP = async (rpId: string) => {
         // Delete illustration
-        const list = await listAll(s3Ref(storage, `roleplays/${rpId}`))
+        const list = await listAll(s3Ref(storage, `users/${user.value?.id}/roleplays/${rpId}`))
         await Promise.all(list.items.map(async (item) => {
             await deleteObject(item)
         }))

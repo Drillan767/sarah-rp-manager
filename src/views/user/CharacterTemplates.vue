@@ -4,6 +4,7 @@ import { listTemplatesForUser } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import CreateTemplateDialog from '@/components/characters/CreateTemplateDialog.vue'
+import CharacterTemplateDetail from '@/components/characters/CharacterTemplateDetail.vue'
 import useUsersStore from '@/stores/users'
 
 type Templates = ListTemplatesForUserData['character_templates']
@@ -64,7 +65,21 @@ onMounted(getCharacters)
                     :items="charactersList"
                     :loading="loading"
                 >
-                    <template #default="{ items: templates }" />
+                    <template #default="{ items: templates }">
+                        <VRow>
+                            <VCol
+                                v-for="(template, index) in templates"
+                                :key="index"
+                                cols="12"
+                                md="4"
+                            >
+                                <CharacterTemplateDetail
+                                    :template="template.raw"
+                                    @saved="getCharacters"
+                                />
+                            </VCol>
+                        </VRow>
+                    </template>
                     <template #no-data>
                         <VEmptyState
                             headline="Aucun personnage"
