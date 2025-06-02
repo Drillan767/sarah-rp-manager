@@ -118,6 +118,30 @@ query ListTemplatesForUser($userId: String!) @auth(level: USER insecureReason: "
   }
 }
 
+query GetTemplate($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    character_template(key: { id: $id }) {
+        id
+        name
+        description
+        illustration
+        participations: participations_on_characterTemplate {
+            id
+            characterName
+            characterIllustration
+            characterDescription
+            roleplay {
+                id
+                title
+                illustration
+                roles: roles_on_roleplay {
+                    id
+                    name
+                }
+            }
+        }
+    }
+}
+
 query ListPublicTemplatesForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
   character_templates(where: { user: { id: { eq: $userId } }, isPublic: { eq: true } }) {
     id
