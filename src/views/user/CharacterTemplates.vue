@@ -82,11 +82,9 @@ onMounted(getCharacters)
                     </template>
                     <template #no-data>
                         <VEmptyState
-                            headline="Aucun personnage"
-                            title="Vous n'avez pas de roleplay"
-                            text="Créez votre premier roleplay pour commencer"
-                            icon="mdi-book-open-blank-variant-outline"
-                            action-text="Créer mon premier roleplay"
+                            headline="Aucun modèle de personnage"
+                            icon="mdi-account-box-plus-outline"
+                            action-text="Créer mon premier modèle"
                             color="primary"
                             @click:action="createTemplateDialog = true"
                         />
