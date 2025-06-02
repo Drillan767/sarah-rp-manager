@@ -29,6 +29,7 @@ const links = [
                 <VTabs
                     direction="vertical"
                     color="primary"
+                    hide-slider
                 >
                     <VTab
                         :to="{ name: 'user-profile-informations' }"
@@ -42,7 +43,7 @@ const links = [
                     />
                     <VTab
                         :to="{ name: 'user-characters' }"
-                        text="Mes personnages"
+                        text="Mes modèles de personnages"
                         prepend-icon="mdi-account-box-multiple"
                     />
                 </VTabs>
