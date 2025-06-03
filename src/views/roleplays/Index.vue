@@ -97,7 +97,8 @@ const links = [
                                     <VCol>
                                         <VChip
                                             prepend-icon="mdi-account-group"
-                                            :text="`${item.raw.nbCharacters[0]._count} joueurs`"
+                                            variant="text"
+                                            :text="`${item.raw.nbCharacters[0]._count} participants`"
                                         />
                                     </VCol>
                                     <VCol

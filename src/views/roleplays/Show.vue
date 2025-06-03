@@ -1,14 +1,28 @@
 <script setup lang="ts">
-import type { GetRoleplayData } from '@sarah-rp-manager/default-connector'
-import { getRoleplay } from '@sarah-rp-manager/default-connector'
+import type { GetRoleplayData, ListTemplatesForUserData } from '@sarah-rp-manager/default-connector'
+import { getRoleplay, listTemplatesForUser } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
+import RoleplayParticipationForm from '@/components/roleplays/RoleplayParticipationForm.vue'
 import useDayjs from '@/composables/dayjs'
 import useUsersStore from '@/stores/users'
 
 type Roleplay = NonNullable<GetRoleplayData['roleplay']>
+type Templates = NonNullable<ListTemplatesForUserData['character_templates']>
+
+interface RoleInformation {
+    id: string
+    name: string
+    description: string
+    disabled: boolean
+    nbPickedText: string
+    nbAvailableText: string
+    nbCharacters: number
+    maxUsers: number
+    nbAvailableColor: 'text-error' | 'text-success'
+}
 
 const router = useRouter()
 const route = useRoute()
@@ -17,6 +31,9 @@ const { user } = storeToRefs(useUsersStore())
 const dayjs = useDayjs()
 
 const roleplay = ref<Roleplay>()
+const pickedRole = ref<string>()
+const userTemplates = ref<Templates>([])
+const displayParticipationForm = ref(false)
 
 const totalUsers = computed(() => {
     if (!roleplay.value) {
@@ -33,16 +50,38 @@ const createdAt = computed(() => {
     return `Créé le ${dayjs(roleplay.value.createdAt).format('DD/MM/YYYY')}`
 })
 
-async function getRoleplayData() {
-    const data = await getRoleplay({ id: rpId })
-    if (!data.data) {
-        router.push({ name: 'roleplays' })
-        return
+const rolesInformations = computed<RoleInformation[]>(() => {
+    if (!roleplay.value) {
+        return []
     }
-    roleplay.value = data.data.roleplay
-}
 
-onMounted(getRoleplayData)
+    return roleplay.value.roles.map(role => {
+
+        const userPicked = userTemplates.value.some(template => template.participations.some(p => p.roleplay.roles.some(r => r.id === role.id)))
+        const roleFull = role.nbCharacters[0]._count === role.maxUsers
+        const nbPickedText = `${role.nbCharacters[0]._count} / ${role.maxUsers} rôle${role.maxUsers > 1 ? 's' : ''} choisi${role.maxUsers > 1 ? 's' : ''}`
+        const nbAvailableText = userPicked
+            ? 'Vous avez déjà choisi ce rôle'
+            : `${role.maxUsers - role.nbCharacters[0]._count} disponible${role.maxUsers > 1 ? 's' : ''}`
+        const nbAvailableColor = userPicked
+            ? 'text-error'
+            : roleFull
+                ? 'text-error'
+                : 'text-success'
+
+        return {
+            id: role.id,
+            name: role.name,
+            description: role.description,
+            disabled: userPicked || roleFull,
+            nbPickedText,
+            nbAvailableText,
+            nbAvailableColor,
+            nbCharacters: role.nbCharacters[0]._count,
+            maxUsers: role.maxUsers,
+        }
+    })
+})
 
 const links = computed(() => ([
     {
@@ -57,6 +96,47 @@ const links = computed(() => ([
         title: roleplay.value?.title ?? 'Roleplay',
     },
 ]))
+
+const joinDisabled = computed(() => {
+    if (!roleplay.value) {
+        return true
+    }
+
+    return roleplay.value.roles.every(role => {
+        const roleFull = role.nbCharacters[0]._count === role.maxUsers
+        const userPicked = userTemplates.value.some(template => template.participations.some(p => p.roleplay.roles.some(r => r.id === role.id)))
+
+        return roleFull || userPicked
+    })
+})
+
+async function getRoleplayData() {
+    const data = await getRoleplay({ id: rpId })
+    if (!data.data) {
+        router.push({ name: 'roleplays' })
+        return
+    }
+    roleplay.value = data.data.roleplay
+}
+
+async function getUserTemplates() {
+    if (!user.value?.id) {
+        return
+    }
+    const data = await listTemplatesForUser({ userId: user.value.id })
+    userTemplates.value = data.data?.character_templates ?? []
+}
+
+function joinRoleplay(roleId?: string) {
+    pickedRole.value = roleId
+    displayParticipationForm.value = true
+}
+
+onMounted(() => {
+    getRoleplayData()
+    getUserTemplates()
+})
+
 </script>
 
 <template>
@@ -119,9 +199,11 @@ const links = computed(() => ([
                                     class="d-flex flex-column ga-4"
                                 >
                                     <VBtn
+                                        :disabled="joinDisabled"
                                         color="primary"
                                         variant="flat"
                                         prepend-icon="mdi-account-plus"
+                                        @click="joinRoleplay()"
                                     >
                                         Rejoindre
                                     </VBtn>
@@ -169,7 +251,7 @@ const links = computed(() => ([
                     </template>
                     <VCardText>
                         <VRow
-                            v-for="(role, i) in roleplay.roles"
+                            v-for="(role, i) in rolesInformations"
                             :key="i"
                         >
                             <VCol>
@@ -179,16 +261,17 @@ const links = computed(() => ([
                                             v-bind="hover"
                                             :title="role.name"
                                             :text="role.description"
-                                            :disabled="role.nbCharacters[0]._count === role.maxUsers"
+                                            :disabled="role.disabled"
                                             variant="flat"
-                                            :elevation="isHovering ? 12 : 2"
+                                            :elevation="isHovering ? 4 : 2"
+                                            @click="joinRoleplay(role.id)"
                                         >
                                             <template #actions>
                                                 <VContainer>
                                                     <VRow no-gutters>
                                                         <VCol>
                                                             <VChip
-                                                                :text="`${role.nbCharacters[0]._count} / ${role.maxUsers} rôle${role.maxUsers > 1 ? 's' : ''} choisi${role.maxUsers > 1 ? 's' : ''}`"
+                                                                :text="role.nbPickedText"
                                                                 prepend-icon="mdi-account-multiple-outline"
                                                                 variant="text"
                                                                 density="compact"
@@ -197,18 +280,18 @@ const links = computed(() => ([
                                                         </VCol>
                                                         <VSpacer />
                                                         <span
-                                                            :class="role.maxUsers - role.nbCharacters[0]._count === 0 ? 'text-grey' : 'text-success'"
+                                                            :class="role.nbAvailableColor"
                                                             class="text-caption"
                                                         >
-                                                            {{ role.maxUsers - role.nbCharacters[0]._count }} disponibles
+                                                            {{ role.nbAvailableText }}
                                                         </span>
                                                     </VRow>
                                                     <VRow no-gutters>
                                                         <VCol>
                                                             <VProgressLinear
-                                                                :model-value="role.nbCharacters[0]._count"
+                                                                :model-value="role.nbCharacters"
                                                                 :max="role.maxUsers"
-                                                                :color="role.nbCharacters[0]._count === role.maxUsers ? 'grey' : 'primary'"
+                                                                :color="role.nbAvailableColor"
                                                                 height="10"
                                                                 rounded="pill"
                                                                 class="mt-2"
@@ -226,5 +309,10 @@ const links = computed(() => ([
                 </VCard>
             </VCol>
         </VRow>
+        <RoleplayParticipationForm
+            v-model:open="displayParticipationForm"
+            v-model:roleplay="roleplay"
+            v-model:role="pickedRole"
+        />
     </VContainer>
 </template>
