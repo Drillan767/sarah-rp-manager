@@ -80,7 +80,6 @@ async function getRoleplay() {
         maxUsers: role.maxUsers,
         description: role.description,
         isFree: role.isFree,
-        roleplay: roleplay.value?.id ?? '',
     }))
 
     preview.value = roleplay.value.illustration
