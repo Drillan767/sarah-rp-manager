@@ -81,8 +81,8 @@ query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code
       maxUsers
       description
       isFree
-      nbCharacters: participations_on_role {
-        _count
+      participations: participations_on_role {
+        id
       }
     }
     user {
@@ -149,6 +149,15 @@ query ListPublicTemplatesForUser($userId: String!) @auth(level: USER insecureRea
     description
     illustration
   }
+}
+
+query ListParticipationsForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+    participations(where: { user: { id: { eq: $userId } } }) {
+        id
+        roleplay {
+            id
+        }
+    }
 }
 
 query ListAvailabilities @auth(level: USER insecureReason: "Handled by code") {

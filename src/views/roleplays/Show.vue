@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { GetRoleplayData, ListTemplatesForUserData } from '@sarah-rp-manager/default-connector'
-import { getRoleplay, listTemplatesForUser } from '@sarah-rp-manager/default-connector'
+import type { ParticipationRole } from '@/types/forms'
+import type { GetRoleplayData, ListTemplatesForUserData, ListParticipationsForUserData } from '@sarah-rp-manager/default-connector'
+import { getRoleplay, listTemplatesForUser, listParticipationsForUser } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -8,9 +9,11 @@ import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleplayParticipationForm from '@/components/roleplays/RoleplayParticipationForm.vue'
 import useDayjs from '@/composables/dayjs'
 import useUsersStore from '@/stores/users'
+import { useHead } from '@vueuse/head'
 
 type Roleplay = NonNullable<GetRoleplayData['roleplay']>
 type Templates = NonNullable<ListTemplatesForUserData['character_templates']>
+type Participations = NonNullable<ListParticipationsForUserData['participations']>
 
 interface RoleInformation {
     id: string
@@ -31,8 +34,9 @@ const { user } = storeToRefs(useUsersStore())
 const dayjs = useDayjs()
 
 const roleplay = ref<Roleplay>()
-const pickedRole = ref<string>()
+const pickedRole = ref<ParticipationRole>()
 const userTemplates = ref<Templates>([])
+const userParticipations = ref<Participations>([])
 const displayParticipationForm = ref(false)
 
 const totalUsers = computed(() => {
@@ -40,7 +44,7 @@ const totalUsers = computed(() => {
         return 0
     }
 
-    return roleplay.value.roles.reduce((acc, role) => acc + role.nbCharacters[0]._count, 0)
+    return roleplay.value.roles.reduce((acc, role) => acc + role.participations.length, 0)
 })
 
 const createdAt = computed(() => {
@@ -57,12 +61,12 @@ const rolesInformations = computed<RoleInformation[]>(() => {
 
     return roleplay.value.roles.map(role => {
 
-        const userPicked = userTemplates.value.some(template => template.participations.some(p => p.roleplay.roles.some(r => r.id === role.id)))
-        const roleFull = role.nbCharacters[0]._count === role.maxUsers
-        const nbPickedText = `${role.nbCharacters[0]._count} / ${role.maxUsers} rôle${role.maxUsers > 1 ? 's' : ''} choisi${role.maxUsers > 1 ? 's' : ''}`
+        const userPicked = userParticipations.value.some(p => p.roleplay.id === roleplay.value?.id)
+        const roleFull = role.participations.length === role.maxUsers
+        const nbPickedText = `${role.participations.length} / ${role.maxUsers} rôle${role.maxUsers > 1 ? 's' : ''} choisi${role.maxUsers > 1 ? 's' : ''}`
         const nbAvailableText = userPicked
             ? 'Vous avez déjà choisi ce rôle'
-            : `${role.maxUsers - role.nbCharacters[0]._count} disponible${role.maxUsers > 1 ? 's' : ''}`
+            : `${role.maxUsers - role.participations.length} disponible${role.maxUsers > 1 ? 's' : ''}`
         const nbAvailableColor = userPicked
             ? 'text-error'
             : roleFull
@@ -77,7 +81,7 @@ const rolesInformations = computed<RoleInformation[]>(() => {
             nbPickedText,
             nbAvailableText,
             nbAvailableColor,
-            nbCharacters: role.nbCharacters[0]._count,
+            nbCharacters: role.participations.length,
             maxUsers: role.maxUsers,
         }
     })
@@ -103,8 +107,8 @@ const joinDisabled = computed(() => {
     }
 
     return roleplay.value.roles.every(role => {
-        const roleFull = role.nbCharacters[0]._count === role.maxUsers
-        const userPicked = userTemplates.value.some(template => template.participations.some(p => p.roleplay.roles.some(r => r.id === role.id)))
+        const roleFull = role.participations.length === role.maxUsers
+        const userPicked = userParticipations.value.some(p => p.roleplay.id === roleplay.value?.id)
 
         return roleFull || userPicked
     })
@@ -127,14 +131,27 @@ async function getUserTemplates() {
     userTemplates.value = data.data?.character_templates ?? []
 }
 
-function joinRoleplay(roleId?: string) {
-    pickedRole.value = roleId
+async function getUserParticipations() {
+    if (!user.value?.id) {
+        return
+    }
+    const data = await listParticipationsForUser({ userId: user.value.id })
+    userParticipations.value = data.data?.participations ?? []
+} 
+
+function joinRoleplay(role?: ParticipationRole) {
+    pickedRole.value = role
     displayParticipationForm.value = true
 }
 
 onMounted(() => {
     getRoleplayData()
     getUserTemplates()
+    getUserParticipations()
+})
+
+useHead({
+    title: computed(() => roleplay.value?.title ?? 'Roleplay'),
 })
 
 </script>
@@ -234,7 +251,9 @@ onMounted(() => {
                     rounded="xl"
                 >
                     <template #title>
-                        <h2>Description</h2>
+                        <h2>
+                            Description
+                        </h2>
                     </template>
                     <VCardText>
                         <div v-html="roleplay.description" />
@@ -264,7 +283,7 @@ onMounted(() => {
                                             :disabled="role.disabled"
                                             variant="flat"
                                             :elevation="isHovering ? 4 : 2"
-                                            @click="joinRoleplay(role.id)"
+                                            @click="joinRoleplay(role)"
                                         >
                                             <template #actions>
                                                 <VContainer>
@@ -311,8 +330,8 @@ onMounted(() => {
         </VRow>
         <RoleplayParticipationForm
             v-model:open="displayParticipationForm"
-            v-model:roleplay="roleplay"
-            v-model:role="pickedRole"
+            :roleplay="roleplay"
+            :role="pickedRole"
         />
     </VContainer>
 </template>

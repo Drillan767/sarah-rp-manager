@@ -202,7 +202,7 @@ function isUsed(role: CreateRoleVariables | EditRoleVariables) {
         return false
     }
 
-    return foundRole.nbCharacters[0]._count > 0
+    return foundRole.participations.length > 0
 }
 
 onMounted(getRoleplay)
