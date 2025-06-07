@@ -222,6 +222,7 @@ mutation CreateGeneralAvailability(
     $daysOfWeek: [String!]!
 ) @auth(level: USER insecureReason: "Handled by code") {
     availability_insert(data: {
+        user: { id: $user },
         type: "available",
         kind: "general"
         startTime: $startTime
@@ -276,6 +277,7 @@ mutation CreateGeneralUnavailability(
     $daysOfWeek: [String!]!
 ) @auth(level: USER insecureReason: "Handled by code") {
     availability_insert(data: {
+        user: { id: $user },
         type: "unavailable",
         kind: "general"
         startTime: $startTime
@@ -293,6 +295,7 @@ mutation CreateSpecificAvailability(
     $endDate: Date!
 ) @auth(level: USER insecureReason: "Handled by code") {
     availability_insert(data: {
+        user: { id: $user },
         type: "available",
         kind: "specific"
         startTime: $startTime
@@ -310,6 +313,7 @@ mutation CreateSpecificUnavailability(
     $endDate: Date!
 ) @auth(level: USER insecureReason: "Handled by code") {
     availability_insert(data: {
+        user: { id: $user },
         type: "unavailable",
         kind: "specific"
         startTime: $startTime

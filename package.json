@@ -9,12 +9,12 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "@firebasegen/default-connector": "link:dataconnect-generated/js/default-connector",
         "@mdi/font": "^7.4.47",
         "@sarah-rp-manager/default-connector": "link:dataconnect-generated/js/default-connector",
         "@vee-validate/i18n": "^4.15.0",
         "@vee-validate/rules": "^4.15.0",
         "@vueuse/core": "^13.2.0",
+        "@vueuse/firebase": "^13.3.0",
         "@vueuse/head": "^2.0.0",
         "@vueuse/router": "^13.2.0",
         "dayjs": "^1.11.13",

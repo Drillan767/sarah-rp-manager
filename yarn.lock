@@ -1813,6 +1813,13 @@
     "@vueuse/metadata" "13.3.0"
     "@vueuse/shared" "13.3.0"
 
+"@vueuse/firebase@^13.3.0":
+  version "13.3.0"
+  resolved "https://registry.yarnpkg.com/@vueuse/firebase/-/firebase-13.3.0.tgz#422c22fa348784415a998e57b280f0b76203b7a8"
+  integrity sha512-9mz9vAEHCqEmW9CXV2Aerf/5gOKAuNVLjHUbqL8VRPUF6x7xpP2svAzh3yDF3jOk+5zlf+m8wvb3TnWZT7DP7A==
+  dependencies:
+    "@vueuse/shared" "13.3.0"
+
 "@vueuse/head@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@vueuse/head/-/head-2.0.0.tgz#a4570c0933368a436796c2f737d56e169a8f0864"
