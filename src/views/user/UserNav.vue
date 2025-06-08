@@ -43,7 +43,7 @@ const links = [
                     />
                     <VTab
                         :to="{ name: 'user-characters' }"
-                        text="Mes modèles de personnages"
+                        text="Mes personnages"
                         prepend-icon="mdi-account-box-multiple"
                     />
                 </VTabs>

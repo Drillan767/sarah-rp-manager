@@ -3,8 +3,8 @@ import type { ListTemplatesForUserData } from '@sarah-rp-manager/default-connect
 import { listTemplatesForUser } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
-import CreateTemplateDialog from '@/components/characters/CreateTemplateDialog.vue'
 import CharacterTemplateDetail from '@/components/characters/CharacterTemplateDetail.vue'
+import CreateTemplateDialog from '@/components/characters/CreateTemplateDialog.vue'
 import useUsersStore from '@/stores/users'
 
 type Templates = ListTemplatesForUserData['character_templates']
@@ -39,9 +39,7 @@ onMounted(getCharacters)
                     density="compact"
                     class="mb-4"
                 >
-                    Les modèles de personnages sont utilisés comme base pour la création de personnages.<br>
-                    Un modèle public peut être copié par tout utilisateur visitant votre profil.<br>
-                    Lors de la création d'un personnage, les informations du modèle seront utilisées comme base, mais restent modifiables.
+                    Vous trouverez ici tous vos personnages, ils peuvent être réutilisés d'un roleplay à l'autre.
                 </VAlert>
             </VCol>
             <VCol
@@ -55,7 +53,7 @@ onMounted(getCharacters)
                     color="primary"
                     @click="createTemplateDialog = true"
                 >
-                    Nouveau modèle de personnage
+                    Nouveau personnage
                 </VBtn>
             </VCol>
         </VRow>
@@ -82,9 +80,9 @@ onMounted(getCharacters)
                     </template>
                     <template #no-data>
                         <VEmptyState
-                            headline="Aucun modèle de personnage"
+                            headline="Aucun personnage"
                             icon="mdi-account-box-plus-outline"
-                            action-text="Créer mon premier modèle"
+                            action-text="Créer mon premier personnage"
                             color="primary"
                             @click:action="createTemplateDialog = true"
                         />
