@@ -112,6 +112,15 @@ defineExpose({
                 </VItemGroup>
             </VCol>
         </VRow>
+        <VRow>
+            <VCol class="d-flex justify-center">
+                <VBtn
+                    prepend-icon="mdi-plus"
+                >
+                    Nouveau personnage
+                </VBtn>
+            </VCol>
+        </VRow>
     </VContainer>
 </template>
 

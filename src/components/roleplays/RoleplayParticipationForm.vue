@@ -85,7 +85,7 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
 <template>
     <VDialog
         v-model="open"
-        max-width="800"
+        max-width="900"
         persistent
     >
         <VCard>
@@ -103,23 +103,29 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                 >
                     <VStepperHeader class="elevation-0">
                         <VStepperItem
-                            title="Choix du rôle"
-                            icon="mdi-badge-account"
-                            :subtitle="roleName"
                             :value="0"
+                            title="Choix du rôle"
+                            :subtitle="roleName"
+                            icon="mdi-badge-account"
                         />
                         <VDivider />
                         <VStepperItem
-                            icon="mdi-account-box-outline"
-                            title="Choix du personnage"
                             :subtitle="characterName"
                             :value="1"
+                            icon="mdi-account-box-outline"
+                            title="Choix du personnage"
                         />
                         <VDivider />
                         <VStepperItem
+                            :value="2"
+                            icon="mdi-account-box-edit-outline"
+                            title="Personnalisation"
+                        />
+                        <VDivider />
+                        <VStepperItem
+                            :value="3"
                             title="Récapitulatif"
                             icon="mdi-check"
-                            :value="2"
                         />
                     </VStepperHeader>
                     <VStepperWindow>
