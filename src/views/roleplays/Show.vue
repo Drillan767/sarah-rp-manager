@@ -330,6 +330,7 @@ useHead({
             v-model:open="displayParticipationForm"
             :roleplay="roleplay"
             :role="pickedRole"
+            :characters="userTemplates"
         />
     </VContainer>
 </template>

@@ -1,19 +1,23 @@
 <script setup lang="ts">
-import type { CreateParticipationVariables, GetRoleplayData } from '@sarah-rp-manager/default-connector'
+import type { CreateParticipationVariables, GetRoleplayData, ListTemplatesForUserData } from '@sarah-rp-manager/default-connector'
 import type { ParticipationCharacter, ParticipationRole } from '@/types/forms'
 import { computed, onMounted, ref, watch } from 'vue'
 import ParticipationStep1 from './ParticipationStep1.vue'
+import ParticipationStep2 from './ParticipationStep2.vue'
 
 type Roleplay = GetRoleplayData['roleplay']
+type Templates = NonNullable<ListTemplatesForUserData['character_templates']>
 
 interface Props {
     roleplay: Roleplay
+    characters: Templates
     role?: string
 }
 
 const {
     roleplay,
     role,
+    characters,
 } = defineProps<Props>()
 
 const form = ref<CreateParticipationVariables>()
@@ -21,10 +25,11 @@ const form = ref<CreateParticipationVariables>()
 const open = defineModel<boolean>('open', { required: true })
 
 const step1 = ref<InstanceType<typeof ParticipationStep1>>()
+const step2 = ref<InstanceType<typeof ParticipationStep2>>()
 
 const currentStep = ref(0)
 const pickedRole = ref<string>()
-const pickedCharacter = ref<ParticipationCharacter>()
+const pickedCharacter = ref<string>()
 
 const headers = [
     {
@@ -41,14 +46,21 @@ const headers = [
     },
 ]
 
+const currentStepInfos = computed(() => headers[currentStep.value])
+const roleName = computed(() => roleplay?.roles.find(r => r.id === pickedRole.value)?.name ?? undefined)
+const characterName = computed(() => characters.find(c => c.id === pickedCharacter.value)?.name ?? undefined)
+const canProgress = computed(() => {
+    if (currentStep.value === 0) {
+        return step1.value?.valid
+    }
+    return true
+})
+
 watch([open, () => role], ([o, r]) => {
     if (o && r) {
         pickedRole.value = r
     }
 })
-
-const currentStepInfos = computed(() => headers[currentStep.value])
-const roleName = computed(() => roleplay?.roles.find(r => r.id === pickedRole.value)?.name ?? undefined)
 
 /*
 0.
@@ -100,7 +112,7 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                         <VStepperItem
                             icon="mdi-account-box-outline"
                             title="Choix du personnage"
-                            :subtitle="pickedCharacter?.name ?? undefined"
+                            :subtitle="characterName"
                             :value="1"
                         />
                         <VDivider />
@@ -120,6 +132,17 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                                 :roles="roleplay?.roles ?? []"
                             />
                         </VStepperWindowItem>
+                        <VStepperWindowItem
+                            :value="1"
+                        >
+                            <ParticipationStep2
+                                ref="step2"
+                                v-model="pickedCharacter"
+                                :roleplay="roleplay?.id ?? ''"
+                                :role="pickedRole"
+                                :characters="characters"
+                            />
+                        </VStepperWindowItem>
                     </VStepperWindow>
                 </VStepper>
             </VCardText>
@@ -132,6 +155,8 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                 </VBtn>
                 <VBtn
                     color="primary"
+                    variant="flat"
+                    :disabled="!canProgress"
                     @click="currentStep++"
                 >
                     Suivant
