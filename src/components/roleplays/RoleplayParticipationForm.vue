@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { CreateParticipationVariables, GetRoleplayData } from '@sarah-rp-manager/default-connector'
-import type { ParticipationRole, ParticipationCharacter } from '@/types/forms'
-import { computed, ref } from 'vue'
+import type { ParticipationCharacter, ParticipationRole } from '@/types/forms'
+import { computed, onMounted, ref, watch } from 'vue'
 import ParticipationStep1 from './ParticipationStep1.vue'
 
 type Roleplay = GetRoleplayData['roleplay']
 
 interface Props {
     roleplay: Roleplay
-    role?: ParticipationRole
+    role?: string
 }
 
 const {
@@ -23,7 +23,7 @@ const open = defineModel<boolean>('open', { required: true })
 const step1 = ref<InstanceType<typeof ParticipationStep1>>()
 
 const currentStep = ref(0)
-const pickedRole = ref<ParticipationRole>()
+const pickedRole = ref<string>()
 const pickedCharacter = ref<ParticipationCharacter>()
 
 const headers = [
@@ -41,15 +41,22 @@ const headers = [
     },
 ]
 
+watch([open, () => role], ([o, r]) => {
+    if (o && r) {
+        pickedRole.value = r
+    }
+})
+
 const currentStepInfos = computed(() => headers[currentStep.value])
+const roleName = computed(() => roleplay?.roles.find(r => r.id === pickedRole.value)?.name ?? undefined)
 
 /*
 0.
-On roleplay detail page, we must check wether the user already has any participation for any role,
+[DONE] On roleplay detail page, we must check wether the user already has any participation for any role,
 and disable said role if so (both in detail and in this component)
 
 1.
-If user clicked on an available role, retrieve said role and skip directly to step 2
+[DONE]If user clicked on an available role, retrieve said role and skip directly to step 2
 Otherwise, display a list of available roles
 
 2.
@@ -67,6 +74,7 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
     <VDialog
         v-model="open"
         max-width="800"
+        persistent
     >
         <VCard>
             <VCardTitle>
@@ -85,7 +93,7 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                         <VStepperItem
                             title="Choix du rôle"
                             icon="mdi-badge-account"
-                            :subtitle="pickedRole?.name ?? undefined"
+                            :subtitle="roleName"
                             :value="0"
                         />
                         <VDivider />
@@ -115,6 +123,20 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                     </VStepperWindow>
                 </VStepper>
             </VCardText>
+            <VCardActions>
+                <VSpacer />
+                <VBtn
+                    @click="open = false"
+                >
+                    Annuler
+                </VBtn>
+                <VBtn
+                    color="primary"
+                    @click="currentStep++"
+                >
+                    Suivant
+                </VBtn>
+            </VCardActions>
         </VCard>
     </VDialog>
 </template>

@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import type { ParticipationRole } from '@/types/forms'
 import { storeToRefs } from 'pinia'
-import useUsersStore from '@/stores/users'
 import { useForm, useIsFormValid } from 'vee-validate'
-import vuetifyConfig from '@/composables/vuetifyConfig'
 import { computed, watch } from 'vue'
+import vuetifyConfig from '@/composables/vuetifyConfig'
+import useUsersStore from '@/stores/users'
 
 interface Form {
-    role: ParticipationRole
+    role: string
 }
 
 const props = defineProps<{
     roles: ParticipationRole[]
 }>()
 
-const pickedRole = defineModel<ParticipationRole>()
+const pickedRole = defineModel<string>()
 
 const { user } = storeToRefs(useUsersStore())
 
-const { defineField } = useForm<Form>({
+const { defineField, setValues } = useForm<Form>({
     validationSchema: {
         role: 'required',
     },
@@ -27,7 +27,7 @@ const { defineField } = useForm<Form>({
 // Disable the role if the user has already picked it or if full
 const rolesWithDisabled = computed(() => props.roles.map(role => ({
     ...role,
-    disabled: user.value?.id === pickedRole.value?.id,
+    disabled: user.value?.id === pickedRole.value,
 })))
 
 const [selection, selectionProps] = defineField('role', vuetifyConfig)
@@ -37,10 +37,17 @@ watch(selection, (value) => {
     pickedRole.value = value
 })
 
+watch(pickedRole, (value) => {
+    if (value) {
+        setValues({
+            role: value,
+        })
+    }
+}, { immediate: true })
+
 defineExpose({
     valid: isFormValid,
 })
-
 </script>
 
 <template>
@@ -49,7 +56,7 @@ defineExpose({
         v-model="selection"
     >
         <VRow
-            v-for="role in roles"
+            v-for="role in rolesWithDisabled"
             :key="role.id"
         >
             <VItem

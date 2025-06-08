@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import type { GetRoleplayData, ListParticipationsForUserData, ListTemplatesForUserData } from '@sarah-rp-manager/default-connector'
 import type { ParticipationRole } from '@/types/forms'
-import type { GetRoleplayData, ListTemplatesForUserData, ListParticipationsForUserData } from '@sarah-rp-manager/default-connector'
-import { getRoleplay, listTemplatesForUser, listParticipationsForUser } from '@sarah-rp-manager/default-connector'
+import { getRoleplay, listParticipationsForUser, listTemplatesForUser } from '@sarah-rp-manager/default-connector'
+import { useHead } from '@vueuse/head'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -9,7 +10,6 @@ import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleplayParticipationForm from '@/components/roleplays/RoleplayParticipationForm.vue'
 import useDayjs from '@/composables/dayjs'
 import useUsersStore from '@/stores/users'
-import { useHead } from '@vueuse/head'
 
 type Roleplay = NonNullable<GetRoleplayData['roleplay']>
 type Templates = NonNullable<ListTemplatesForUserData['character_templates']>
@@ -34,7 +34,7 @@ const { user } = storeToRefs(useUsersStore())
 const dayjs = useDayjs()
 
 const roleplay = ref<Roleplay>()
-const pickedRole = ref<ParticipationRole>()
+const pickedRole = ref<string>()
 const userTemplates = ref<Templates>([])
 const userParticipations = ref<Participations>([])
 const displayParticipationForm = ref(false)
@@ -59,8 +59,7 @@ const rolesInformations = computed<RoleInformation[]>(() => {
         return []
     }
 
-    return roleplay.value.roles.map(role => {
-
+    return roleplay.value.roles.map((role) => {
         const userPicked = userParticipations.value.some(p => p.roleplay.id === roleplay.value?.id)
         const roleFull = role.participations.length === role.maxUsers
         const nbPickedText = `${role.participations.length} / ${role.maxUsers} rôle${role.maxUsers > 1 ? 's' : ''} choisi${role.maxUsers > 1 ? 's' : ''}`
@@ -106,7 +105,7 @@ const joinDisabled = computed(() => {
         return true
     }
 
-    return roleplay.value.roles.every(role => {
+    return roleplay.value.roles.every((role) => {
         const roleFull = role.participations.length === role.maxUsers
         const userPicked = userParticipations.value.some(p => p.roleplay.id === roleplay.value?.id)
 
@@ -137,10 +136,10 @@ async function getUserParticipations() {
     }
     const data = await listParticipationsForUser({ userId: user.value.id })
     userParticipations.value = data.data?.participations ?? []
-} 
+}
 
 function joinRoleplay(role?: ParticipationRole) {
-    pickedRole.value = role
+    pickedRole.value = role?.id
     displayParticipationForm.value = true
 }
 
@@ -153,7 +152,6 @@ onMounted(() => {
 useHead({
     title: computed(() => roleplay.value?.title ?? 'Roleplay'),
 })
-
 </script>
 
 <template>
