@@ -5,19 +5,15 @@ import type {
 } from '@/types/forms'
 
 import { useForm, useIsFormValid } from 'vee-validate'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import vuetifyConfig from '@/composables/vuetifyConfig'
 
 type Template = CreateTemplateFormType | UpdateTemplateFormType
 
-const {
-    edit = false,
-    loading = false,
-    currentPreview,
-} = defineProps<{
+const props = defineProps<{
     edit?: boolean
     loading?: boolean
-    currentPreview?: string
+    currentPreview?: string | undefined
 }>()
 
 const template = defineModel<Template>('template', { required: true })
@@ -30,7 +26,7 @@ const { defineField, setValues, controlledValues } = useForm<Template>({
     validationSchema: computed(() => ({
         name: 'required',
         description: 'required',
-        illustration: edit ? '' : 'required',
+        illustration: props.edit ? '' : 'required',
     })),
     initialValues: {
         ...template.value,
@@ -47,12 +43,6 @@ defineField('user')
 
 const formValid = useIsFormValid()
 
-onMounted(() => {
-    if (edit && currentPreview) {
-        preview.value = currentPreview
-    }
-})
-
 function handleImage(e: Event) {
     const files = (e.target as HTMLInputElement).files
 
@@ -63,6 +53,15 @@ function handleImage(e: Event) {
         })
     }
 }
+
+watch([() => props.edit, () => props.currentPreview], ([e, p]) => {
+    if (e && p) {
+        preview.value = p
+    }
+    else {
+        preview.value = ''
+    }
+})
 
 watch(formValid, (newVal) => {
     valid.value = newVal
@@ -108,7 +107,7 @@ watch(controlledValues, (newVal) => {
                     >
                         <template
                             v-if="preview !== ''"
-                            #append
+                            #append-inner
                         >
                             <VAvatar
                                 :image="preview"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { UpdateTemplateFormType } from '@/types/forms'
-import useCharacter from '@/composables/character'
 import { ref, watch } from 'vue'
+import useCharacter from '@/composables/character'
 import TemplateForm from './TemplateForm.vue'
 
 const props = defineProps<{
@@ -36,7 +36,7 @@ async function storeTemplate() {
 </script>
 
 <template>
-<VDialog
+    <VDialog
         v-model="open"
         max-width="800"
     >

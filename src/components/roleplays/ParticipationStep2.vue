@@ -16,6 +16,10 @@ const {
     roleplay: string
 }>()
 
+const emit = defineEmits<{
+    (e: 'createCharacter'): void
+}>()
+
 const pickedCharacter = defineModel<string>()
 
 const tempCharacters = ref<Templates>([])
@@ -56,7 +60,7 @@ defineExpose({
             <VCol>
                 <VItemGroup
                     v-bind="characterProps"
-                    v-model="pickedCharacter"
+                    v-model="character"
                 >
                     <VContainer>
                         <VRow>
@@ -116,6 +120,7 @@ defineExpose({
             <VCol class="d-flex justify-center">
                 <VBtn
                     prepend-icon="mdi-plus"
+                    @click="emit('createCharacter')"
                 >
                     Nouveau personnage
                 </VBtn>
