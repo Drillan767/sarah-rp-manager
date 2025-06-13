@@ -5,6 +5,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import ParticipationStep1 from './ParticipationStep1.vue'
 import ParticipationStep2 from './ParticipationStep2.vue'
 import ParticipationStep3 from './ParticipationStep3.vue'
+import ParticipationStep4 from './ParticipationStep4.vue'
 
 type Roleplay = GetRoleplayData['roleplay']
 type Templates = NonNullable<ListTemplatesForUserData['character_templates']>
@@ -42,6 +43,10 @@ const headers = [
     {
         title: 'Choisissez un personnage',
         text: 'Vous pouvez choisir un personnage ou le créer pour l\'occasion.',
+    },
+    {
+        title: 'Récapitulatif',
+        text: 'Rajoutez des informations supplémentaires à votre personnage.',
     },
     {
         title: 'Récapitulatif',
@@ -186,6 +191,14 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                                 :cloned-character="clonedCharacter"
                             />
                         </VStepperWindowItem>
+                        <VStepperWindowItem
+                            :value="3"
+                        >
+                            <ParticipationStep4
+                                :role="pickedRole"
+                                :character="clonedCharacter"
+                            />
+                        </VStepperWindowItem>
                     </VStepperWindow>
                 </VStepper>
             </VCardText>
@@ -208,7 +221,7 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                     :disabled="!canProgress"
                     @click="currentStep++"
                 >
-                    Suivant
+                    {{ currentStep === 3 ? 'Rejoindre le roleplay' : 'Suivant' }}
                 </VBtn>
             </VCardActions>
         </VCard>
