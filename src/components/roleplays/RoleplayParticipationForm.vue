@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { CreateParticipationVariables, GetRoleplayData, ListTemplatesForUserData } from '@sarah-rp-manager/default-connector'
 import type { ParticipationCharacter, ParticipationRole } from '@/types/forms'
-import { computed, onMounted, ref, watch } from 'vue'
+import { createParticipation } from '@sarah-rp-manager/default-connector'
+import { storeToRefs } from 'pinia'
+import { computed, ref, watch } from 'vue'
+import useUsersStore from '@/stores/users'
 import ParticipationStep1 from './ParticipationStep1.vue'
 import ParticipationStep2 from './ParticipationStep2.vue'
 import ParticipationStep3 from './ParticipationStep3.vue'
@@ -22,9 +25,11 @@ const {
     characters,
 } = defineProps<Props>()
 
-const form = ref<CreateParticipationVariables>()
-
+const emit = defineEmits<{
+    (e: 'joined'): void
+}>()
 const open = defineModel<boolean>('open', { required: true })
+const { user } = storeToRefs(useUsersStore())
 
 const step1 = ref<InstanceType<typeof ParticipationStep1>>()
 const step2 = ref<InstanceType<typeof ParticipationStep2>>()
@@ -34,6 +39,7 @@ const currentStep = ref(0)
 const pickedRoleId = ref<string>()
 const pickedCharacter = ref<string>()
 const clonedCharacter = ref<Templates[number]>()
+const loading = ref(false)
 
 const headers = [
     {
@@ -79,6 +85,40 @@ function createCharacter() {
         participations: [],
     }
     currentStep.value = 2
+}
+
+function reset() {
+    currentStep.value = 0
+    pickedRoleId.value = undefined
+    pickedCharacter.value = undefined
+    clonedCharacter.value = undefined
+}
+
+async function joinRoleplay() {
+    if (!user.value || !roleplay || !pickedRoleId.value || !pickedCharacter.value) {
+        return
+    }
+
+    loading.value = true
+
+    try {
+        await createParticipation({
+            user: user.value.id,
+            roleplay: roleplay.id,
+            role: pickedRoleId.value,
+            characterTemplate: pickedCharacter.value,
+        })
+
+        emit('joined')
+        reset()
+        open.value = false
+    }
+    catch (e) {
+        console.error(e)
+    }
+    finally {
+        loading.value = false
+    }
 }
 
 watch([open, () => role], ([o, r]) => {
@@ -217,12 +257,22 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                     Précédent
                 </VBtn>
                 <VBtn
+                    v-if="currentStep < 3"
                     color="primary"
                     variant="flat"
                     :disabled="!canProgress"
                     @click="currentStep++"
                 >
-                    {{ currentStep === 3 ? 'Rejoindre le roleplay' : 'Suivant' }}
+                    Suivant
+                </VBtn>
+                <VBtn
+                    v-else
+                    color="primary"
+                    variant="flat"
+                    :disabled="loading"
+                    @click="joinRoleplay"
+                >
+                    Rejoindre le roleplay
                 </VBtn>
             </VCardActions>
         </VCard>

@@ -143,6 +143,11 @@ function joinRoleplay(role?: ParticipationRole) {
     displayParticipationForm.value = true
 }
 
+function handleParticipation() {
+    // TODO: redirect to discussion page.
+    console.log('joined')
+}
+
 onMounted(() => {
     getRoleplayData()
     getUserTemplates()
@@ -331,6 +336,7 @@ useHead({
             :roleplay="roleplay"
             :role="pickedRole"
             :characters="userTemplates"
+            @joined="handleParticipation"
         />
     </VContainer>
 </template>
