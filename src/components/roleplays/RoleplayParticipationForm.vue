@@ -31,7 +31,7 @@ const step2 = ref<InstanceType<typeof ParticipationStep2>>()
 const step3 = ref<InstanceType<typeof ParticipationStep3>>()
 
 const currentStep = ref(0)
-const pickedRole = ref<string>()
+const pickedRoleId = ref<string>()
 const pickedCharacter = ref<string>()
 const clonedCharacter = ref<Templates[number]>()
 
@@ -45,7 +45,7 @@ const headers = [
         text: 'Vous pouvez choisir un personnage ou le créer pour l\'occasion.',
     },
     {
-        title: 'Récapitulatif',
+        title: 'Personnalisation',
         text: 'Rajoutez des informations supplémentaires à votre personnage.',
     },
     {
@@ -55,7 +55,7 @@ const headers = [
 ]
 
 const currentStepInfos = computed(() => headers[currentStep.value])
-const roleName = computed(() => roleplay?.roles.find(r => r.id === pickedRole.value)?.name ?? undefined)
+const pickedRole = computed(() => roleplay?.roles.find(r => r.id === pickedRoleId.value))
 const characterName = computed(() => characters.find(c => c.id === pickedCharacter.value)?.name ?? undefined)
 const canProgress = computed(() => {
     if (currentStep.value === 0) {
@@ -83,7 +83,7 @@ function createCharacter() {
 
 watch([open, () => role], ([o, r]) => {
     if (o && r) {
-        pickedRole.value = r
+        pickedRoleId.value = r
     }
 })
 
@@ -136,7 +136,7 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                         <VStepperItem
                             :value="0"
                             title="Choix du rôle"
-                            :subtitle="roleName"
+                            :subtitle="pickedRole?.name"
                             icon="mdi-badge-account"
                         />
                         <VDivider />
@@ -165,7 +165,7 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                         >
                             <ParticipationStep1
                                 ref="step1"
-                                v-model="pickedRole"
+                                v-model="pickedRoleId"
                                 :roles="roleplay?.roles ?? []"
                             />
                         </VStepperWindowItem>
@@ -173,11 +173,11 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                             :value="1"
                         >
                             <ParticipationStep2
-                                v-if="pickedRole"
+                                v-if="pickedRoleId"
                                 ref="step2"
                                 v-model="pickedCharacter"
                                 :roleplay="roleplay?.id ?? ''"
-                                :role="pickedRole"
+                                :role="pickedRoleId"
                                 :characters="characters"
                                 @create-character="createCharacter"
                             />
@@ -195,6 +195,7 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                             :value="3"
                         >
                             <ParticipationStep4
+                                v-if="pickedRole && clonedCharacter"
                                 :role="pickedRole"
                                 :character="clonedCharacter"
                             />
