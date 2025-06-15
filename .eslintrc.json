@@ -1,5 +1,12 @@
 {
     "extends": "@antfu",
+    "settings": {
+        "import/resolver": {
+            "node": {
+                "extensions": [".ts", ".vue"]
+            }
+        }
+    },
     "rules": {
         "@typescript-eslint/indent": [
             "error",

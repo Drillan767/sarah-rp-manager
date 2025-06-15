@@ -1,0 +1,328 @@
+mutation CreateUser(
+    $id: String!,
+    $username: String!,
+    $handle: String!,
+    $email: String!,
+    $avatar: String!,
+    $description: String!,
+    $isAdmin: Boolean!,
+) @auth(level: PUBLIC insecureReason: "Handled by code") {
+    user_insert(data: {
+        id: $id,
+        username: $username,
+        handle: $handle,
+        email: $email,
+        avatar: $avatar,
+        description: $description,
+        isAdmin: $isAdmin
+    })
+}
+
+mutation UpdateUser(
+    $id: String!,
+    $username: String!,
+    $handle: String!,
+    $email: String!,
+    $avatar: String!,
+    $description: String!,
+) @auth(level: USER insecureReason: "Handled by code") {
+    user_update(
+        key: { id: $id },
+        data: {
+            username: $username,
+            email: $email,
+            handle: $handle,
+            avatar: $avatar,
+            description: $description,
+        }
+    )
+}
+
+mutation UpdateUserRole(
+    $id: String!,
+    $isAdmin: Boolean!
+) @auth(level: USER insecureReason: "Handled by code") {
+    user_update(key: { id: $id }, data: { isAdmin: $isAdmin })
+}
+
+mutation DeleteUser($id: String!) @auth(level: USER insecureReason: "Handled by code") {
+    user_delete(key: { id: $id })
+}
+
+mutation CreateRoleplay(
+    $title: String!,
+    $description: String!,
+    $illustration: String!,
+    $startDate: Date,
+    $user: String!
+) @auth(level: USER insecureReason: "Handled by code") {
+    roleplay_insert(
+        data: {
+            title: $title,
+            description: $description,
+            illustration: $illustration,
+            startDate: $startDate,
+            user: { id: $user }
+        }
+    )
+}
+
+mutation updateRoleplayIllustration(
+    $id: UUID!,
+    $illustration: String!
+) @auth(level: USER insecureReason: "Handled by code") {
+    roleplay_update(key: { id: $id }, data: { illustration: $illustration })
+}
+
+mutation UpdateRoleplay(
+    $id: UUID!,
+    $title: String!,
+    $description: String!,
+    $illustration: String,
+    $startDate: Date,
+) @auth(level: USER insecureReason: "Handled by code") {
+    roleplay_update(
+        key: { id: $id },
+        data: {
+            title: $title,
+            description: $description,
+            illustration: $illustration,
+            startDate: $startDate
+        }
+    )
+}
+
+mutation UpdateMessageBoard(
+    $id: UUID!,
+    $messageBoard: String
+) @auth(level: USER insecureReason: "Handled by code") {
+    roleplay_update(key: { id: $id }, data: { messageBoard: $messageBoard })
+}
+
+mutation DeleteRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    roleplay_delete(key: { id: $id })
+}
+
+mutation CreateChannel(
+    $name: String!,
+    $roleplay: UUID!,
+    $isInternal: Boolean!,
+    $isDefault: Boolean!
+) @auth(level: USER insecureReason: "Handled by code") {
+    channel_insert(data: {
+        name: $name,
+        roleplay: { id: $roleplay },
+        isInternal: $isInternal,
+        isDefault: $isDefault
+    })
+}
+
+mutation EditChannel(
+    $id: UUID!,
+    $name: String!,
+) @auth(level: USER insecureReason: "Handled by code") {
+    channel_update(key: { id: $id }, data: { name: $name })
+}
+
+mutation DeleteChannel($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    channel_delete(key: { id: $id })
+}
+
+mutation DeleteChannelsForSpecificRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+  channel_deleteMany(where: { roleplayId: { eq: $roleplayId } })
+}
+
+mutation CreateRole(
+    $name: String!,
+    $maxUsers: Int!,
+    $description: String!,
+    $isFree: Boolean!,
+    $roleplay: UUID!
+) @auth(level: USER insecureReason: "Handled by code") {
+    role_insert(data: {
+        name: $name,
+        maxUsers: $maxUsers,
+        description: $description,
+        isFree: $isFree,
+        roleplay: { id: $roleplay }
+    })
+}
+
+mutation EditRole(
+    $id: UUID!,
+    $name: String!,
+    $maxUsers: Int!,
+    $description: String!,
+    $isFree: Boolean!
+) @auth(level: USER insecureReason: "Handled by code") {
+    role_update(
+        key: { id: $id },
+        data: {
+            name: $name,
+            maxUsers: $maxUsers,
+            description: $description,
+            isFree: $isFree
+        }
+    )
+}
+
+mutation DeleteRole($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    role_delete(key: { id: $id })
+}
+
+mutation DeleteRolesForSpecificRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+  role_deleteMany(where: { roleplayId: { eq: $roleplayId } })
+}
+
+mutation CreateCharacterTemplate(
+    $name: String!,
+    $description: String!,
+    $illustration: String!,
+    $isPublic: Boolean!,
+    $user: String!
+) @auth(level: USER insecureReason: "Handled by code") {
+    character_template_insert(data: {
+        name: $name,
+        description: $description,
+        illustration: $illustration,
+        isPublic: $isPublic,
+        user: { id: $user }
+    })
+}
+
+mutation UpdateCharacterTemplate(
+    $id: UUID!,
+    $name: String!,
+    $description: String!,
+    $illustration: String
+) @auth(level: USER insecureReason: "Handled by code") {
+    character_template_update(key: { id: $id }, data: {
+        name: $name,
+        description: $description,
+        illustration: $illustration
+    })
+}
+
+mutation UpdateTemplateIllustration(
+    $id: UUID!,
+    $illustration: String!
+) @auth(level: USER insecureReason: "Handled by code") {
+    character_template_update(key: { id: $id }, data: { illustration: $illustration })
+}
+
+mutation DeleteCharacterTemplate($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    character_template_delete(key: { id: $id })
+}
+
+mutation CreateGeneralAvailability(
+    $user: String!,
+    $startTime: String!,
+    $endTime: String!,
+    $pattern: String!
+    $daysOfWeek: [String!]!
+) @auth(level: USER insecureReason: "Handled by code") {
+    availability_insert(data: {
+        user: { id: $user },
+        type: "available",
+        kind: "general"
+        startTime: $startTime
+        endTime: $endTime
+        pattern: $pattern
+        daysOfWeek: $daysOfWeek
+    })
+}
+
+mutation CreateParticipation(
+    $user: String!,
+    $roleplay: UUID!,
+    $role: UUID!,
+    $characterTemplate: UUID!,
+    $characterName: String,
+    $characterIllustration: String,
+    $characterDescription: String
+) @auth(level: USER insecureReason: "Handled by code") {
+    participation_insert(data: {
+        user: { id: $user },
+        roleplay: { id: $roleplay },
+        role: { id: $role },
+        characterTemplate: { id: $characterTemplate },
+        characterName: $characterName,
+        characterIllustration: $characterIllustration,
+        characterDescription: $characterDescription
+    })
+}
+
+mutation UpdateParticipation(
+    $id: UUID!,
+    $characterName: String,
+    $characterIllustration: String,
+    $characterDescription: String
+) @auth(level: USER insecureReason: "Handled by code") {
+    participation_update(key: { id: $id }, data: {
+        characterName: $characterName,
+        characterIllustration: $characterIllustration,
+        characterDescription: $characterDescription
+    })
+}
+
+mutation DeleteParticipation($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    participation_delete(key: { id: $id })
+}
+
+mutation CreateGeneralUnavailability(
+    $user: String!,
+    $startTime: String!,
+    $endTime: String!,
+    $pattern: String!
+    $daysOfWeek: [String!]!
+) @auth(level: USER insecureReason: "Handled by code") {
+    availability_insert(data: {
+        user: { id: $user },
+        type: "unavailable",
+        kind: "general"
+        startTime: $startTime
+        endTime: $endTime
+        pattern: $pattern
+        daysOfWeek: $daysOfWeek
+    })
+}
+
+mutation CreateSpecificAvailability(
+    $user: String!,
+    $startTime: String!,
+    $endTime: String!,
+    $startDate: Date!,
+    $endDate: Date!
+) @auth(level: USER insecureReason: "Handled by code") {
+    availability_insert(data: {
+        user: { id: $user },
+        type: "available",
+        kind: "specific"
+        startTime: $startTime
+        endTime: $endTime
+        startDate: $startDate
+        endDate: $endDate
+    })
+}
+
+mutation CreateSpecificUnavailability(
+    $user: String!,
+    $startTime: String!,
+    $endTime: String!,
+    $startDate: Date!,
+    $endDate: Date!
+) @auth(level: USER insecureReason: "Handled by code") {
+    availability_insert(data: {
+        user: { id: $user },
+        type: "unavailable",
+        kind: "specific"
+        startTime: $startTime
+        endTime: $endTime
+        startDate: $startDate
+        endDate: $endDate
+    })
+}
+
+mutation DeleteAvailability($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    availability_delete(key: { id: $id })
+}

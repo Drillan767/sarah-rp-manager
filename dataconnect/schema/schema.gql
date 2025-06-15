@@ -1,0 +1,75 @@
+type User @table(name: "users", singular: "user", plural: "users") {
+    id: String! @default(expr: "auth.uid")
+    username: String! @col(dataType: "varchar(50)")
+    handle: String! @col(dataType: "varchar(50)")
+    email: String! @col(dataType: "varchar(255)")
+    avatar: String! @col(dataType: "varchar(255)")
+    description: String!
+    createdAt: Date! @default(expr: "request.time")
+    updatedAt: Date! @default(expr: "request.time")
+    isAdmin: Boolean! @default(expr: "false")
+}
+
+type Roleplay @table(name: "roleplays", singular: "roleplay", plural: "roleplays") {
+    title: String!
+    description: String!
+    illustration: String!
+    messageBoard: String
+    startDate: Date
+    createdAt: Date! @default(expr: "request.time")
+    updatedAt: Date! @default(expr: "request.time")
+    user: User!
+}
+
+type Channel @table(name: "channels", singular: "channel", plural: "channels") {
+    name: String!
+    roleplay: Roleplay!
+    isInternal: Boolean!
+    isDefault: Boolean!
+}
+
+type Role @table(name: "roles", singular: "role", plural: "roles") {
+    id: UUID! @default(expr: "uuidV4()")
+    name: String!
+    maxUsers: Int!
+    roleplay: Roleplay!
+    description: String!
+    createdAt: Date! @default(expr: "request.time")
+    isFree: Boolean!
+}
+
+type CharacterTemplate @table(name: "character_templates", singular: "character_template", plural: "character_templates") {
+    id: UUID! @default(expr: "uuidV4()")
+    name: String!
+    description: String!
+    illustration: String!
+    user: User!
+    createdAt: Date! @default(expr: "request.time")
+    isPublic: Boolean!
+}
+
+type Participation @table(name: "participations", singular: "participation", plural: "participations") {
+    id: UUID! @default(expr: "uuidV4()")
+    user: User!
+    roleplay: Roleplay!
+    role: Role!
+    characterTemplate: CharacterTemplate!
+    characterName: String
+    characterIllustration: String
+    characterDescription: String
+    joinedAt: Date! @default(expr: "request.time")
+    status: String! @default(expr: "'active'")
+}
+
+type Availability @table(name: "availabilities", singular: "availability", plural: "availabilities") {
+    user: User!
+    type: String!
+    kind: String!
+    startTime: String!
+    endTime: String!
+    createdAt: Date! @default(expr: "request.time")
+    pattern: String
+    daysOfWeek: [String]
+    startDate: Date
+    endDate: Date
+}

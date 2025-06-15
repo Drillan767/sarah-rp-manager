@@ -1,0 +1,199 @@
+query ListUsers @auth(level: USER insecureReason: "Handled by code") {
+  users {
+    id
+    username
+    handle
+    email
+    avatar
+    description
+  }
+}
+
+query GetUser($id: String!) @auth(level: USER insecureReason: "Handled by code") {
+  user(key: { id: $id }) {
+    id
+    username
+    email
+    handle
+    avatar
+    description
+  }
+}
+
+query ListRoleplays(
+    $limit: Int = 12
+    $offset: Int = 0
+    $search: String
+) @auth(level: PUBLIC insecureReason: "Handled by code") {
+  roleplays(
+    limit: $limit,
+    offset: $offset,
+    where: {
+        _or: [
+            {
+                title: { contains: $search }
+            },
+            {
+                description: { contains: $search }
+            },
+            {
+                user: { handle: { contains: $search } }
+            }
+        ]
+    }
+  ) {
+    id
+    title
+    description
+    illustration
+    startDate
+    nbCharacters: participations_on_roleplay {
+        _count
+    }
+    user {
+      id
+      handle
+    }
+  }
+}
+
+query ListRoleplaysForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+  roleplays(where: { user: { id: { eq: $userId } } }) {
+    id
+    title
+    description
+    illustration
+  }
+}
+
+query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+  roleplay(key: { id: $id }) {
+    id
+    title
+    description
+    illustration
+    messageBoard
+    startDate
+    createdAt
+    roles: roles_on_roleplay  {
+      id
+      name
+      maxUsers
+      description
+      isFree
+      participations: participations_on_role {
+        id
+      }
+    }
+    user {
+      id
+      avatar
+      username
+      handle
+    }
+  }
+}
+
+query ListTemplatesForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+  character_templates(where: { user: { id: { eq: $userId } } }) {
+    id
+    name
+    description
+    illustration
+    participations: participations_on_characterTemplate {
+      id
+      characterName
+      characterIllustration
+      characterDescription
+      roleplay {
+        id
+        title
+        illustration
+        roles: roles_on_roleplay {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+query GetTemplate($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    character_template(key: { id: $id }) {
+        id
+        name
+        description
+        illustration
+        participations: participations_on_characterTemplate {
+            id
+            characterName
+            characterIllustration
+            characterDescription
+            roleplay {
+                id
+                title
+                illustration
+                roles: roles_on_roleplay {
+                    id
+                    name
+                }
+            }
+        }
+    }
+}
+
+query ListPublicTemplatesForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+  character_templates(where: { user: { id: { eq: $userId } }, isPublic: { eq: true } }) {
+    id
+    name
+    description
+    illustration
+  }
+}
+
+query ListParticipationsForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+    participations(where: { user: { id: { eq: $userId } } }) {
+        id
+        roleplay {
+            id
+        }
+    }
+}
+
+query ListAvailabilities @auth(level: USER insecureReason: "Handled by code") {
+    availabilities {
+        id
+        pattern
+        daysOfWeek
+        startDate
+        endDate
+        type
+        kind
+        startTime
+        endTime
+        user {
+            id
+            username
+            handle
+        }
+    }
+}
+
+query GetAvailabilityForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+    availabilities(where: { user: { id: { eq: $userId } } }) {
+        id
+        pattern
+        daysOfWeek
+        startDate
+        endDate
+        type
+        kind
+        startTime
+        endTime
+        user {
+            id
+            username
+            handle
+        }
+    }
+}

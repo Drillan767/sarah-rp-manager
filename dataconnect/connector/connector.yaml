@@ -1,0 +1,6 @@
+connectorId: default
+generate:
+    javascriptSdk:
+        outputDir: ../../dataconnect-generated/js/default-connector
+        package: '@sarah-rp-manager/default-connector'
+        packageJsonDir: ../..
