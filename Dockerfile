@@ -1,7 +1,7 @@
 FROM node:22-alpine
 
 # Copy Firebase config and schema
-COPY firebase.json .firebaserc dataconnect/ .dataconnect/ package.json yarn.lock ./
+COPY firebase.json .firebaserc dataconnect/ package.json yarn.lock ./
 
 RUN yarn add firebase-tools --dev
 RUN npx firebase dataconnect:sdk:generate
