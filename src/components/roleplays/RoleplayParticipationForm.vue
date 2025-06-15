@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { CreateParticipationVariables, GetRoleplayData, ListTemplatesForUserData } from '@sarah-rp-manager/default-connector'
-import type { ParticipationCharacter, ParticipationRole } from '@/types/forms'
+import type { GetRoleplayData, ListTemplatesForUserData } from '@sarah-rp-manager/default-connector'
 import { createParticipation } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
