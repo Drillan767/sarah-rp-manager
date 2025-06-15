@@ -154,7 +154,7 @@ query ListPublicTemplatesForUser($userId: String!) @auth(level: USER insecureRea
 query ListParticipationsForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
     participations(where: { user: { id: { eq: $userId } } }) {
         id
-        roleplay {
+        role {
             id
         }
     }

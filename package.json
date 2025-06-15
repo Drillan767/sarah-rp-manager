@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "@mdi/font": "^7.4.47",
-        "@sarah-rp-manager/default-connector": "file:dataconnect-generated/js/default-connector",
+        "@sarah-rp-manager/default-connector": "link:dataconnect-generated/js/default-connector",
         "@vee-validate/i18n": "^4.15.0",
         "@vee-validate/rules": "^4.15.0",
         "@vueuse/core": "^13.2.0",

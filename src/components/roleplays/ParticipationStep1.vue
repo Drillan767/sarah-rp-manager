@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import type { ListParticipationsForUserData } from '@sarah-rp-manager/default-connector'
 import type { ParticipationRole } from '@/types/forms'
-import { storeToRefs } from 'pinia'
 import { useForm, useIsFormValid } from 'vee-validate'
 import { computed, watch } from 'vue'
 import vuetifyConfig from '@/composables/vuetifyConfig'
-import useUsersStore from '@/stores/users'
+
+type Participations = NonNullable<ListParticipationsForUserData['participations']>
 
 interface Form {
     role: string
@@ -12,11 +13,10 @@ interface Form {
 
 const props = defineProps<{
     roles: ParticipationRole[]
+    participations: Participations
 }>()
 
 const pickedRole = defineModel<string>()
-
-const { user } = storeToRefs(useUsersStore())
 
 const { defineField, setValues } = useForm<Form>({
     validationSchema: {
@@ -27,7 +27,7 @@ const { defineField, setValues } = useForm<Form>({
 // Disable the role if the user has already picked it or if full
 const rolesWithDisabled = computed(() => props.roles.map(role => ({
     ...role,
-    disabled: user.value?.id === pickedRole.value,
+    disabled: props.participations.some(p => p.role.id === role.id),
 })))
 
 const [selection, selectionProps] = defineField('role', vuetifyConfig)
@@ -69,6 +69,7 @@ defineExpose({
                         :text="role.description"
                         :append-icon="isSelected ? 'mdi-check-circle' : undefined"
                         :variant="isSelected ? 'tonal' : 'outlined'"
+                        :disabled="role.disabled"
                         @click="toggle"
                     />
                 </VCol>

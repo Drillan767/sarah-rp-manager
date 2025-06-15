@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GetRoleplayData, ListTemplatesForUserData } from '@sarah-rp-manager/default-connector'
+import type { GetRoleplayData, ListParticipationsForUserData, ListTemplatesForUserData } from '@sarah-rp-manager/default-connector'
 import { createParticipation } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
@@ -11,10 +11,12 @@ import ParticipationStep4 from './ParticipationStep4.vue'
 
 type Roleplay = GetRoleplayData['roleplay']
 type Templates = NonNullable<ListTemplatesForUserData['character_templates']>
+type Participations = NonNullable<ListParticipationsForUserData['participations']>
 
 interface Props {
     roleplay: Roleplay
     characters: Templates
+    participations: Participations
     role?: string
 }
 
@@ -138,7 +140,7 @@ watch(pickedCharacter, (char) => {
 and disable said role if so (both in detail and in this component)
 
 1.
-[DONE]If user clicked on an available role, retrieve said role and skip directly to step 2
+[DONE] If user clicked on an available role, retrieve said role and skip directly to step 2
 Otherwise, display a list of available roles
 
 2.
@@ -147,8 +149,8 @@ If user has at least one character model, display a list of them, but add a butt
 If user has no character model, display the template form. When saving, create the character at the same time.
 
 3.
-Display a recap containing both the role detail and the character detail.
-Clicking on "Join" will create the participation and redirect to the roleplay discussion page.
+[DONE] Display a recap containing both the role detail and the character detail.
+[DONE] Clicking on "Join" will create the participation and redirect to the roleplay discussion page.
 */
 </script>
 
@@ -206,6 +208,7 @@ Clicking on "Join" will create the participation and redirect to the roleplay di
                                 ref="step1"
                                 v-model="pickedRoleId"
                                 :roles="roleplay?.roles ?? []"
+                                :participations="participations"
                             />
                         </VStepperWindowItem>
                         <VStepperWindowItem

@@ -60,7 +60,7 @@ const rolesInformations = computed<RoleInformation[]>(() => {
     }
 
     return roleplay.value.roles.map((role) => {
-        const userPicked = userParticipations.value.some(p => p.roleplay.id === roleplay.value?.id)
+        const userPicked = userParticipations.value.some(p => p.role.id === role.id)
         const roleFull = role.participations.length === role.maxUsers
         const nbPickedText = `${role.participations.length} / ${role.maxUsers} rôle${role.maxUsers > 1 ? 's' : ''} choisi${role.maxUsers > 1 ? 's' : ''}`
         const nbAvailableText = userPicked
@@ -105,12 +105,7 @@ const joinDisabled = computed(() => {
         return true
     }
 
-    return roleplay.value.roles.every((role) => {
-        const roleFull = role.participations.length === role.maxUsers
-        const userPicked = userParticipations.value.some(p => p.roleplay.id === roleplay.value?.id)
-
-        return roleFull || userPicked
-    })
+    return rolesInformations.value.every(role => role.disabled)
 })
 
 async function getRoleplayData() {
@@ -134,8 +129,8 @@ async function getUserParticipations() {
     if (!user.value?.id) {
         return
     }
-    const data = await listParticipationsForUser({ userId: user.value.id })
-    userParticipations.value = data.data?.participations ?? []
+    const { data } = await listParticipationsForUser({ userId: user.value.id })
+    userParticipations.value = data?.participations ?? []
 }
 
 function joinRoleplay(role?: ParticipationRole) {
@@ -336,6 +331,7 @@ useHead({
             :roleplay="roleplay"
             :role="pickedRole"
             :characters="userTemplates"
+            :participations="userParticipations"
             @joined="handleParticipation"
         />
     </VContainer>
