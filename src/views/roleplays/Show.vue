@@ -214,11 +214,21 @@ useHead({
                                     class="d-flex flex-column ga-4"
                                 >
                                     <VBtn
+                                        v-if="userParticipations.some(p => roleplay?.roles.some(r => r.id === p.role.id))"
+                                        :to="{ name: 'roleplay-channels', params: { id: roleplay.id } }"
+                                        color="primary"
+                                        variant="flat"
+                                        prepend-icon="mdi-login"
+                                    >
+                                        Accéder
+                                    </VBtn>
+                                    <VBtn
+                                        v-else
                                         :disabled="joinDisabled"
                                         color="primary"
                                         variant="flat"
                                         prepend-icon="mdi-account-plus"
-                                        @click="joinRoleplay()"
+                                        @click="joinRoleplay"
                                     >
                                         Rejoindre
                                     </VBtn>
