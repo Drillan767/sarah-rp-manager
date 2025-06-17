@@ -94,6 +94,13 @@ query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code
   }
 }
 
+query ListChannelsForRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+  channels(where: { roleplay: { id: { eq: $roleplayId } } }) {
+    id
+    name
+  }
+}
+
 query ListTemplatesForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
   character_templates(where: { user: { id: { eq: $userId } } }) {
     id
@@ -153,6 +160,15 @@ query ListPublicTemplatesForUser($userId: String!) @auth(level: USER insecureRea
 
 query ListParticipationsForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
     participations(where: { user: { id: { eq: $userId } } }) {
+        id
+        role {
+            id
+        }
+    }
+}
+
+query ListParticipationsForRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    participations(where: { roleplay: { id: { eq: $roleplayId } } }) {
         id
         role {
             id

@@ -109,12 +109,12 @@ const joinDisabled = computed(() => {
 })
 
 async function getRoleplayData() {
-    const data = await getRoleplay({ id: rpId })
-    if (!data.data) {
+    const { data } = await getRoleplay({ id: rpId })
+    if (!data) {
         router.push({ name: 'roleplays' })
         return
     }
-    roleplay.value = data.data.roleplay
+    roleplay.value = data.roleplay
 }
 
 async function getUserTemplates() {
