@@ -176,6 +176,27 @@ query ListParticipationsForRoleplay($roleplayId: UUID!) @auth(level: USER insecu
     }
 }
 
+query ListUsersForRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    participations(where: { roleplay: { id: { eq: $roleplayId } } }) {
+        id
+        characterName
+        characterIllustration
+        characterDescription
+        user {
+            id
+            username
+            handle
+            avatar
+        }
+        characterTemplate {
+            id
+            name
+            illustration
+            description
+        }
+    }
+}
+
 query ListAvailabilities @auth(level: USER insecureReason: "Handled by code") {
     availabilities {
         id

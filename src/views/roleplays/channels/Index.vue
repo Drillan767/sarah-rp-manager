@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import type { GetRoleplayData, ListChannelsForRoleplayData, ListParticipationsForRoleplayData } from '@sarah-rp-manager/default-connector'
-import { getRoleplay, listChannelsForRoleplay, listParticipationsForRoleplay } from '@sarah-rp-manager/default-connector'
-import { onMounted, ref } from 'vue'
+import type { GetRoleplayData, ListChannelsForRoleplayData, ListUsersForRoleplayData } from '@sarah-rp-manager/default-connector'
+import { getRoleplay, listChannelsForRoleplay, listUsersForRoleplay } from '@sarah-rp-manager/default-connector'
+import { useHead } from '@vueuse/head'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 type Roleplay = NonNullable<GetRoleplayData['roleplay']>
 type Channels = NonNullable<ListChannelsForRoleplayData['channels']>
-type Participations = NonNullable<ListParticipationsForRoleplayData['participations']>
+type Participations = NonNullable<ListUsersForRoleplayData['participations']>
 
 const route = useRoute()
 const router = useRouter()
@@ -14,8 +15,12 @@ const rpId = route.params.id.toString()
 
 const loading = ref(false)
 const roleplay = ref<Roleplay>()
-const channels = ref<Channels>()
+const channels = ref<Channels>([])
 const participations = ref<Participations>()
+
+const users = computed(() => {
+
+})
 
 async function loadRoleplay() {
     const { data } = await getRoleplay({ id: rpId })
@@ -28,7 +33,7 @@ async function loadRoleplay() {
 }
 
 async function loadParticipations() {
-    const { data } = await listParticipationsForRoleplay({ roleplayId: rpId })
+    const { data } = await listUsersForRoleplay({ roleplayId: rpId })
     participations.value = data.participations
 
     if (data.participations.length === 0) {
@@ -41,6 +46,10 @@ async function loadChannels() {
     channels.value = data.channels
 }
 
+useHead({
+    title: () => roleplay.value?.title ?? 'Roleplay',
+})
+
 onMounted(async () => {
     loading.value = true
     await Promise.all([
@@ -49,6 +58,15 @@ onMounted(async () => {
         loadChannels(),
     ])
     loading.value = false
+})
+
+watch(channels, (value) => {
+    if (value.length) {
+        const mainChannel = value.find(channel => channel.name === 'Canal principal')
+        if (mainChannel) {
+            router.push({ name: 'roleplay-channels-detail', params: { id: rpId, channelId: mainChannel.id } })
+        }
+    }
 })
 </script>
 
@@ -101,4 +119,5 @@ onMounted(async () => {
             />
         </VList>
     </VNavigationDrawer>
+    <RouterView />
 </template>

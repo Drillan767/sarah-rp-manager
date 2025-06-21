@@ -18,12 +18,15 @@ const routes: RouteRecordRaw[] = [
         path: '/roleplays/:id/channels',
         name: 'roleplay-channels',
         component: () => import('@/views/roleplays/channels/Index.vue'),
+        children: [
+            {
+                path: ':channelId',
+                name: 'roleplay-channels-detail',
+                component: () => import('@/views/roleplays/channels/Detail.vue'),
+            },
+        ],
     },
-    {
-        path: '/roleplays/:id/channels/:channelId',
-        name: 'roleplay-channels-detail',
-        component: () => import('@/views/roleplays/channels/Detail.vue'),
-    },
+
 ]
 
 export default routes
