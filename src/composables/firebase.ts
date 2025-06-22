@@ -2,6 +2,7 @@ import { connectorConfig } from '@sarah-rp-manager/default-connector'
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { connectDataConnectEmulator, getDataConnect } from 'firebase/data-connect'
+import { getDatabase } from 'firebase/database'
 import { getStorage } from 'firebase/storage'
 
 const firebaseConfig = {
@@ -17,7 +18,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 
 const dc = getDataConnect(app, connectorConfig)
-
+const database = getDatabase(app)
 const storage = getStorage(app)
 
 if (import.meta.env.VITE_ENV === 'local') {
@@ -30,6 +31,7 @@ export default function useFirebase() {
     return {
         auth,
         dc,
+        database,
         storage,
     }
 }

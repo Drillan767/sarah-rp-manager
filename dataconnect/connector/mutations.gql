@@ -326,3 +326,20 @@ mutation CreateSpecificUnavailability(
 mutation DeleteAvailability($id: UUID!) @auth(level: USER insecureReason: "Handled by code") {
     availability_delete(key: { id: $id })
 }
+
+mutation createMessage($content: String!, $channelId: String!, $roleplayId: String!, $userId: String!) @auth(level: USER insecureReason: "Handled by code") {
+    message_insert(data: {
+        content: $content
+        channelId: $channelId
+        roleplayId: $roleplayId
+        userId: $userId
+    })
+}
+
+mutation updateMessage($id: String!, $content: String!) @auth(level: USER insecureReason: "Handled by code") {
+    message_update(key: { id: $id }, data: { content: $content })
+}
+
+mutation deleteMessage($id: String!) @auth(level: USER insecureReason: "Handled by code") {
+    message_update(key: { id: $id }, data: { isDeleted: true })
+}

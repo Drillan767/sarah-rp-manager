@@ -2,10 +2,16 @@
     "emulators": {
         "dataconnect": {
             "dataDir": "dataconnect/.dataconnect/pgliteData"
+        },
+        "database": {
+            "port": 9000
         }
     },
     "dataconnect": {
         "source": "dataconnect"
+    },
+    "database": {
+        "rules": "database.rules.json"
     },
     "functions": [
         {

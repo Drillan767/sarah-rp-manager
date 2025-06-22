@@ -234,3 +234,45 @@ query GetAvailabilityForUser($userId: String!) @auth(level: USER insecureReason:
         }
     }
 }
+
+query getMessages($channelId: String!, $limit: Int = 50, $offset: Int = 0) @auth(level: USER insecureReason: "Handled by code") {
+    messages(
+        where: { channelId: { eq: $channelId }, isDeleted: { eq: false } }
+        orderBy: { createdAt: DESC }
+        limit: $limit
+        offset: $offset
+    ) {
+        id
+        content
+        userId
+        channelId
+        roleplayId
+        createdAt
+        updatedAt
+        user {
+            id
+            username
+            handle
+            avatar
+        }
+    }
+}
+
+query getMessage($id: String!) @auth(level: USER insecureReason: "Handled by code") {
+    message(id: $id) {
+        id
+        content
+        userId
+        channelId
+        roleplayId
+        createdAt
+        updatedAt
+        isDeleted
+        user {
+            id
+            username
+            handle
+            avatar
+        }
+    }
+}

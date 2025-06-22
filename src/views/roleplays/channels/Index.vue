@@ -9,6 +9,14 @@ type Roleplay = NonNullable<GetRoleplayData['roleplay']>
 type Channels = NonNullable<ListChannelsForRoleplayData['channels']>
 type Participations = NonNullable<ListUsersForRoleplayData['participations']>
 
+interface UserList {
+    id: string
+    username: string
+    handle: string
+    avatar: string
+    participations: Participations
+}
+
 const route = useRoute()
 const router = useRouter()
 const rpId = route.params.id.toString()
@@ -16,10 +24,19 @@ const rpId = route.params.id.toString()
 const loading = ref(false)
 const roleplay = ref<Roleplay>()
 const channels = ref<Channels>([])
-const participations = ref<Participations>()
+const participations = ref<Participations>([])
 
 const users = computed(() => {
-
+    return participations.value.reduce<UserList[]>((acc, participation) => {
+        const user = acc.find(user => user.id === participation.user.id)
+        if (user) {
+            user.participations.push(participation)
+        }
+        else {
+            acc.push({ ...participation.user, participations: [participation] })
+        }
+        return acc
+    }, [])
 })
 
 async function loadRoleplay() {
@@ -97,6 +114,18 @@ watch(channels, (value) => {
                 />
                 Membres
             </VListSubheader>
+
+            <VListItem
+                v-for="user in users"
+                :key="user.id"
+                :title="user.username"
+            >
+                <template #prepend>
+                    <VAvatar
+                        :image="user.avatar"
+                    />
+                </template>
+            </VListItem>
         </VList>
         <VDivider />
         <VList
