@@ -27,6 +27,14 @@ interface TypingStatus {
     timestamp: number
 }
 
+interface OnlineUser {
+    avatar: string
+    isOnline: boolean
+    lastSeen: number
+    userId: string
+    username: string
+}
+
 export default function useChat() {
     const { database } = useFirebase()
     const { user } = storeToRefs(useUsersStore())
@@ -34,6 +42,7 @@ export default function useChat() {
     const messages = ref<ChatMessage[]>([])
     const typingUsers = ref<TypingStatus[]>([])
     const isLoading = ref(false)
+    const onlineUsers = ref<OnlineUser[]>([])
 
     // Subscribe to real-time messages for a channel
     const subscribeToMessages = (roleplayId: string, channelId: string) => {
@@ -192,8 +201,15 @@ export default function useChat() {
         const onlineRef = dbRef(database, `presence/${roleplayId}`)
 
         onValue(onlineRef, (snapshot) => {
-            const _data = snapshot.val()
-            // Handle online users data
+            const data = snapshot.val()
+            // Only keep users where isOnline is true
+            onlineUsers.value = data
+                ? Object.values(data).map((user: any) => ({
+                        ...user,
+                        status: user.isOnline ? 'online' : 'offline',
+                        lastSeen: user.lastSeen,
+                    }))
+                : []
         })
 
         return () => off(onlineRef)
@@ -211,7 +227,7 @@ export default function useChat() {
                 userId: user.value.id,
                 username: user.value.username,
                 avatar: user.value.avatar,
-                lastSeen: serverTimestamp(),
+                lastSeen: Date.now(),
                 isOnline: true,
             })
         }
@@ -220,7 +236,7 @@ export default function useChat() {
                 userId: user.value.id,
                 username: user.value.username,
                 avatar: user.value.avatar,
-                lastSeen: serverTimestamp(),
+                lastSeen: Date.now(),
                 isOnline: false,
             })
         }
@@ -235,6 +251,7 @@ export default function useChat() {
         setTypingStatus,
         loadMessageHistory,
         markAsRead,
+        onlineUsers,
         getOnlineUsers,
         setPresence,
     }

@@ -23,7 +23,7 @@ const messagesContainer = ref<HTMLElement>()
 const isTyping = ref(false)
 const typingTimeout = ref<ReturnType<typeof setTimeout>>()
 
-const roleplayId = route.params.roleplayId as string
+const roleplayId = route.params.id as string
 const channelId = route.params.channelId as string
 
 // Auto-scroll to bottom when new messages arrive
@@ -98,9 +98,6 @@ onMounted(async () => {
 
     // Subscribe to messages
     unsubscribe = subscribeToMessages(roleplayId, channelId)
-
-    // Set presence as online
-    setPresence(roleplayId, true)
 
     // Scroll to bottom initially
     scrollToBottom()

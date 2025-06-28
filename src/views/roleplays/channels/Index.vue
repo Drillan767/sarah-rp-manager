@@ -2,8 +2,9 @@
 import type { GetRoleplayData, ListChannelsForRoleplayData, ListUsersForRoleplayData } from '@sarah-rp-manager/default-connector'
 import { getRoleplay, listChannelsForRoleplay, listUsersForRoleplay } from '@sarah-rp-manager/default-connector'
 import { useHead } from '@vueuse/head'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import useChat from '@/composables/chat'
 
 type Roleplay = NonNullable<GetRoleplayData['roleplay']>
 type Channels = NonNullable<ListChannelsForRoleplayData['channels']>
@@ -15,11 +16,13 @@ interface UserList {
     handle: string
     avatar: string
     participations: Participations
+    online: boolean
 }
 
 const route = useRoute()
 const router = useRouter()
 const rpId = route.params.id.toString()
+const { getOnlineUsers, setPresence, onlineUsers } = useChat()
 
 const loading = ref(false)
 const roleplay = ref<Roleplay>()
@@ -28,12 +31,16 @@ const participations = ref<Participations>([])
 
 const users = computed(() => {
     return participations.value.reduce<UserList[]>((acc, participation) => {
-        const user = acc.find(user => user.id === participation.user.id)
-        if (user) {
-            user.participations.push(participation)
+        const onlineUser = onlineUsers.value.find(user => user.userId === participation.user.id)
+        if (acc.find(user => user.id === participation.user.id)) {
+            acc.find(user => user.id === participation.user.id)!.participations.push(participation)
         }
         else {
-            acc.push({ ...participation.user, participations: [participation] })
+            acc.push({
+                ...participation.user,
+                participations: [participation],
+                online: onlineUser?.isOnline ?? false,
+            })
         }
         return acc
     }, [])
@@ -63,6 +70,11 @@ async function loadChannels() {
     channels.value = data.channels
 }
 
+function listOnlineUsers() {
+    const unsubscribe = getOnlineUsers(rpId)
+    return () => unsubscribe()
+}
+
 useHead({
     title: () => roleplay.value?.title ?? 'Roleplay',
 })
@@ -73,9 +85,13 @@ onMounted(async () => {
         loadRoleplay(),
         loadParticipations(),
         loadChannels(),
+        listOnlineUsers(),
+        setPresence(rpId, true),
     ])
     loading.value = false
 })
+
+onBeforeUnmount(() => setPresence(rpId, false))
 
 watch(channels, (value) => {
     if (value.length) {
@@ -121,9 +137,15 @@ watch(channels, (value) => {
                 :title="user.username"
             >
                 <template #prepend>
-                    <VAvatar
-                        :image="user.avatar"
-                    />
+                    <VBadge
+                        :color="user.online ? 'success' : 'error'"
+                        location="bottom right"
+                        dot
+                    >
+                        <VAvatar
+                            :image="user.avatar"
+                        />
+                    </VBadge>
                 </template>
             </VListItem>
         </VList>
