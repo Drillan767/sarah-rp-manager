@@ -2,7 +2,7 @@ import {
     createMessage,
     getMessages,
 } from '@sarah-rp-manager/default-connector'
-import { ref as dbRef, off, onValue, push, serverTimestamp, set } from 'firebase/database'
+import { ref as dbRef, off, onValue, push, set } from 'firebase/database'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import useUsersStore from '@/stores/users'
@@ -154,7 +154,7 @@ export default function useChat() {
     }
 
     // Load message history from DataConnect (for persistence)
-    const loadMessageHistory = async (roleplayId: string, channelId: string, _limit = 50) => {
+    const loadMessageHistory = async (channelId: string, _limit = 50) => {
         try {
             const { data } = await getMessages({
                 channelId,
