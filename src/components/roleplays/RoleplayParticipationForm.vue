@@ -3,6 +3,7 @@ import type { GetRoleplayData, ListParticipationsForUserData, ListTemplatesForUs
 import { createParticipation } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
+import useCharacter from '@/composables/character'
 import useUsersStore from '@/stores/users'
 import ParticipationStep1 from './ParticipationStep1.vue'
 import ParticipationStep2 from './ParticipationStep2.vue'
@@ -29,8 +30,11 @@ const {
 const emit = defineEmits<{
     (e: 'joined'): void
 }>()
+
 const open = defineModel<boolean>('open', { required: true })
+
 const { user } = storeToRefs(useUsersStore())
+const { createTemplate } = useCharacter()
 
 const step1 = ref<InstanceType<typeof ParticipationStep1>>()
 const step2 = ref<InstanceType<typeof ParticipationStep2>>()
@@ -40,6 +44,7 @@ const currentStep = ref(0)
 const pickedRoleId = ref<string>()
 const pickedCharacter = ref<string>()
 const clonedCharacter = ref<Templates[number]>()
+const characterCreated = ref(false)
 const loading = ref(false)
 
 const headers = [
@@ -64,6 +69,34 @@ const headers = [
 const currentStepInfos = computed(() => headers[currentStep.value])
 const pickedRole = computed(() => roleplay?.roles.find(r => r.id === pickedRoleId.value))
 const characterName = computed(() => characters.find(c => c.id === pickedCharacter.value)?.name ?? undefined)
+
+// Add computed property for current character data
+const currentCharacterData = computed(() => {
+    if (characterCreated.value && step3.value?.template) {
+        // For new characters, use the form data from step 3
+        let illustrationUrl: string
+        if (step3.value.template.illustration instanceof File) {
+            illustrationUrl = URL.createObjectURL(step3.value.template.illustration)
+        }
+        else if (typeof step3.value.template.illustration === 'string') {
+            illustrationUrl = step3.value.template.illustration
+        }
+        else {
+            illustrationUrl = clonedCharacter.value?.illustration || ''
+        }
+
+        return {
+            id: step3.value.template.id,
+            name: step3.value.template.name,
+            description: step3.value.template.description,
+            illustration: illustrationUrl,
+            participations: [],
+        }
+    }
+    // For existing characters, use the cloned character data
+    return clonedCharacter.value || undefined
+})
+
 const canProgress = computed(() => {
     if (currentStep.value === 0) {
         return step1.value?.valid
@@ -85,6 +118,7 @@ function createCharacter() {
         illustration: '',
         participations: [],
     }
+    characterCreated.value = true
     currentStep.value = 2
 }
 
@@ -96,18 +130,38 @@ function reset() {
 }
 
 async function joinRoleplay() {
-    if (!user.value || !roleplay || !pickedRoleId.value || !pickedCharacter.value) {
+    if (!user.value || !roleplay || !pickedRoleId.value || (!pickedCharacter.value && !characterCreated.value)) {
         return
     }
 
     loading.value = true
 
+    let templateId: string | undefined
+
     try {
+        if (characterCreated.value) {
+            if (!step3.value) {
+                throw new Error('Template is undefined')
+            }
+
+            if (!step3.value.template.illustration) {
+                throw new Error('Illustration is undefined')
+            }
+
+            templateId = await createTemplate({
+                name: step3.value.template.name,
+                description: step3.value.template.description,
+                illustration: step3.value.template.illustration,
+                user: user.value.id,
+                isPublic: false,
+            })
+        }
+
         await createParticipation({
             user: user.value.id,
             roleplay: roleplay.id,
             role: pickedRoleId.value,
-            characterTemplate: pickedCharacter.value,
+            characterTemplate: characterCreated.value && templateId ? templateId : pickedCharacter.value!,
         })
 
         emit('joined')
@@ -160,7 +214,7 @@ If user has no character model, display the template form. When saving, create t
         max-width="900"
         persistent
     >
-        <VCard>
+        <VCard :loading="loading">
             <VCardTitle>
                 <h2 class="text-h5">
                     {{ currentStepInfos.title }}
@@ -237,9 +291,9 @@ If user has no character model, display the template form. When saving, create t
                             :value="3"
                         >
                             <ParticipationStep4
-                                v-if="pickedRole && clonedCharacter"
+                                v-if="pickedRole && currentCharacterData"
                                 :role="pickedRole"
-                                :character="clonedCharacter"
+                                :character="currentCharacterData"
                             />
                         </VStepperWindowItem>
                     </VStepperWindow>
@@ -271,6 +325,7 @@ If user has no character model, display the template form. When saving, create t
                     v-else
                     color="primary"
                     variant="flat"
+                    :loading="loading"
                     :disabled="loading"
                     @click="joinRoleplay"
                 >

@@ -7,8 +7,8 @@ import {
     updateTemplateIllustration,
 } from '@sarah-rp-manager/default-connector'
 import { deleteObject, getDownloadURL, listAll, ref as s3Ref, uploadBytes } from 'firebase/storage'
-import useUsersStore from '@/stores/users'
 import { storeToRefs } from 'pinia'
+import useUsersStore from '@/stores/users'
 import useFirebase from './firebase'
 
 export default function useCharacter() {
@@ -35,6 +35,8 @@ export default function useCharacter() {
             id: data.character_template_insert.id,
             illustration: url,
         })
+
+        return data.character_template_insert.id
     }
 
     async function updateTemplate(template: UpdateTemplateFormType) {
@@ -76,6 +78,6 @@ export default function useCharacter() {
     return {
         createTemplate,
         updateTemplate,
-        deleteTemplate
+        deleteTemplate,
     }
 }
