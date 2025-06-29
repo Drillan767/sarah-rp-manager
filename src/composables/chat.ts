@@ -154,11 +154,12 @@ export default function useChat() {
     }
 
     // Load message history from DataConnect (for persistence)
-    const loadMessageHistory = async (channelId: string, _limit = 50) => {
+    const loadMessageHistory = async (roleplayId: string, channelId: string, limit = 50) => {
         try {
             const { data } = await getMessages({
+                roleplayId,
                 channelId,
-                limit: _limit,
+                limit,
                 offset: 0,
             })
 
