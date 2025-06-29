@@ -35,6 +35,7 @@ watch(() => props.clonedCharacter, (c) => {
 
 defineExpose({
     formValid: valid,
+    template,
 })
 </script>
 

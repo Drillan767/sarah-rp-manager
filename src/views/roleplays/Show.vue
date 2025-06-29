@@ -109,12 +109,12 @@ const joinDisabled = computed(() => {
 })
 
 async function getRoleplayData() {
-    const data = await getRoleplay({ id: rpId })
-    if (!data.data) {
+    const { data } = await getRoleplay({ id: rpId })
+    if (!data) {
         router.push({ name: 'roleplays' })
         return
     }
-    roleplay.value = data.data.roleplay
+    roleplay.value = data.roleplay
 }
 
 async function getUserTemplates() {
@@ -139,8 +139,7 @@ function joinRoleplay(role?: ParticipationRole) {
 }
 
 function handleParticipation() {
-    // TODO: redirect to discussion page.
-    console.log('joined')
+    router.push({ name: 'roleplay-channels', params: { id: rpId } })
 }
 
 onMounted(() => {
@@ -214,11 +213,21 @@ useHead({
                                     class="d-flex flex-column ga-4"
                                 >
                                     <VBtn
+                                        v-if="userParticipations.some(p => roleplay?.roles.some(r => r.id === p.role.id))"
+                                        :to="{ name: 'roleplay-channels', params: { id: roleplay.id } }"
+                                        color="primary"
+                                        variant="flat"
+                                        prepend-icon="mdi-login"
+                                    >
+                                        Accéder
+                                    </VBtn>
+                                    <VBtn
+                                        v-else
                                         :disabled="joinDisabled"
                                         color="primary"
                                         variant="flat"
                                         prepend-icon="mdi-account-plus"
-                                        @click="joinRoleplay()"
+                                        @click="joinRoleplay"
                                     >
                                         Rejoindre
                                     </VBtn>

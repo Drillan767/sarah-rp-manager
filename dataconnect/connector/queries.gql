@@ -94,6 +94,13 @@ query GetRoleplay($id: UUID!) @auth(level: USER insecureReason: "Handled by code
   }
 }
 
+query ListChannelsForRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+  channels(where: { roleplay: { id: { eq: $roleplayId } } }) {
+    id
+    name
+  }
+}
+
 query ListTemplatesForUser($userId: String!) @auth(level: USER insecureReason: "Handled by code") {
   character_templates(where: { user: { id: { eq: $userId } } }) {
     id
@@ -160,6 +167,36 @@ query ListParticipationsForUser($userId: String!) @auth(level: USER insecureReas
     }
 }
 
+query ListParticipationsForRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    participations(where: { roleplay: { id: { eq: $roleplayId } } }) {
+        id
+        role {
+            id
+        }
+    }
+}
+
+query ListUsersForRoleplay($roleplayId: UUID!) @auth(level: USER insecureReason: "Handled by code") {
+    participations(where: { roleplay: { id: { eq: $roleplayId } } }) {
+        id
+        characterName
+        characterIllustration
+        characterDescription
+        user {
+            id
+            username
+            handle
+            avatar
+        }
+        characterTemplate {
+            id
+            name
+            illustration
+            description
+        }
+    }
+}
+
 query ListAvailabilities @auth(level: USER insecureReason: "Handled by code") {
     availabilities {
         id
@@ -194,6 +231,48 @@ query GetAvailabilityForUser($userId: String!) @auth(level: USER insecureReason:
             id
             username
             handle
+        }
+    }
+}
+
+query getMessages($channelId: String!, $limit: Int = 50, $offset: Int = 0) @auth(level: USER insecureReason: "Handled by code") {
+    messages(
+        where: { channelId: { eq: $channelId }, isDeleted: { eq: false } }
+        orderBy: { createdAt: DESC }
+        limit: $limit
+        offset: $offset
+    ) {
+        id
+        content
+        userId
+        channelId
+        roleplayId
+        createdAt
+        updatedAt
+        user {
+            id
+            username
+            handle
+            avatar
+        }
+    }
+}
+
+query getMessage($id: String!) @auth(level: USER insecureReason: "Handled by code") {
+    message(id: $id) {
+        id
+        content
+        userId
+        channelId
+        roleplayId
+        createdAt
+        updatedAt
+        isDeleted
+        user {
+            id
+            username
+            handle
+            avatar
         }
     }
 }
