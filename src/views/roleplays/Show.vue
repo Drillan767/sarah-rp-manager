@@ -139,8 +139,7 @@ function joinRoleplay(role?: ParticipationRole) {
 }
 
 function handleParticipation() {
-    // TODO: redirect to discussion page.
-    console.log('joined')
+    router.push({ name: 'roleplay-channels', params: { id: rpId } })
 }
 
 onMounted(() => {
