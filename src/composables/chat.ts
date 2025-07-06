@@ -25,6 +25,7 @@ interface TypingStatus {
     avatar: string
     isTyping: boolean
     timestamp: number
+    channelId: string
 }
 
 interface OnlineUser {
@@ -61,11 +62,11 @@ export default function useChat() {
                         ...data[key],
                     })
                 })
-                // Sort by timestamp
-                messages.value = messageList.sort((a, b) => a.timestamp - b.timestamp)
-            }
-            else {
-                messages.value = []
+
+                // Merge with existing messages, avoiding duplicates
+                const existingMessages = messages.value.filter(msg => msg.channelId !== channelId)
+                const newMessages = messageList.sort((a, b) => a.timestamp - b.timestamp)
+                messages.value = [...existingMessages, ...newMessages]
             }
         })
 
@@ -80,13 +81,14 @@ export default function useChat() {
                         typingList.push({
                             userId: key,
                             ...data[key],
+                            channelId,
                         })
                     }
                 })
-                typingUsers.value = typingList
-            }
-            else {
-                typingUsers.value = []
+
+                // Merge with existing typing users, avoiding duplicates
+                const existingTypingUsers = typingUsers.value.filter(user => user.channelId !== channelId)
+                typingUsers.value = [...existingTypingUsers, ...typingList]
             }
         })
 
@@ -176,8 +178,10 @@ export default function useChat() {
                     roleplayId: msg.roleplayId,
                 }))
 
-                // Merge with existing real-time messages
-                messages.value = [...historyMessages, ...messages.value]
+                // Merge with existing messages, avoiding duplicates
+                const existingMessages = messages.value.filter(msg => msg.channelId !== channelId)
+                const newMessages = historyMessages.sort((a, b) => a.timestamp - b.timestamp)
+                messages.value = [...existingMessages, ...newMessages]
             }
         }
         catch (error) {

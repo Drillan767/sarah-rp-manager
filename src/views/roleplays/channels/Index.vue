@@ -22,7 +22,15 @@ interface UserList {
 const route = useRoute()
 const router = useRouter()
 const rpId = route.params.id.toString()
-const { getOnlineUsers, setPresence, onlineUsers } = useChat()
+const {
+    messages,
+    typingUsers,
+    getOnlineUsers,
+    setPresence,
+    onlineUsers,
+    subscribeToMessages,
+    loadMessageHistory,
+} = useChat()
 
 const loading = ref(false)
 const roleplay = ref<Roleplay>()
@@ -44,6 +52,24 @@ const users = computed(() => {
         }
         return acc
     }, [])
+})
+
+// Filter messages by current channel
+const currentChannelMessages = computed(() => {
+    const currentChannelId = route.params.channelId as string
+    if (!currentChannelId)
+        return []
+
+    return messages.value.filter(message => message.channelId === currentChannelId)
+})
+
+// Filter typing users by current channel
+const currentChannelTypingUsers = computed(() => {
+    const currentChannelId = route.params.channelId as string
+    if (!currentChannelId)
+        return []
+
+    return typingUsers.value.filter(user => user.channelId === currentChannelId)
 })
 
 async function loadRoleplay() {
@@ -70,9 +96,32 @@ async function loadChannels() {
     channels.value = data.channels
 }
 
+async function loadAllMessages() {
+    // Load message history for all channels
+    for (const channel of channels.value) {
+        await loadMessageHistory(rpId, channel.id)
+    }
+}
+
 function listOnlineUsers() {
     const unsubscribe = getOnlineUsers(rpId)
     return () => unsubscribe()
+}
+
+function subscribeToAllChannels() {
+    // Subscribe to messages for all channels
+    const unsubscribers: (() => void)[] = []
+
+    for (const channel of channels.value) {
+        const unsubscribe = subscribeToMessages(rpId, channel.id)
+        if (unsubscribe) {
+            unsubscribers.push(unsubscribe)
+        }
+    }
+
+    return () => {
+        unsubscribers.forEach(unsubscribe => unsubscribe())
+    }
 }
 
 useHead({
@@ -88,12 +137,24 @@ onMounted(async () => {
         listOnlineUsers(),
         setPresence(rpId, true),
     ])
+
+    // Load messages and subscribe to all channels after channels are loaded
+    await loadAllMessages()
+    const unsubscribeAll = subscribeToAllChannels()
+
     loading.value = false
+
+    // Store unsubscribe function for cleanup
+    onBeforeUnmount(() => {
+        if (unsubscribeAll) {
+            unsubscribeAll()
+        }
+    })
 })
 
 onBeforeUnmount(() => setPresence(rpId, false))
 
-watch(channels, (value) => {
+watch(channels, async (value) => {
     if (value.length) {
         const mainChannel = value.find(channel => channel.name === 'Canal principal')
         if (mainChannel) {
@@ -170,5 +231,9 @@ watch(channels, (value) => {
             />
         </VList>
     </VNavigationDrawer>
-    <RouterView />
+    <RouterView
+        :messages="currentChannelMessages"
+        :typing-users="currentChannelTypingUsers"
+        :channels="channels"
+    />
 </template>
