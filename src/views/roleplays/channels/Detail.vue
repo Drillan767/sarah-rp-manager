@@ -1,21 +1,27 @@
 <script setup lang="ts">
+import type { ListChannelsForRoleplayData } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import useChat from '@/composables/chat'
 import useUsersStore from '@/stores/users'
 
+type Channels = NonNullable<ListChannelsForRoleplayData['channels']>
+
+interface Props {
+    messages: any[]
+    typingUsers: any[]
+    channels: Channels
+}
+
+const props = defineProps<Props>()
+
 const route = useRoute()
 const { user } = storeToRefs(useUsersStore())
 const {
-    messages,
-    typingUsers,
-    isLoading,
-    subscribeToMessages,
     sendMessage,
     setTypingStatus,
     setPresence,
-    loadMessageHistory,
 } = useChat()
 
 const newMessage = ref('')
@@ -24,7 +30,12 @@ const isTyping = ref(false)
 const typingTimeout = ref<ReturnType<typeof setTimeout>>()
 
 const roleplayId = route.params.id as string
-const channelId = route.params.channelId as string
+const channelId = computed(() => route.params.channelId as string)
+
+// Get current channel information
+const currentChannel = computed(() => {
+    return props.channels.find(channel => channel.id === channelId.value)
+})
 
 // Auto-scroll to bottom when new messages arrive
 function scrollToBottom() {
@@ -39,7 +50,7 @@ function scrollToBottom() {
 function handleTyping() {
     if (!isTyping.value) {
         isTyping.value = true
-        setTypingStatus(true, roleplayId, channelId)
+        setTypingStatus(true, roleplayId, channelId.value)
     }
 
     // Clear existing timeout
@@ -50,8 +61,8 @@ function handleTyping() {
     // Set new timeout
     typingTimeout.value = setTimeout(() => {
         isTyping.value = false
-        setTypingStatus(false, roleplayId, channelId)
-    }, 1000)
+        setTypingStatus(false, roleplayId, channelId.value)
+    }, 500)
 }
 
 // Send message
@@ -59,9 +70,9 @@ async function handleSendMessage() {
     if (!newMessage.value.trim() || !user.value)
         return
 
-    await sendMessage(newMessage.value, roleplayId, channelId)
+    await sendMessage(newMessage.value, roleplayId, channelId.value)
     newMessage.value = ''
-    setTypingStatus(false, roleplayId, channelId)
+    setTypingStatus(false, roleplayId, channelId.value)
     isTyping.value = false
 
     if (typingTimeout.value) {
@@ -90,48 +101,39 @@ function isOwnMessage(messageUserId: string) {
     return messageUserId === user.value?.id
 }
 
-let unsubscribe: (() => void) | undefined
-
-onMounted(async () => {
-    // Load message history first
-    await loadMessageHistory(roleplayId, channelId)
-
-    // Subscribe to messages
-    unsubscribe = subscribeToMessages(roleplayId, channelId)
-
-    // Scroll to bottom initially
-    scrollToBottom()
-})
+onMounted(scrollToBottom)
 
 onUnmounted(() => {
-    // Cleanup
-    if (unsubscribe) {
-        unsubscribe()
-    }
-
-    // Set presence as offline
     setPresence(roleplayId, false)
 
-    // Clear typing timeout
     if (typingTimeout.value) {
         clearTimeout(typingTimeout.value)
     }
 })
 
-// Watch messages for auto-scroll
-watch(messages, scrollToBottom, { deep: true })
+watch(() => props.messages, scrollToBottom, { deep: true })
+
+// Watch for channel changes
+watch(() => route.params.channelId, () => {
+    // Clear current state when switching channels
+    newMessage.value = ''
+    isTyping.value = false
+    if (typingTimeout.value) {
+        clearTimeout(typingTimeout.value)
+    }
+
+    scrollToBottom()
+})
 </script>
 
 <template>
     <VContainer fluid class="pa-0 h-100">
         <VRow no-gutters class="h-100">
-            <!-- Chat Messages Area -->
             <VCol class="d-flex flex-column h-100">
-                <!-- Messages Header -->
                 <VCard flat class="rounded-0 border-b">
                     <VCardTitle class="text-h6 pa-4">
                         <VIcon icon="mdi-message-text" class="me-2" />
-                        {{ route.params.channelName || 'Canal' }}
+                        {{ currentChannel?.name || 'Canal' }}
                     </VCardTitle>
                 </VCard>
 
@@ -142,11 +144,7 @@ watch(messages, scrollToBottom, { deep: true })
                         class="flex-grow-1 pa-4 overflow-y-auto"
                         style="max-height: calc(100vh - 200px);"
                     >
-                        <div v-if="isLoading" class="d-flex justify-center pa-4">
-                            <VProgressCircular indeterminate />
-                        </div>
-
-                        <div v-else-if="messages.length === 0" class="text-center pa-8">
+                        <div v-if="props.messages.length === 0" class="text-center pa-8">
                             <VIcon icon="mdi-message-outline" size="64" class="text-grey-lighten-1 mb-4" />
                             <p class="text-grey-lighten-1">
                                 Aucun message pour le moment
@@ -158,13 +156,14 @@ watch(messages, scrollToBottom, { deep: true })
 
                         <div v-else class="d-flex flex-column gap-3">
                             <div
-                                v-for="message in messages"
+                                v-for="message in props.messages"
                                 :key="message.id"
                                 class="d-flex"
                                 :class="{ 'justify-end': isOwnMessage(message.userId) }"
                             >
                                 <VCard
-                                    class="pa-3 max-width-70" :class="[
+                                    class="pa-3 max-width-70"
+                                    :class="[
                                         isOwnMessage(message.userId)
                                             ? 'bg-primary text-white'
                                             : 'bg-grey-lighten-4',
@@ -194,11 +193,11 @@ watch(messages, scrollToBottom, { deep: true })
                         </div>
 
                         <!-- Typing Indicator -->
-                        <div v-if="typingUsers.length > 0" class="d-flex align-center pa-2">
+                        <div v-if="props.typingUsers.length > 0" class="d-flex align-center pa-2">
                             <VCard flat class="bg-grey-lighten-4 pa-2">
                                 <div class="d-flex align-center">
                                     <VAvatar
-                                        v-for="typingUser in typingUsers"
+                                        v-for="typingUser in props.typingUsers"
                                         :key="typingUser.userId"
                                         :image="typingUser.avatar"
                                         :alt="typingUser.username"
@@ -206,8 +205,8 @@ watch(messages, scrollToBottom, { deep: true })
                                         class="me-1"
                                     />
                                     <span class="text-caption text-grey-darken-1">
-                                        {{ typingUsers.map(u => u.username).join(', ') }}
-                                        {{ typingUsers.length === 1 ? 'tape' : 'tape' }}...
+                                        {{ props.typingUsers.map(u => u.username).join(', ') }}
+                                        {{ props.typingUsers.length === 1 ? 'tape' : 'tape' }}...
                                     </span>
                                 </div>
                             </VCard>
@@ -220,23 +219,24 @@ watch(messages, scrollToBottom, { deep: true })
                             <div class="d-flex align-end gap-2">
                                 <VTextField
                                     v-model="newMessage"
+                                    :disabled="!user"
                                     placeholder="Tapez votre message..."
                                     variant="outlined"
                                     density="compact"
                                     hide-details
                                     class="flex-grow-1"
-                                    :disabled="!user"
+                                    autocomplete="off"
                                     @input="handleTyping"
                                     @keypress="handleKeyPress"
                                 />
                                 <VBtn
+                                    :disabled="!newMessage.trim() || !user"
+                                    class="ml-2"
+                                    size="small"
                                     type="submit"
                                     color="primary"
-                                    :disabled="!newMessage.trim() || !user"
-                                    :loading="isLoading"
-                                >
-                                    <VIcon icon="mdi-send" />
-                                </VBtn>
+                                    icon="mdi-send"
+                                />
                             </div>
                         </VForm>
                     </VCard>

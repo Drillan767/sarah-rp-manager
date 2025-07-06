@@ -3,12 +3,14 @@ import type { ListRoleplaysData } from '@sarah-rp-manager/default-connector'
 import { listRoleplays } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import useDayjs from '@/composables/dayjs'
 import useUsersStore from '@/stores/users'
 
 const { user } = storeToRefs(useUsersStore())
 const dayjs = useDayjs()
+const router = useRouter()
 
 const search = ref<string>()
 const itemsPerPage = ref(12)
@@ -19,6 +21,10 @@ async function getRoleplays() {
         search: search.value,
     })
     roleplays.value = data.roleplays
+}
+
+function createRoleplay() {
+    router.push({ name: 'user-roleplays-create' })
 }
 
 onMounted(getRoleplays)
@@ -134,6 +140,14 @@ const links = [
                     </VCol>
                 </VRow>
             </VContainer>
+        </template>
+        <template #no-data>
+            <VEmptyState
+                icon="mdi-comment-off-outline"
+                title="Aucun roleplay trouvé"
+                action-text="Créer un roleplay"
+                @click:action="createRoleplay"
+            />
         </template>
     </VDataIterator>
 </template>
