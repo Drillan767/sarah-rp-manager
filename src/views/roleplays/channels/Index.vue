@@ -2,9 +2,11 @@
 import type { GetRoleplayData, ListChannelsForRoleplayData, ListUsersForRoleplayData } from '@sarah-rp-manager/default-connector'
 import { getRoleplay, listChannelsForRoleplay, listUsersForRoleplay } from '@sarah-rp-manager/default-connector'
 import { useHead } from '@vueuse/head'
+import { storeToRefs } from 'pinia'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import useChat from '@/composables/chat'
+import useUsersStore from '@/stores/users'
 
 type Roleplay = NonNullable<GetRoleplayData['roleplay']>
 type Channels = NonNullable<ListChannelsForRoleplayData['channels']>
@@ -22,6 +24,7 @@ interface UserList {
 const route = useRoute()
 const router = useRouter()
 const rpId = route.params.id.toString()
+const { user: currentUser } = storeToRefs(useUsersStore())
 const {
     messages,
     typingUsers,
@@ -70,6 +73,10 @@ const currentChannelTypingUsers = computed(() => {
         return []
 
     return typingUsers.value.filter(user => user.channelId === currentChannelId)
+})
+
+const isRpOwner = computed(() => {
+    return participations.value.some(participation => participation.user.id === currentUser.value?.id)
 })
 
 async function loadRoleplay() {
@@ -235,5 +242,6 @@ watch(channels, async (value) => {
         :messages="currentChannelMessages"
         :typing-users="currentChannelTypingUsers"
         :channels="channels"
+        :is-owner="isRpOwner"
     />
 </template>

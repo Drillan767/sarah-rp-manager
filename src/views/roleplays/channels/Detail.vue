@@ -12,6 +12,7 @@ interface Props {
     messages: any[]
     typingUsers: any[]
     channels: Channels
+    isOwner: boolean
 }
 
 const props = defineProps<Props>()
@@ -131,10 +132,19 @@ watch(() => route.params.channelId, () => {
         <VRow no-gutters class="h-100">
             <VCol class="d-flex flex-column h-100">
                 <VCard flat class="rounded-0 border-b">
-                    <VCardTitle class="text-h6 pa-4">
-                        <VIcon icon="mdi-message-text" class="me-2" />
-                        {{ currentChannel?.name || 'Canal' }}
-                    </VCardTitle>
+                    <template #title>
+                        <h6 class="text-h6">
+                            <VIcon icon="mdi-message-text" class="me-2" />
+                            {{ currentChannel?.name || 'Canal' }}
+                        </h6>
+                    </template>
+                    <template #append>
+                        <VBtn
+                            v-if="isOwner"
+                            icon="mdi-dots-vertical"
+                            variant="text"
+                        />
+                    </template>
                 </VCard>
 
                 <!-- Messages Container -->
