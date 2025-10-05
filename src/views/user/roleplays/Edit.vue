@@ -15,7 +15,7 @@ import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleForm from '@/components/roleplays/RoleForm.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
 import useRoleplays from '@/composables/roleplays'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 import MessageBoard from './MessageBoard.vue'
 
 const route = useRoute()

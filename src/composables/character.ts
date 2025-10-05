@@ -8,7 +8,7 @@ import {
 } from '@sarah-rp-manager/default-connector'
 import { deleteObject, getDownloadURL, listAll, ref as s3Ref, uploadBytes } from 'firebase/storage'
 import { storeToRefs } from 'pinia'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 import useFirebase from './firebase'
 
 export default function useCharacter() {

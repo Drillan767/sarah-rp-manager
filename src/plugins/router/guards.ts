@@ -1,6 +1,6 @@
 import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 
 export function authGuard(
     to: RouteLocationNormalized,

@@ -5,7 +5,7 @@ import {
 import { ref as dbRef, off, onValue, push, set } from 'firebase/database'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 import useFirebase from './firebase'
 
 interface ChatMessage {

@@ -3,7 +3,7 @@ import type { CreateTemplateFormType } from '@/types/forms'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import useCharacter from '@/composables/character'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 import TemplateForm from './TemplateForm.vue'
 
 const emit = defineEmits<{

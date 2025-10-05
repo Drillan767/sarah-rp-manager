@@ -4,14 +4,12 @@ import { computed, onMounted, provide, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Navbar from './components/Navbar.vue'
 import Pegi18Warning from './components/Pegi18Warning.vue'
-import useAuth from './composables/auth'
 import useToast from './composables/toast'
+import useAuthStore from './stores/auth'
 
-const { initAuth } = useAuth()
 const route = useRoute()
+const { initialize } = useAuthStore()
 const { showError, showSuccess } = useToast()
-
-onMounted(() => initAuth())
 
 const title = ref('')
 
@@ -30,6 +28,8 @@ provide('toast', {
     showError,
     showSuccess,
 })
+
+onMounted(initialize)
 </script>
 
 <template>

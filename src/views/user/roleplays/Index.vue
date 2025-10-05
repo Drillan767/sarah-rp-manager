@@ -4,7 +4,7 @@ import { listRoleplaysForUser } from '@sarah-rp-manager/default-connector'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 
 type RoleplayList = NonNullable<ListRoleplaysForUserData['roleplays']>
 

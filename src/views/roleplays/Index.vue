@@ -6,7 +6,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import useDayjs from '@/composables/dayjs'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 
 const { user } = storeToRefs(useUsersStore())
 const dayjs = useDayjs()

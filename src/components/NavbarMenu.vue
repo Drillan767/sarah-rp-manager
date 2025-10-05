@@ -2,12 +2,12 @@
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useDisplay, useTheme } from 'vuetify'
-import useUsersStore from '@/stores/users'
+import useAuthStore from '@/stores/auth'
 
 defineProps<{ displayUsername: boolean }>()
 
-const { signIn, signOut } = useUsersStore()
-const { user } = storeToRefs(useUsersStore())
+const { signIn, signOut } = useAuthStore()
+const { user } = storeToRefs(useAuthStore())
 const router = useRouter()
 
 const { mobile } = useDisplay()

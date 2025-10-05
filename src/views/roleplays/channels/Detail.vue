@@ -4,7 +4,7 @@ import { storeToRefs } from 'pinia'
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import useChat from '@/composables/chat'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 
 type Channels = NonNullable<ListChannelsForRoleplayData['channels']>
 

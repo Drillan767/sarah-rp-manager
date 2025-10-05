@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import CharacterTemplateDetail from '@/components/characters/CharacterTemplateDetail.vue'
 import CreateTemplateDialog from '@/components/characters/CreateTemplateDialog.vue'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 
 type Templates = ListTemplatesForUserData['character_templates']
 

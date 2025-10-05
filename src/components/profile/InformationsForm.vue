@@ -6,7 +6,7 @@ import { onMounted, ref } from 'vue'
 import useToast from '@/composables/toast'
 import useUser from '@/composables/user'
 import vuetifyConfig from '@/composables/vuetifyConfig'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 
 type User = NonNullable<GetUserData['user']>
 

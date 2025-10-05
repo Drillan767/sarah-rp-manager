@@ -6,7 +6,7 @@ import landingMessages from '@/assets/json/landing-messages.json'
 import Message from '@/components/channels/Message.vue'
 import useDayjs from '@/composables/dayjs'
 import useToast from '@/composables/toast'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 
 interface IMessage {
     id: number

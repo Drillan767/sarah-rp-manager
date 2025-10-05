@@ -9,7 +9,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleplayParticipationForm from '@/components/roleplays/RoleplayParticipationForm.vue'
 import useDayjs from '@/composables/dayjs'
-import useUsersStore from '@/stores/users'
+import useUsersStore from '@/stores/auth'
 
 type Roleplay = NonNullable<GetRoleplayData['roleplay']>
 type Templates = NonNullable<ListTemplatesForUserData['character_templates']>
