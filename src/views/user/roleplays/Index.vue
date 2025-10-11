@@ -1,25 +1,23 @@
 <script setup lang="ts">
-import type { ListRoleplaysForUserData } from '@sarah-rp-manager/default-connector'
-import { listRoleplaysForUser } from '@sarah-rp-manager/default-connector'
+import type { Roleplay } from '@/util/repositories/roleplays'
 import { storeToRefs } from 'pinia'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import useUsersStore from '@/stores/auth'
-
-type RoleplayList = NonNullable<ListRoleplaysForUserData['roleplays']>
+import { listRpForUser } from '@/util/repositories/roleplays'
 
 const { user } = storeToRefs(useUsersStore())
 const router = useRouter()
 
-const roleplays = ref<RoleplayList>([])
+const roleplays = ref<Roleplay[]>([])
 const loading = ref(false)
 
 async function getRoleplays() {
     if (!user.value?.id)
         return
     loading.value = true
-    const { data } = await listRoleplaysForUser({ userId: user.value.id })
-    roleplays.value = data.roleplays
+    const rpList = await listRpForUser(user.value.id)
+    roleplays.value = rpList
     loading.value = false
 }
 
