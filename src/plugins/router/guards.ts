@@ -2,12 +2,18 @@ import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import useUsersStore from '@/stores/auth'
 
-export function authGuard(
+export async function authGuard(
     to: RouteLocationNormalized,
     _: RouteLocationNormalized,
     next: NavigationGuardNext,
 ) {
-    const { isAuthenticated } = storeToRefs(useUsersStore())
+    const authStore = useUsersStore()
+    const { isAuthenticated, loading } = storeToRefs(authStore)
+
+    // Wait for auth initialization to complete
+    if (loading.value) {
+        await authStore.initialize()
+    }
 
     // Check if the route requires authentication
     const requiresAuth = to.path.startsWith('/profil')

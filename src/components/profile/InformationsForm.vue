@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import type { GetUserData } from '@sarah-rp-manager/default-connector'
+import type { Tables } from '@/types/database'
 import { storeToRefs } from 'pinia'
 import { useForm, useIsFormValid } from 'vee-validate'
 import { onMounted, ref } from 'vue'
 import useToast from '@/composables/toast'
-import useUser from '@/composables/user'
 import vuetifyConfig from '@/composables/vuetifyConfig'
 import useUsersStore from '@/stores/auth'
+import { getUserInfos, updateDescription } from '@/util/repositories/users'
 
-type User = NonNullable<GetUserData['user']>
+type User = Tables<'users'>
 
 const { user } = storeToRefs(useUsersStore())
-const { updateUserInfo, getUserInfo } = useUser()
 const { showSuccess, showError } = useToast()
 
 const loading = ref(false)
@@ -31,7 +30,7 @@ async function loadCurrentUserInfos() {
     if (!user.value)
         return
     loading.value = true
-    const data = await getUserInfo(user.value.id)
+    const data = await getUserInfos(user.value.id)
     if (data) {
         storedUser.value = data
     }
@@ -48,10 +47,7 @@ const save = handleSubmit(async (values) => {
     loading.value = true
 
     try {
-        await updateUserInfo(user.value.id, {
-            ...storedUser.value,
-            description: values.description,
-        })
+        await updateDescription(user.value.id, values.description)
         showSuccess('Informations mises à jour avec succès')
     }
     catch (error) {
