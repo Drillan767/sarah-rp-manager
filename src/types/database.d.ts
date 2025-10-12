@@ -16,7 +16,7 @@ export interface Database {
                     is_default: boolean
                     is_internal: boolean
                     name: string
-                    roleplay_id: string | null
+                    roleplay_id: string
                 }
                 Insert: {
                     created_at?: string
@@ -24,7 +24,7 @@ export interface Database {
                     is_default: boolean
                     is_internal: boolean
                     name: string
-                    roleplay_id?: string | null
+                    roleplay_id: string
                 }
                 Update: {
                     created_at?: string
@@ -32,7 +32,7 @@ export interface Database {
                     is_default?: boolean
                     is_internal?: boolean
                     name?: string
-                    roleplay_id?: string | null
+                    roleplay_id?: string
                 }
                 Relationships: [
                     {
@@ -202,7 +202,7 @@ export interface Database {
                     message_board: string | null
                     start_date: string | null
                     title: string
-                    user_id: string | null
+                    user_id: string
                 }
                 Insert: {
                     created_at?: string
@@ -212,7 +212,7 @@ export interface Database {
                     message_board?: string | null
                     start_date?: string | null
                     title: string
-                    user_id?: string | null
+                    user_id: string
                 }
                 Update: {
                     created_at?: string
@@ -222,7 +222,7 @@ export interface Database {
                     message_board?: string | null
                     start_date?: string | null
                     title?: string
-                    user_id?: string | null
+                    user_id?: string
                 }
                 Relationships: [
                     {
