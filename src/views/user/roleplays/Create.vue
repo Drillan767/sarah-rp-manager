@@ -1,34 +1,37 @@
 <script setup lang="ts">
-import type { CreateRoleplayVariables, CreateRoleVariables } from '@sarah-rp-manager/default-connector'
 import type { Toast } from '@/types'
+import type { Roleplay } from '@/util/repositories/roleplays'
+import type { Role } from '@/util/repositories/roles'
 import { computed, inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleForm from '@/components/roleplays/RoleForm.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
-import useRoleplays from '@/composables/roleplays'
+import { createRoleplay } from '@/util/repositories/roleplays'
 
-type RoleplayFormType = Omit<CreateRoleplayVariables, 'illustration'> & {
-    illustration: File
+type RoleplayFormType = Omit<Roleplay, 'illustration' | 'id' | 'created_at'> & {
+    illustration: File | undefined
 }
 
-const { createRP } = useRoleplays()
+type RoleFormType = Omit<Role, 'id' | 'roleplay_id' | 'created_at'>
+
 const router = useRouter()
 const toast = inject<Toast>('toast')
 
 const roleplay = ref<RoleplayFormType>({
     title: '',
     description: '',
-    illustration: new File([], ''),
-    user: '',
+    user_id: '',
+    message_board: null,
+    start_date: null,
+    illustration: undefined,
 })
 
-const roles = ref<CreateRoleVariables[]>([{
+const roles = ref<RoleFormType[]>([{
     name: '',
-    maxUsers: 0,
+    max_users: 0,
     description: '',
-    isFree: false,
-    roleplay: '',
+    is_free: false,
 }])
 
 const roleplayValid = ref(false)
@@ -37,7 +40,7 @@ const loading = ref(false)
 const rolesForms = ref<InstanceType<typeof RoleForm>[]>([])
 const rolesValid = ref<boolean[]>([])
 
-const freeRoleUsed = computed(() => roles.value.some(role => role.isFree))
+const freeRoleUsed = computed(() => roles.value.some(role => role.is_free))
 const canSubmit = computed(() => roleplayValid.value && rolesValid.value.every(valid => valid))
 
 function assignRoleRef(el: InstanceType<typeof RoleForm>, index: number) {
@@ -47,7 +50,8 @@ function assignRoleRef(el: InstanceType<typeof RoleForm>, index: number) {
 async function handleSubmit() {
     loading.value = true
     try {
-        const id = await createRP(roleplay.value, roles.value)
+        const id = await createRoleplay(roleplay.value, roles.value)
+        // const id = await createRP(roleplay.value, roles.value)
         toast?.showSuccess('Roleplay créé avec succès')
         router.push({ name: 'user-roleplays-edit', params: { rpId: id } })
     }
@@ -63,10 +67,9 @@ async function handleSubmit() {
 function addRole(free: boolean) {
     roles.value.push({
         name: free ? 'Rôle libre' : '',
-        maxUsers: 0,
+        max_users: 0,
         description: free ? 'Les utilisateurs qui choisiront ce rôle utiliseront leur propre profil comme personnage' : '',
-        isFree: free,
-        roleplay: '',
+        is_free: free,
     })
 }
 
