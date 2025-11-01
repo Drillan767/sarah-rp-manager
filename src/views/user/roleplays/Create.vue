@@ -2,14 +2,16 @@
 import type { Toast } from '@/types'
 import type { Roleplay } from '@/util/repositories/roleplays'
 import type { Role } from '@/util/repositories/roles'
+import { storeToRefs } from 'pinia'
 import { computed, inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import RoleForm from '@/components/roleplays/RoleForm.vue'
 import RoleplayForm from '@/components/roleplays/RoleplayForm.vue'
+import useAuthStore from '@/stores/auth'
 import { createRoleplay } from '@/util/repositories/roleplays'
 
-type RoleplayFormType = Omit<Roleplay, 'illustration' | 'id' | 'created_at'> & {
+type RoleplayFormType = Omit<Roleplay, 'id' | 'created_at' | 'illustration'> & {
     illustration: File | undefined
 }
 
@@ -17,6 +19,7 @@ type RoleFormType = Omit<Role, 'id' | 'roleplay_id' | 'created_at'>
 
 const router = useRouter()
 const toast = inject<Toast>('toast')
+const { user: currentUser } = storeToRefs(useAuthStore())
 
 const roleplay = ref<RoleplayFormType>({
     title: '',
@@ -41,17 +44,33 @@ const rolesForms = ref<InstanceType<typeof RoleForm>[]>([])
 const rolesValid = ref<boolean[]>([])
 
 const freeRoleUsed = computed(() => roles.value.some(role => role.is_free))
-const canSubmit = computed(() => roleplayValid.value && rolesValid.value.every(valid => valid))
+const canSubmit = computed(() =>
+    roleplayValid.value
+    && rolesValid.value.every(valid => valid)
+    && roleplay.value.illustration instanceof File,
+)
 
 function assignRoleRef(el: InstanceType<typeof RoleForm>, index: number) {
     rolesForms.value[index] = el
 }
 
 async function handleSubmit() {
+    if (!currentUser.value)
+        return
+    // Type guard to ensure illustration exists
+    if (!roleplay.value.illustration) {
+        toast?.showError('L\'illustration est requise')
+        return
+    }
+
     loading.value = true
     try {
-        const id = await createRoleplay(roleplay.value, roles.value)
-        // const id = await createRP(roleplay.value, roles.value)
+        const { illustration, ...rpData } = roleplay.value
+        const rpPayload = {
+            ...rpData,
+            user_id: currentUser.value?.id,
+        }
+        const id = await createRoleplay(rpPayload, illustration, roles.value)
         toast?.showSuccess('Roleplay créé avec succès')
         router.push({ name: 'user-roleplays-edit', params: { rpId: id } })
     }

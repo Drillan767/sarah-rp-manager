@@ -34,52 +34,70 @@ export async function listRpForUser(user: string) {
 }
 
 export async function createRoleplay(
-    rp: Omit<Roleplay, 'created_at' | 'illustration'>,
+    rp: Omit<Roleplay, 'id' | 'created_at' | 'illustration'>,
     image: File,
-    roles: Omit<Role, 'roleplay_id' | 'created_at'>[],
+    roles: Omit<Role, 'id' | 'roleplay_id' | 'created_at'>[],
 ) {
-    // Create initial roleplay
-    const { error: rpError, data: rpData } = await supabase
-        .from('roleplays')
-        .insert({
-            ...rp,
-            illustration: '',
-        })
-        .select()
+    let rpId: string | null = null
+    let uploadedFilePath: string | null = null
 
-    if (rpError || !rpData) {
-        console.error('Error inserting roleplay', rpData)
-        return
+    try {
+        // Create initial roleplay
+        const { error: rpError, data: rpData } = await supabase
+            .from('roleplays')
+            .insert({ ...rp, illustration: '' })
+            .select()
+
+        if (rpError || !rpData) {
+            throw new Error(`Failed to create roleplay: ${rpError?.message}`)
+        }
+
+        rpId = rpData[0].id
+
+        // Upload image
+        const { data: file, error: fileError } = await supabase.storage
+            .from('images')
+            .upload(`roleplays/${rpId}`, image, {
+                contentType: image.type,
+                cacheControl: '3600',
+            })
+
+        if (fileError || !file) {
+            throw new Error(`Failed to upload image: ${fileError?.message}`)
+        }
+
+        uploadedFilePath = file.fullPath
+
+        // Update rp with the file's path
+        const { error: updateError } = await supabase
+            .from('roleplays')
+            .update({ illustration: file.fullPath })
+            .eq('id', rpId)
+
+        if (updateError) {
+            throw new Error(`Failed to update illustration: ${updateError.message}`)
+        }
+
+        // Create roles
+        await createRoles(roles, rpId)
+
+        // Create default channels
+        await createDefaultChannels(rpId)
+
+        return rpId
     }
+    catch (error) {
+        // Cleanup: delete roleplay if it was created
+        if (rpId) {
+            await supabase.from('roleplays').delete().eq('id', rpId)
+        }
 
-    const rpId = rpData[0].id
+        // Cleanup: delete uploaded file if it exists
+        if (uploadedFilePath) {
+            await supabase.storage.from('images').remove([uploadedFilePath])
+        }
 
-    // Upload image
-    const { data: file, error: fileError } = await supabase.storage
-        .from('images')
-        .upload(`roleplays/${rpId}`, image, {
-            contentType: image.type,
-            cacheControl: '3600',
-        })
-
-    if (fileError || !file) {
-        console.error('Error uploading the image', fileError)
-        return
+        console.error('Error creating roleplay:', error)
+        throw error // Re-throw so caller knows it failed
     }
-
-    // Update rp with the file's path
-
-    await supabase
-        .from('roleplays')
-        .update({
-            illustration: file.fullPath,
-        })
-        .eq('id', rpId)
-
-    await createRoles(roles, rpId)
-
-    // Create default channels
-    await createDefaultChannels(rpId)
-
-    return rpId
 }
